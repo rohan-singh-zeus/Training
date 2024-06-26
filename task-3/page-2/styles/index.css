@@ -1,0 +1,86 @@
+@import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap");
+html,
+body {
+  /* width: 100%;
+  height: 100%; */
+  margin: 0px;
+  padding: 0px;
+  /* overflow-x: hidden; */
+  font-family: "Quicksand", sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+html .grid-item-1 .navLeft,
+body .grid-item-1 .navLeft {
+  display: flex;
+  align-items: center;
+}
+html .grid-item-1 .navLeft p,
+body .grid-item-1 .navLeft p {
+  font-size: 25px;
+  margin-left: 10px;
+}
+html .grid-item-1 .navLeft img,
+body .grid-item-1 .navLeft img {
+  height: 50px;
+  width: 50px;
+  margin-left: 24px;
+}
+html .grid-item-1 .navRight,
+body .grid-item-1 .navRight {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+html .grid-item-1 .navRight i,
+body .grid-item-1 .navRight i {
+  margin: 0px 30px;
+  display: none;
+}
+html .grid-item-1 .navRight li,
+body .grid-item-1 .navRight li {
+  /* margin: 0px 30px; */
+  color: #3fd28b;
+  list-style-type: none;
+  padding: 28px 25px;
+  font-weight: 600;
+}
+html .grid-item-1 .navRight li:hover,
+body .grid-item-1 .navRight li:hover {
+  color: white;
+  border-bottom: 5px solid white;
+}
+html .grid-item-1 .navRight div,
+body .grid-item-1 .navRight div {
+  display: flex;
+  height: 50px;
+  align-items: center;
+  position: relative;
+  padding: 18px 30px;
+}
+html .grid-item-1 .navRight div i,
+body .grid-item-1 .navRight div i {
+  font-size: 24px;
+  /* margin: 0px 30px; */
+}
+html .grid-item-1 .navRight div p,
+body .grid-item-1 .navRight div p {
+  position: absolute;
+  top: 5px;
+  right: 20px;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 20px;
+  width: 20px;
+  background-color: blue;
+  border-radius: 50%;
+  font-size: 15px;
+}
+html .grid-item-1 .navRight div .msg,
+body .grid-item-1 .navRight div .msg {
+  color: black;
+  background-color: white;
+  font-weight: bold;
+}/*# sourceMappingURL=index.css.map */
