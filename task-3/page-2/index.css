@@ -1,19 +1,22 @@
 @import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap");
 
-html,body {
-  width: 100%;
-  height: 100%;
+html,
+body {
+  /* width: 100%;
+  height: 100%; */
   margin: 0px;
   padding: 0px;
-  overflow-x: hidden;
+  /* overflow-x: hidden; */
   font-family: "Quicksand", sans-serif;
+  display: flex;
+  flex-direction: column;
 }
 
 .gridContainer {
   display: grid;
   max-height: 100vh;
   max-width: 100vw;
-  grid-template-rows: 6vh 84vh 5vh 5vh;
+  grid-template-rows: auto auto 5vh 5vh;
   background-color: black;
 }
 
@@ -23,11 +26,12 @@ html,body {
   color: white;
   align-items: center;
   justify-content: space-between;
+  padding: 0px 10px;
 }
 
-.navLeft{
-    display: flex;
-    align-items: center;
+.navLeft {
+  display: flex;
+  align-items: center;
 }
 
 .navLeft > p {
@@ -35,9 +39,10 @@ html,body {
   margin-left: 10px;
 }
 
-.navRight{
-    display: flex;
-    align-items: center;
+.navRight {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
 }
 
 .navLeft > img {
@@ -46,70 +51,71 @@ html,body {
   margin-left: 24px;
 }
 
-.navRight > li{
-  margin: 0px 30px;
-  color: #3FD28B;
+.navRight > li {
+  /* margin: 0px 30px; */
+  color: #3fd28b;
   list-style-type: none;
-  padding: 18px 0px;
+  padding: 28px 25px;
   font-weight: 600;
 }
 
-.navRight > li:hover{
+.navRight > li:hover {
   color: white;
   border-bottom: 5px solid white;
 }
 
-.navRight > div{
+.navRight > div {
   display: flex;
   align-items: center;
-  margin-right: 20px;
+  /* margin-right: 20px; */
 }
 
-.navRight > div > div{
+.navRight > div {
   display: flex;
   height: 50px;
   align-items: center;
   position: relative;
+  padding: 18px 30px;
 }
 
-.navRight > div > div > i{
+.navRight > div > i {
   font-size: 24px;
-  margin: 0px 30px;
+  /* margin: 0px 30px; */
 }
 
-.navRight > div > div> p{
+.navRight > div > p {
   position: absolute;
-  top: -10px;
+  top: 5px;
   right: 20px;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 20px;
-    width: 20px;
-    background-color: blue;
-    border-radius: 50%;
-    font-size: 15px;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 20px;
+  width: 20px;
+  background-color: blue;
+  border-radius: 50%;
+  font-size: 15px;
 }
 
-.navRight > div > div > .msg{
+.navRight > div > div > .msg {
   color: black;
   background-color: white;
   font-weight: bold;
 }
 
-.navRight > div > i{
+.navRight > i {
   margin: 0px 30px;
   display: none;
 }
 
 .grid-item-2 {
   background-color: #eeeeee;
-  display: flex;
+  /* display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: center; */
   padding: 32px;
-  flex-direction: column;
+  /* flex-direction: column; */
 }
 
 .courseHeader {
@@ -126,7 +132,7 @@ html,body {
   justify-content: center;
 }
 
-.courseHeader > div:hover{
+.courseHeader > div:hover {
   border-bottom: 5px solid black;
 }
 
@@ -200,10 +206,14 @@ html,body {
 
 .courseItems {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
   gap: 20px;
-  width: 100%;
-  overflow: auto;
+  /* width: 100%; */
+  /* display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  flex-wrap: wrap; */
+  /* overflow: auto; */
   padding: 20px 0px;
 }
 
@@ -214,54 +224,78 @@ html,body {
   display: flex;
   flex-direction: column;
   border-radius: 3px;
-  height: 346px;
+  /* height: 346px; */
   /* width: 50%; */
+  /* margin: 20px; */
+  /* height: 350px; */
+  /* height: fit-content; */
+  /* padding: 20px; */
+  /* max-width: 538px; */
   background-color: #ffffff;
   position: relative;
+  /* min-width: fit-content; */
 }
 
 .courseItemsMain {
   flex: 0.8;
   display: flex;
-  align-items: center;
+  /* align-items: center; */
+  padding: 30px;
   border-bottom: 1px solid rgb(212, 209, 209);
+  /* margin-top: 10px; */
+}
+
+.courseItemsMain > img{
+  height: 35px;
+  position: absolute;
+  top: 20px;
+  right: 10px;
 }
 
 .cimage {
-  flex: 0.28;
-  display: flex;
+  /* flex: 0.28; */
+  /* display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: center; */
+  /* position: absolute;
+  top: 20px;
+  left: 10px; */
+  /* padding: 5px; */
+}
+
+.cimage > img {
   background-repeat: no-repeat;
   object-fit: fill;
 }
 
-.cimage > img {
-  height: 210px;
-  width: 182px;
-}
-
 .cContents {
   width: 100%;
-  flex: 0.72;
-  display: flex;
+  /* flex: 0.72; */
+  /* display: flex;
   flex-direction: column;
   align-items: start;
-  justify-content: start;
+  justify-content: start; */
+  margin-left: 15px;
+  /* background-color: #D80000; */
   /* position: relative; */
+  /* position: absolute;
+  left: 180px;
+  top: 5px; */
   /* background-color: aqua; */
 }
 
-.cc-1{
-  font-size: 20px;
+.cc-1 {
+  font-size: 16px;
   color: #222222;
   font-weight: bold;
-  margin-top: 20px;
+  margin-top: 0px;
+  /* margin-top: 20px; */
+  /* width: 100%; */
 }
 
 .cc-2 {
   color: #666666;
-  font-size: 14px;
+  font-size: 12px;
   display: flex;
   align-items: center;
   margin-top: -10px;
@@ -273,7 +307,7 @@ html,body {
 
 .cc-3 {
   color: #666666;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .cc-3 > span {
@@ -282,12 +316,12 @@ html,body {
 
 .cc-4 > select {
   /* margin: 0px 15px; */
-  width: 400px;
+  width: 300px;
   border: none;
   background-color: transparent;
   border-bottom: 1px solid #e0e1e1;
   margin-top: 5px;
-  font-size: 20px;
+  font-size: 16px;
   padding: 2px 0px;
   color: #222222;
   font-weight: 500;
@@ -296,22 +330,23 @@ html,body {
 
 .cc-5 {
   color: #666666;
-  font-size: 14px;
+  font-size: 12px;
 }
 
-.cc-6{
-  position: absolute;
-  right: 30px;
-  top: 30px;
+.cc-6 {
+  /* position: absolute; */
+  /* right: 20px; */
+  /* top: 15px;
+  left: 320px; */
 }
 
-.cc-7{
-  color: #D80000;
-  background-color: #FFE4E6;
+.cc-7 {
+  color: #d80000;
+  background-color: #ffe4e6;
   padding: 3px 5px;
   position: absolute;
-  left: 0px;
   top: -16px;
+  left: 0px;
 }
 
 .courseItemsIcons {
@@ -319,14 +354,15 @@ html,body {
   display: flex;
   align-items: center;
   justify-content: space-evenly;
+  padding: 15px;
 }
 
-.courseItemsIcons > button{
+.courseItemsIcons > button {
   border: none;
   background-color: transparent;
 }
 
-.courseItemsIcons > button:disabled{
+.courseItemsIcons > button:disabled {
   opacity: 0.3;
 }
 
@@ -371,66 +407,9 @@ html,body {
   margin-left: 10px;
 }
 
-.textComp > span{
+.textComp > span {
   margin-left: 10px;
   font-weight: 700;
-}
-
-@media screen and (max-width: 320px){
-  .navLeft > p {
-    display: none;
-  }
-
-  .navRight > div > div{
-    display: none;
-  }
-}
-
-@media screen and (max-width: 1280px) {
-    .navRight > div > i{
-        display: inline-block;
-    }
-
-    .cimage > img{
-      height: 180px;
-      width: 140px;
-    }
-
-    .cContents{
-      margin-left: 10px;
-    }
-
-    .cc-1{
-      font-size: 18px;
-    }
-
-    .cc-2{
-      font-size: 12px;
-    }
-
-    .cc-3{
-      font-size: 12px;
-    }
-
-    .courseItems{
-        grid-template-columns: 1fr;
-    }
-
-    .navRight > li{
-      display: none;
-    }
-
-    .textComp > p{
-      font-size: 12px;
-    }
-
-    .textComp > span{
-      font-size: 11px;
-    }
-
-    .cimage{
-      margin-top: -30px;
-    }
 }
 
 /* width */
@@ -451,4 +430,49 @@ html,body {
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
+}
+
+@media only screen and (max-width: 768px){
+  .navRight > li{
+    display: none;
+  }
+  .navRight > i{
+    display: inline-block;
+  }
+}
+
+@media only screen and (max-width: 1094px) and (min-width: 768px){
+  .courseItems{
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .citem-1, .citem-2, .citem-3, .citem-4{
+    margin: 0px;
+    min-width: fit-content;
+  }
+
+  .cContents{
+    padding: 10px;
+  }
+
+  .cc-4 > select{
+    width: 100%;
+  }
+
+  .cimage > img{
+    height: 150px;
+    width: 130px;
+  }
+
+  .navRight > li{
+    padding: 28px 10px;
+  }
+
+  .navRight > div{
+    padding: 20px 15px;
+  }
+
+  .navRight > div > p{
+    right: 0;
+  }
 }
