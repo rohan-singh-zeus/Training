@@ -7,109 +7,105 @@ body {
   padding: 0px;
   overflow-x: hidden;
   font-family: "Quicksand", sans-serif;
+  display: flex;
+  flex-direction: column;
 }
-html .gridContainer,
-body .gridContainer {
-  display: grid;
-  grid-template-rows: 6vh 84vh 5vh 5vh;
-  background-color: black;
-}
-html .gridContainer .grid-item-1,
-body .gridContainer .grid-item-1 {
+html .grid-item-1,
+body .grid-item-1 {
   background-color: #222222;
   display: flex;
   color: white;
   align-items: center;
 }
-html .gridContainer .grid-item-1 p,
-body .gridContainer .grid-item-1 p {
+html .grid-item-1 p,
+body .grid-item-1 p {
   font-size: 25px;
   margin-left: 10px;
 }
-html .gridContainer .grid-item-1 img,
-body .gridContainer .grid-item-1 img {
+html .grid-item-1 img,
+body .grid-item-1 img {
   height: 50px;
   width: 50px;
   margin-left: 24px;
 }
-html .gridContainer .grid-item-2,
-body .gridContainer .grid-item-2 {
+html .grid-item-2,
+body .grid-item-2 {
   background-color: #eeeeee;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-html .gridContainer .grid-item-2 .formContainer,
-body .gridContainer .grid-item-2 .formContainer {
+html .grid-item-2 .formContainer,
+body .grid-item-2 .formContainer {
   background-color: #ffffff;
   height: 600px;
   width: 488px;
   border-top: 2px #3ac7ec;
 }
-html .gridContainer .grid-item-2 .formContainer .formHeader,
-body .gridContainer .grid-item-2 .formContainer .formHeader {
+html .grid-item-2 .formContainer .formHeader,
+body .grid-item-2 .formContainer .formHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
-html .gridContainer .grid-item-2 .formContainer .formHeader img,
-body .gridContainer .grid-item-2 .formContainer .formHeader img {
+html .grid-item-2 .formContainer .formHeader img,
+body .grid-item-2 .formContainer .formHeader img {
   height: 26px;
   width: 17px;
   margin-left: 32px;
 }
-html .gridContainer .grid-item-2 .formContainer .formHeader p,
-body .gridContainer .grid-item-2 .formContainer .formHeader p {
+html .grid-item-2 .formContainer .formHeader p,
+body .grid-item-2 .formContainer .formHeader p {
   color: #222222;
   font-size: 24px;
   font-weight: 500;
   margin-left: -30px;
 }
-html .gridContainer .grid-item-2 .formContainer .formRadio,
-body .gridContainer .grid-item-2 .formContainer .formRadio {
+html .grid-item-2 .formContainer .formRadio,
+body .grid-item-2 .formContainer .formRadio {
   display: flex;
   align-items: center;
   margin-top: 10px;
 }
-html .gridContainer .grid-item-2 .formContainer .formRadio div,
-body .gridContainer .grid-item-2 .formContainer .formRadio div {
+html .grid-item-2 .formContainer .formRadio div,
+body .grid-item-2 .formContainer .formRadio div {
   margin-left: 25px;
   display: flex;
   align-items: center;
 }
-html .gridContainer .grid-item-2 .formContainer .formRadio div label,
-body .gridContainer .grid-item-2 .formContainer .formRadio div label {
+html .grid-item-2 .formContainer .formRadio div label,
+body .grid-item-2 .formContainer .formRadio div label {
   color: #333333;
   font-size: 18px;
   font-weight: 500;
   margin-left: 8px;
 }
-html .gridContainer .grid-item-2 .formContainer .formRadio div input,
-body .gridContainer .grid-item-2 .formContainer .formRadio div input {
+html .grid-item-2 .formContainer .formRadio div input,
+body .grid-item-2 .formContainer .formRadio div input {
   accent-color: #1f7a54;
   height: 20px;
   width: 24px;
 }
-html .gridContainer .grid-item-2 .formContainer .formSelectors,
-body .gridContainer .grid-item-2 .formContainer .formSelectors {
+html .grid-item-2 .formContainer .formSelectors,
+body .grid-item-2 .formContainer .formSelectors {
   display: flex;
   flex-direction: column;
   justify-content: start;
   padding: 32px;
 }
-html .gridContainer .grid-item-2 .formContainer .formSelectors div,
-body .gridContainer .grid-item-2 .formContainer .formSelectors div {
+html .grid-item-2 .formContainer .formSelectors div,
+body .grid-item-2 .formContainer .formSelectors div {
   display: flex;
   flex-direction: column;
   padding: 20px 0px;
 }
-html .gridContainer .grid-item-2 .formContainer .formSelectors div label,
-body .gridContainer .grid-item-2 .formContainer .formSelectors div label {
+html .grid-item-2 .formContainer .formSelectors div label,
+body .grid-item-2 .formContainer .formSelectors div label {
   color: #666666;
   font-size: 12px;
 }
-html .gridContainer .grid-item-2 .formContainer .formSelectors div select,
-body .gridContainer .grid-item-2 .formContainer .formSelectors div select {
+html .grid-item-2 .formContainer .formSelectors div select,
+body .grid-item-2 .formContainer .formSelectors div select {
   border: none;
   border-bottom: 1px solid #e0e1e1;
   margin-top: 5px;
@@ -119,8 +115,8 @@ body .gridContainer .grid-item-2 .formContainer .formSelectors div select {
   font-weight: 500;
   outline: none;
 }
-html .gridContainer .grid-item-2 .formContainer .formInputs,
-body .gridContainer .grid-item-2 .formContainer .formInputs {
+html .grid-item-2 .formContainer .formInputs,
+body .grid-item-2 .formContainer .formInputs {
   display: flex;
   flex-direction: column;
   justify-content: start;
@@ -128,62 +124,62 @@ body .gridContainer .grid-item-2 .formContainer .formInputs {
   position: relative;
   /* background-color: #3ac7ec; */
 }
-html .gridContainer .grid-item-2 .formContainer .formInputs div input,
-body .gridContainer .grid-item-2 .formContainer .formInputs div input {
+html .grid-item-2 .formContainer .formInputs div input,
+body .grid-item-2 .formContainer .formInputs div input {
   width: 100%;
   border: none;
   border-bottom: 1px solid #e0e1e1;
   padding: 3px;
   outline: none;
 }
-html .gridContainer .grid-item-2 .formContainer .formInputs div input::-moz-placeholder, body .gridContainer .grid-item-2 .formContainer .formInputs div input::-moz-placeholder {
+html .grid-item-2 .formContainer .formInputs div input::-moz-placeholder, body .grid-item-2 .formContainer .formInputs div input::-moz-placeholder {
   color: #666666;
   font-size: 16px;
 }
-html .gridContainer .grid-item-2 .formContainer .formInputs div input::placeholder,
-body .gridContainer .grid-item-2 .formContainer .formInputs div input::placeholder {
+html .grid-item-2 .formContainer .formInputs div input::placeholder,
+body .grid-item-2 .formContainer .formInputs div input::placeholder {
   color: #666666;
   font-size: 16px;
 }
-html .gridContainer .grid-item-2 .formContainer .formInputs div p,
-body .gridContainer .grid-item-2 .formContainer .formInputs div p {
+html .grid-item-2 .formContainer .formInputs div p,
+body .grid-item-2 .formContainer .formInputs div p {
   color: #1f7a54;
   font-size: 14px;
   font-weight: 500;
   text-align: right;
 }
-html .gridContainer .grid-item-2 .formContainer .formInputs .forgotEye,
-body .gridContainer .grid-item-2 .formContainer .formInputs .forgotEye {
+html .grid-item-2 .formContainer .formInputs .forgotEye,
+body .grid-item-2 .formContainer .formInputs .forgotEye {
   position: absolute;
   top: 50%;
   right: 30px;
 }
-html .gridContainer .grid-item-2 .formContainer .formRemember,
-body .gridContainer .grid-item-2 .formContainer .formRemember {
+html .grid-item-2 .formContainer .formRemember,
+body .grid-item-2 .formContainer .formRemember {
   padding: 5px 32px;
   display: flex;
   align-items: center;
 }
-html .gridContainer .grid-item-2 .formContainer .formRemember label,
-body .gridContainer .grid-item-2 .formContainer .formRemember label {
+html .grid-item-2 .formContainer .formRemember label,
+body .grid-item-2 .formContainer .formRemember label {
   color: #222222;
   font-size: 16px;
   font-weight: 500;
   margin-left: 5px;
 }
-html .gridContainer .grid-item-2 .formContainer .formRemember input[type=checkbox],
-body .gridContainer .grid-item-2 .formContainer .formRemember input[type=checkbox] {
+html .grid-item-2 .formContainer .formRemember input[type=checkbox],
+body .grid-item-2 .formContainer .formRemember input[type=checkbox] {
   accent-color: #1f7a54;
 }
-html .gridContainer .grid-item-2 .formContainer .formBtn,
-body .gridContainer .grid-item-2 .formContainer .formBtn {
+html .grid-item-2 .formContainer .formBtn,
+body .grid-item-2 .formContainer .formBtn {
   display: flex;
   align-items: center;
   justify-content: center;
   margin-top: 30px;
 }
-html .gridContainer .grid-item-2 .formContainer .formBtn button,
-body .gridContainer .grid-item-2 .formContainer .formBtn button {
+html .grid-item-2 .formContainer .formBtn button,
+body .grid-item-2 .formContainer .formBtn button {
   height: 40px;
   width: 216px;
   color: #1f2834;
@@ -191,61 +187,61 @@ body .gridContainer .grid-item-2 .formContainer .formBtn button {
   border: none;
   box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.2392156863);
 }
-html .gridContainer .grid-item-3,
-body .gridContainer .grid-item-3 {
+html .grid-item-3,
+body .grid-item-3 {
   background-color: #eeeeee;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-html .gridContainer .grid-item-3 p,
-body .gridContainer .grid-item-3 p {
+html .grid-item-3 p,
+body .grid-item-3 p {
   margin-left: 20px;
   color: #1f7a54;
   font-size: 18px;
   font-weight: normal;
 }
-html .gridContainer .grid-item-4,
-body .gridContainer .grid-item-4 {
+html .grid-item-4,
+body .grid-item-4 {
   background-color: #e0e1e1;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-html .gridContainer .grid-item-4 img,
-body .gridContainer .grid-item-4 img {
+html .grid-item-4 img,
+body .grid-item-4 img {
   height: 40px;
   width: 40px;
 }
-html .gridContainer .grid-item-4 .quantum,
-body .gridContainer .grid-item-4 .quantum {
+html .grid-item-4 .quantum,
+body .grid-item-4 .quantum {
   font-size: 20px;
   font-weight: bold;
 }
-html .gridContainer .grid-item-4 .textComp,
-body .gridContainer .grid-item-4 .textComp {
+html .grid-item-4 .textComp,
+body .grid-item-4 .textComp {
   display: flex;
   align-items: center;
   margin-left: 32px;
 }
-html .gridContainer .grid-item-4 .textComp p,
-body .gridContainer .grid-item-4 .textComp p {
+html .grid-item-4 .textComp p,
+body .grid-item-4 .textComp p {
   margin-left: 10px;
 }
 @media screen and (max-width: 1024px) {
-  html .gridContainer .grid-item-4 .textComp p,
-  body .gridContainer .grid-item-4 .textComp p {
+  html .grid-item-4 .textComp p,
+  body .grid-item-4 .textComp p {
     font-size: 12px;
   }
 }
-html .gridContainer .grid-item-4 .textComp span,
-body .gridContainer .grid-item-4 .textComp span {
+html .grid-item-4 .textComp span,
+body .grid-item-4 .textComp span {
   margin-left: 10px;
   font-weight: 700;
 }
 @media screen and (max-width: 1024px) {
-  html .gridContainer .grid-item-4 .textComp span,
-  body .gridContainer .grid-item-4 .textComp span {
+  html .grid-item-4 .textComp span,
+  body .grid-item-4 .textComp span {
     font-size: 11px;
   }
 }/*# sourceMappingURL=index.css.map */
