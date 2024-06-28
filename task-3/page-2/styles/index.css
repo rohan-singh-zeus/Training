@@ -170,7 +170,7 @@ body .grid-item-1 .navRight .dashboard-2 {
   height: 582px;
   width: 320px;
   top: 85px;
-  right: 150px;
+  right: 200px;
   padding: 0;
   z-index: 999;
   color: #1f7a54;
@@ -216,6 +216,7 @@ body .grid-item-1 .navRight .dashboard-2 .db-list .ashish .para-1 {
   margin: 0;
   background-color: white;
   color: black;
+  font-weight: 600;
 }
 html .grid-item-1 .navRight .dashboard-2 .db-list .ashish .para-2,
 body .grid-item-1 .navRight .dashboard-2 .db-list .ashish .para-2 {
@@ -223,6 +224,7 @@ body .grid-item-1 .navRight .dashboard-2 .db-list .ashish .para-2 {
   margin: 0;
   background-color: white;
   color: black;
+  font-weight: 700;
 }
 html .grid-item-1 .navRight .dashboard-2 .db-list .ashish .para-bottom,
 body .grid-item-1 .navRight .dashboard-2 .db-list .ashish .para-bottom {
@@ -239,14 +241,14 @@ body .grid-item-1 .navRight .dashboard-2 .db-list .ashish .para-3 {
   font-size: 10px;
   margin: 0;
   background-color: white;
-  color: black;
+  color: #6e6e6e;
 }
 html .grid-item-1 .navRight .dashboard-2 .db-list .ashish .para-4,
 body .grid-item-1 .navRight .dashboard-2 .db-list .ashish .para-4 {
   font-size: 10px;
   margin: 0;
   background-color: white;
-  color: black;
+  color: #6e6e6e;
 }
 html .grid-item-1 .navRight .dashboard-2 .db-buttons,
 body .grid-item-1 .navRight .dashboard-2 .db-buttons {
@@ -258,6 +260,104 @@ body .grid-item-1 .navRight .dashboard-2 .db-buttons {
 html .grid-item-1 .navRight .dashboard-2 .db-buttons button,
 body .grid-item-1 .navRight .dashboard-2 .db-buttons button {
   flex: 0.5;
+  color: #1f7a54;
+  font-size: 14px;
+  border: none;
+  background-color: #ffffff;
+  padding: 10px;
+  box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.2392156863);
+}
+html .grid-item-1 .navRight .dashboard-3,
+body .grid-item-1 .navRight .dashboard-3 {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  justify-content: space-between;
+  position: absolute;
+  background-color: #ffffff;
+  height: 582px;
+  width: 350px;
+  top: 85px;
+  right: 280px;
+  padding: 0;
+  z-index: 999;
+  color: #1f7a54;
+  box-shadow: 2px 2px 15px #888888;
+  font-size: 16px;
+}
+html .grid-item-1 .navRight .dashboard-3 .db2-list,
+body .grid-item-1 .navRight .dashboard-3 .db2-list {
+  flex: 0.75;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  width: 100%;
+  min-height: 100%;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  padding: 0;
+}
+html .grid-item-1 .navRight .dashboard-3 .db2-list .ashish,
+body .grid-item-1 .navRight .dashboard-3 .db2-list .ashish {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  width: 100%;
+  padding: 10px 5px;
+  height: -moz-fit-content;
+  height: fit-content;
+  border-bottom: 1px solid gray;
+}
+html .grid-item-1 .navRight .dashboard-3 .db2-list .ashish p,
+body .grid-item-1 .navRight .dashboard-3 .db2-list .ashish p {
+  position: relative;
+  top: 0;
+  right: 0;
+  width: 100%;
+  padding: 0px 10px;
+  display: flex;
+  align-items: start;
+  justify-content: start;
+}
+html .grid-item-1 .navRight .dashboard-3 .db2-list .ashish .para-1,
+body .grid-item-1 .navRight .dashboard-3 .db2-list .ashish .para-1 {
+  font-size: 14px;
+  margin: 0;
+  background-color: white;
+  color: black;
+  font-weight: 700;
+}
+html .grid-item-1 .navRight .dashboard-3 .db2-list .ashish .para-2,
+body .grid-item-1 .navRight .dashboard-3 .db2-list .ashish .para-2 {
+  font-size: 12px;
+  margin: 0;
+  background-color: white;
+  color: black;
+  font-weight: 600;
+}
+html .grid-item-1 .navRight .dashboard-3 .db2-list .ashish .para-3,
+body .grid-item-1 .navRight .dashboard-3 .db2-list .ashish .para-3 {
+  font-size: 12px;
+  margin: 0;
+  background-color: white;
+  color: #6e6e6e;
+}
+html .grid-item-1 .navRight .dashboard-3 .db2-buttons,
+body .grid-item-1 .navRight .dashboard-3 .db2-buttons {
+  flex: 0.25;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}
+html .grid-item-1 .navRight .dashboard-3 .db2-buttons button,
+body .grid-item-1 .navRight .dashboard-3 .db2-buttons button {
+  flex: 1;
+  color: #1f7a54;
+  font-size: 14px;
+  border: none;
+  background-color: #ffffff;
+  padding: 10px;
+  box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.2392156863);
 }
 html .grid-item-2,
 body .grid-item-2 {
@@ -357,148 +457,76 @@ body .grid-item-2 .courseItems {
   gap: 20px;
   padding: 20px 0px;
 }
-html .grid-item-2 .courseItems .citem-1,
-html .grid-item-2 .courseItems .citem-2,
-html .grid-item-2 .courseItems .citem-3,
-html .grid-item-2 .courseItems .citem-4,
-body .grid-item-2 .courseItems .citem-1,
-body .grid-item-2 .courseItems .citem-2,
-body .grid-item-2 .courseItems .citem-3,
-body .grid-item-2 .courseItems .citem-4 {
+html .grid-item-2 .courseItems .card,
+body .grid-item-2 .courseItems .card {
   display: flex;
   flex-direction: column;
   border-radius: 3px;
   background-color: #ffffff;
   position: relative;
 }
-html .grid-item-2 .courseItems .citem-1 .courseItemsMain,
-html .grid-item-2 .courseItems .citem-2 .courseItemsMain,
-html .grid-item-2 .courseItems .citem-3 .courseItemsMain,
-html .grid-item-2 .courseItems .citem-4 .courseItemsMain,
-body .grid-item-2 .courseItems .citem-1 .courseItemsMain,
-body .grid-item-2 .courseItems .citem-2 .courseItemsMain,
-body .grid-item-2 .courseItems .citem-3 .courseItemsMain,
-body .grid-item-2 .courseItems .citem-4 .courseItemsMain {
+html .grid-item-2 .courseItems .card .courseItemsMain,
+body .grid-item-2 .courseItems .card .courseItemsMain {
   flex: 0.8;
   display: flex;
   padding: 30px;
   border-bottom: 1px solid rgb(212, 209, 209);
 }
-html .grid-item-2 .courseItems .citem-1 .courseItemsMain .star,
-html .grid-item-2 .courseItems .citem-2 .courseItemsMain .star,
-html .grid-item-2 .courseItems .citem-3 .courseItemsMain .star,
-html .grid-item-2 .courseItems .citem-4 .courseItemsMain .star,
-body .grid-item-2 .courseItems .citem-1 .courseItemsMain .star,
-body .grid-item-2 .courseItems .citem-2 .courseItemsMain .star,
-body .grid-item-2 .courseItems .citem-3 .courseItemsMain .star,
-body .grid-item-2 .courseItems .citem-4 .courseItemsMain .star {
+html .grid-item-2 .courseItems .card .courseItemsMain .star,
+body .grid-item-2 .courseItems .card .courseItemsMain .star {
   height: 35px;
   position: absolute;
   top: 20px;
   right: 10px;
 }
-html .grid-item-2 .courseItems .citem-1 .courseItemsMain .cimage img,
-html .grid-item-2 .courseItems .citem-2 .courseItemsMain .cimage img,
-html .grid-item-2 .courseItems .citem-3 .courseItemsMain .cimage img,
-html .grid-item-2 .courseItems .citem-4 .courseItemsMain .cimage img,
-body .grid-item-2 .courseItems .citem-1 .courseItemsMain .cimage img,
-body .grid-item-2 .courseItems .citem-2 .courseItemsMain .cimage img,
-body .grid-item-2 .courseItems .citem-3 .courseItemsMain .cimage img,
-body .grid-item-2 .courseItems .citem-4 .courseItemsMain .cimage img {
+html .grid-item-2 .courseItems .card .courseItemsMain .cimage img,
+body .grid-item-2 .courseItems .card .courseItemsMain .cimage img {
   background-repeat: no-repeat;
   -o-object-fit: fill;
      object-fit: fill;
 }
 @media only screen and (max-width: 1094px) and (min-width: 768px) {
-  html .grid-item-2 .courseItems .citem-1 .courseItemsMain .cimage img,
-  html .grid-item-2 .courseItems .citem-2 .courseItemsMain .cimage img,
-  html .grid-item-2 .courseItems .citem-3 .courseItemsMain .cimage img,
-  html .grid-item-2 .courseItems .citem-4 .courseItemsMain .cimage img,
-  body .grid-item-2 .courseItems .citem-1 .courseItemsMain .cimage img,
-  body .grid-item-2 .courseItems .citem-2 .courseItemsMain .cimage img,
-  body .grid-item-2 .courseItems .citem-3 .courseItemsMain .cimage img,
-  body .grid-item-2 .courseItems .citem-4 .courseItemsMain .cimage img {
+  html .grid-item-2 .courseItems .card .courseItemsMain .cimage img,
+  body .grid-item-2 .courseItems .card .courseItemsMain .cimage img {
     height: 150px;
     width: 130px;
   }
 }
-html .grid-item-2 .courseItems .citem-1 .courseItemsMain .cContents,
-html .grid-item-2 .courseItems .citem-2 .courseItemsMain .cContents,
-html .grid-item-2 .courseItems .citem-3 .courseItemsMain .cContents,
-html .grid-item-2 .courseItems .citem-4 .courseItemsMain .cContents,
-body .grid-item-2 .courseItems .citem-1 .courseItemsMain .cContents,
-body .grid-item-2 .courseItems .citem-2 .courseItemsMain .cContents,
-body .grid-item-2 .courseItems .citem-3 .courseItemsMain .cContents,
-body .grid-item-2 .courseItems .citem-4 .courseItemsMain .cContents {
+html .grid-item-2 .courseItems .card .courseItemsMain .cContents,
+body .grid-item-2 .courseItems .card .courseItemsMain .cContents {
   width: 100%;
   margin-left: 15px;
 }
-html .grid-item-2 .courseItems .citem-1 .courseItemsMain .cContents .cc-1,
-html .grid-item-2 .courseItems .citem-2 .courseItemsMain .cContents .cc-1,
-html .grid-item-2 .courseItems .citem-3 .courseItemsMain .cContents .cc-1,
-html .grid-item-2 .courseItems .citem-4 .courseItemsMain .cContents .cc-1,
-body .grid-item-2 .courseItems .citem-1 .courseItemsMain .cContents .cc-1,
-body .grid-item-2 .courseItems .citem-2 .courseItemsMain .cContents .cc-1,
-body .grid-item-2 .courseItems .citem-3 .courseItemsMain .cContents .cc-1,
-body .grid-item-2 .courseItems .citem-4 .courseItemsMain .cContents .cc-1 {
+html .grid-item-2 .courseItems .card .courseItemsMain .cContents .cc-1,
+body .grid-item-2 .courseItems .card .courseItemsMain .cContents .cc-1 {
   font-size: 16px;
   color: #222222;
   font-weight: bold;
   margin-top: 0px;
 }
-html .grid-item-2 .courseItems .citem-1 .courseItemsMain .cContents .cc-2,
-html .grid-item-2 .courseItems .citem-2 .courseItemsMain .cContents .cc-2,
-html .grid-item-2 .courseItems .citem-3 .courseItemsMain .cContents .cc-2,
-html .grid-item-2 .courseItems .citem-4 .courseItemsMain .cContents .cc-2,
-body .grid-item-2 .courseItems .citem-1 .courseItemsMain .cContents .cc-2,
-body .grid-item-2 .courseItems .citem-2 .courseItemsMain .cContents .cc-2,
-body .grid-item-2 .courseItems .citem-3 .courseItemsMain .cContents .cc-2,
-body .grid-item-2 .courseItems .citem-4 .courseItemsMain .cContents .cc-2 {
+html .grid-item-2 .courseItems .card .courseItemsMain .cContents .cc-2,
+body .grid-item-2 .courseItems .card .courseItemsMain .cContents .cc-2 {
   color: #666666;
   font-size: 12px;
   display: flex;
   align-items: center;
   margin-top: -10px;
 }
-html .grid-item-2 .courseItems .citem-1 .courseItemsMain .cContents .cc-2 span,
-html .grid-item-2 .courseItems .citem-2 .courseItemsMain .cContents .cc-2 span,
-html .grid-item-2 .courseItems .citem-3 .courseItemsMain .cContents .cc-2 span,
-html .grid-item-2 .courseItems .citem-4 .courseItemsMain .cContents .cc-2 span,
-body .grid-item-2 .courseItems .citem-1 .courseItemsMain .cContents .cc-2 span,
-body .grid-item-2 .courseItems .citem-2 .courseItemsMain .cContents .cc-2 span,
-body .grid-item-2 .courseItems .citem-3 .courseItemsMain .cContents .cc-2 span,
-body .grid-item-2 .courseItems .citem-4 .courseItemsMain .cContents .cc-2 span {
+html .grid-item-2 .courseItems .card .courseItemsMain .cContents .cc-2 span,
+body .grid-item-2 .courseItems .card .courseItemsMain .cContents .cc-2 span {
   color: #1f7a54;
 }
-html .grid-item-2 .courseItems .citem-1 .courseItemsMain .cContents .cc-3,
-html .grid-item-2 .courseItems .citem-2 .courseItemsMain .cContents .cc-3,
-html .grid-item-2 .courseItems .citem-3 .courseItemsMain .cContents .cc-3,
-html .grid-item-2 .courseItems .citem-4 .courseItemsMain .cContents .cc-3,
-body .grid-item-2 .courseItems .citem-1 .courseItemsMain .cContents .cc-3,
-body .grid-item-2 .courseItems .citem-2 .courseItemsMain .cContents .cc-3,
-body .grid-item-2 .courseItems .citem-3 .courseItemsMain .cContents .cc-3,
-body .grid-item-2 .courseItems .citem-4 .courseItemsMain .cContents .cc-3 {
+html .grid-item-2 .courseItems .card .courseItemsMain .cContents .cc-3,
+body .grid-item-2 .courseItems .card .courseItemsMain .cContents .cc-3 {
   color: #666666;
   font-size: 12px;
 }
-html .grid-item-2 .courseItems .citem-1 .courseItemsMain .cContents .cc-3 span,
-html .grid-item-2 .courseItems .citem-2 .courseItemsMain .cContents .cc-3 span,
-html .grid-item-2 .courseItems .citem-3 .courseItemsMain .cContents .cc-3 span,
-html .grid-item-2 .courseItems .citem-4 .courseItemsMain .cContents .cc-3 span,
-body .grid-item-2 .courseItems .citem-1 .courseItemsMain .cContents .cc-3 span,
-body .grid-item-2 .courseItems .citem-2 .courseItemsMain .cContents .cc-3 span,
-body .grid-item-2 .courseItems .citem-3 .courseItemsMain .cContents .cc-3 span,
-body .grid-item-2 .courseItems .citem-4 .courseItemsMain .cContents .cc-3 span {
+html .grid-item-2 .courseItems .card .courseItemsMain .cContents .cc-3 span,
+body .grid-item-2 .courseItems .card .courseItemsMain .cContents .cc-3 span {
   font-weight: bold;
 }
-html .grid-item-2 .courseItems .citem-1 .courseItemsMain .cContents .cc-4 select,
-html .grid-item-2 .courseItems .citem-2 .courseItemsMain .cContents .cc-4 select,
-html .grid-item-2 .courseItems .citem-3 .courseItemsMain .cContents .cc-4 select,
-html .grid-item-2 .courseItems .citem-4 .courseItemsMain .cContents .cc-4 select,
-body .grid-item-2 .courseItems .citem-1 .courseItemsMain .cContents .cc-4 select,
-body .grid-item-2 .courseItems .citem-2 .courseItemsMain .cContents .cc-4 select,
-body .grid-item-2 .courseItems .citem-3 .courseItemsMain .cContents .cc-4 select,
-body .grid-item-2 .courseItems .citem-4 .courseItemsMain .cContents .cc-4 select {
+html .grid-item-2 .courseItems .card .courseItemsMain .cContents .cc-4 select,
+body .grid-item-2 .courseItems .card .courseItemsMain .cContents .cc-4 select {
   width: 300px;
   border: none;
   background-color: transparent;
@@ -511,36 +539,18 @@ body .grid-item-2 .courseItems .citem-4 .courseItemsMain .cContents .cc-4 select
   outline: none;
 }
 @media only screen and (max-width: 1094px) and (min-width: 768px) {
-  html .grid-item-2 .courseItems .citem-1 .courseItemsMain .cContents .cc-4 select,
-  html .grid-item-2 .courseItems .citem-2 .courseItemsMain .cContents .cc-4 select,
-  html .grid-item-2 .courseItems .citem-3 .courseItemsMain .cContents .cc-4 select,
-  html .grid-item-2 .courseItems .citem-4 .courseItemsMain .cContents .cc-4 select,
-  body .grid-item-2 .courseItems .citem-1 .courseItemsMain .cContents .cc-4 select,
-  body .grid-item-2 .courseItems .citem-2 .courseItemsMain .cContents .cc-4 select,
-  body .grid-item-2 .courseItems .citem-3 .courseItemsMain .cContents .cc-4 select,
-  body .grid-item-2 .courseItems .citem-4 .courseItemsMain .cContents .cc-4 select {
+  html .grid-item-2 .courseItems .card .courseItemsMain .cContents .cc-4 select,
+  body .grid-item-2 .courseItems .card .courseItemsMain .cContents .cc-4 select {
     width: 100%;
   }
 }
-html .grid-item-2 .courseItems .citem-1 .courseItemsMain .cContents .cc-5,
-html .grid-item-2 .courseItems .citem-2 .courseItemsMain .cContents .cc-5,
-html .grid-item-2 .courseItems .citem-3 .courseItemsMain .cContents .cc-5,
-html .grid-item-2 .courseItems .citem-4 .courseItemsMain .cContents .cc-5,
-body .grid-item-2 .courseItems .citem-1 .courseItemsMain .cContents .cc-5,
-body .grid-item-2 .courseItems .citem-2 .courseItemsMain .cContents .cc-5,
-body .grid-item-2 .courseItems .citem-3 .courseItemsMain .cContents .cc-5,
-body .grid-item-2 .courseItems .citem-4 .courseItemsMain .cContents .cc-5 {
+html .grid-item-2 .courseItems .card .courseItemsMain .cContents .cc-5,
+body .grid-item-2 .courseItems .card .courseItemsMain .cContents .cc-5 {
   color: #666666;
   font-size: 12px;
 }
-html .grid-item-2 .courseItems .citem-1 .courseItemsMain .cContents .cc-7,
-html .grid-item-2 .courseItems .citem-2 .courseItemsMain .cContents .cc-7,
-html .grid-item-2 .courseItems .citem-3 .courseItemsMain .cContents .cc-7,
-html .grid-item-2 .courseItems .citem-4 .courseItemsMain .cContents .cc-7,
-body .grid-item-2 .courseItems .citem-1 .courseItemsMain .cContents .cc-7,
-body .grid-item-2 .courseItems .citem-2 .courseItemsMain .cContents .cc-7,
-body .grid-item-2 .courseItems .citem-3 .courseItemsMain .cContents .cc-7,
-body .grid-item-2 .courseItems .citem-4 .courseItemsMain .cContents .cc-7 {
+html .grid-item-2 .courseItems .card .courseItemsMain .cContents .cc-7,
+body .grid-item-2 .courseItems .card .courseItemsMain .cContents .cc-7 {
   color: #d80000;
   background-color: #ffe4e6;
   padding: 3px 5px;
@@ -549,61 +559,31 @@ body .grid-item-2 .courseItems .citem-4 .courseItemsMain .cContents .cc-7 {
   left: 0px;
 }
 @media only screen and (max-width: 1094px) and (min-width: 768px) {
-  html .grid-item-2 .courseItems .citem-1 .courseItemsMain .cContents,
-  html .grid-item-2 .courseItems .citem-2 .courseItemsMain .cContents,
-  html .grid-item-2 .courseItems .citem-3 .courseItemsMain .cContents,
-  html .grid-item-2 .courseItems .citem-4 .courseItemsMain .cContents,
-  body .grid-item-2 .courseItems .citem-1 .courseItemsMain .cContents,
-  body .grid-item-2 .courseItems .citem-2 .courseItemsMain .cContents,
-  body .grid-item-2 .courseItems .citem-3 .courseItemsMain .cContents,
-  body .grid-item-2 .courseItems .citem-4 .courseItemsMain .cContents {
+  html .grid-item-2 .courseItems .card .courseItemsMain .cContents,
+  body .grid-item-2 .courseItems .card .courseItemsMain .cContents {
     padding: 10px;
   }
 }
-html .grid-item-2 .courseItems .citem-1 .courseItemsIcons,
-html .grid-item-2 .courseItems .citem-2 .courseItemsIcons,
-html .grid-item-2 .courseItems .citem-3 .courseItemsIcons,
-html .grid-item-2 .courseItems .citem-4 .courseItemsIcons,
-body .grid-item-2 .courseItems .citem-1 .courseItemsIcons,
-body .grid-item-2 .courseItems .citem-2 .courseItemsIcons,
-body .grid-item-2 .courseItems .citem-3 .courseItemsIcons,
-body .grid-item-2 .courseItems .citem-4 .courseItemsIcons {
+html .grid-item-2 .courseItems .card .courseItemsIcons,
+body .grid-item-2 .courseItems .card .courseItemsIcons {
   flex: 0.2;
   display: flex;
   align-items: center;
   justify-content: space-evenly;
   padding: 15px;
 }
-html .grid-item-2 .courseItems .citem-1 .courseItemsIcons button,
-html .grid-item-2 .courseItems .citem-2 .courseItemsIcons button,
-html .grid-item-2 .courseItems .citem-3 .courseItemsIcons button,
-html .grid-item-2 .courseItems .citem-4 .courseItemsIcons button,
-body .grid-item-2 .courseItems .citem-1 .courseItemsIcons button,
-body .grid-item-2 .courseItems .citem-2 .courseItemsIcons button,
-body .grid-item-2 .courseItems .citem-3 .courseItemsIcons button,
-body .grid-item-2 .courseItems .citem-4 .courseItemsIcons button {
+html .grid-item-2 .courseItems .card .courseItemsIcons button,
+body .grid-item-2 .courseItems .card .courseItemsIcons button {
   border: none;
   background-color: transparent;
 }
-html .grid-item-2 .courseItems .citem-1 .courseItemsIcons button:disabled,
-html .grid-item-2 .courseItems .citem-2 .courseItemsIcons button:disabled,
-html .grid-item-2 .courseItems .citem-3 .courseItemsIcons button:disabled,
-html .grid-item-2 .courseItems .citem-4 .courseItemsIcons button:disabled,
-body .grid-item-2 .courseItems .citem-1 .courseItemsIcons button:disabled,
-body .grid-item-2 .courseItems .citem-2 .courseItemsIcons button:disabled,
-body .grid-item-2 .courseItems .citem-3 .courseItemsIcons button:disabled,
-body .grid-item-2 .courseItems .citem-4 .courseItemsIcons button:disabled {
+html .grid-item-2 .courseItems .card .courseItemsIcons button:disabled,
+body .grid-item-2 .courseItems .card .courseItemsIcons button:disabled {
   opacity: 0.3;
 }
 @media only screen and (max-width: 1094px) and (min-width: 768px) {
-  html .grid-item-2 .courseItems .citem-1,
-  html .grid-item-2 .courseItems .citem-2,
-  html .grid-item-2 .courseItems .citem-3,
-  html .grid-item-2 .courseItems .citem-4,
-  body .grid-item-2 .courseItems .citem-1,
-  body .grid-item-2 .courseItems .citem-2,
-  body .grid-item-2 .courseItems .citem-3,
-  body .grid-item-2 .courseItems .citem-4 {
+  html .grid-item-2 .courseItems .card,
+  body .grid-item-2 .courseItems .card {
     margin: 0px;
     min-width: -moz-fit-content;
     min-width: fit-content;
@@ -672,4 +652,8 @@ body .grid-item-4 .textComp span {
   body .grid-item-4 .textComp span {
     font-size: 11px;
   }
+}
+
+.dNone {
+  display: none;
 }/*# sourceMappingURL=index.css.map */
