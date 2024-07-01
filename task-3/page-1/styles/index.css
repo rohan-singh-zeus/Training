@@ -9,6 +9,8 @@ body {
   font-family: "Quicksand", sans-serif;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
+  background-color: #eeeeee;
 }
 html .grid-item-1,
 body .grid-item-1 {

@@ -1,6 +1,32 @@
-function toggleClassName(itemCall, classToggle){
+interface Cards{
+    title: string,
+    subject: string,
+    grade: string,
+    addition: string,
+    info:{
+        totalStudents: string,
+        duration: string,
+    },
+    image: string
+}
+
+interface Notifications{
+    info: string,
+    course: string,
+    cTime: string
+}
+
+interface Announcements{
+    author: string,
+    desc: string,
+    fileInfo: string,
+    time: string
+}
+
+
+function toggleClassName(itemCall: string, classToggle: string){
     const item = document.querySelector(`.${itemCall}`)
-    item.classList.toggle(classToggle)
+    item?.classList.toggle(classToggle)
 }
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -8,13 +34,13 @@ document.addEventListener("DOMContentLoaded", function () {
     response
       .json()
       .then((data) => {
-        data.cards.map((d) => {
+        data.cards.map((d: Cards) => {
           populateCards(d);
         });
-        data.announcements.map((d)=>{
+        data.announcements.map((d: Announcements)=>{
             populateAnnouncements(d)
         })
-        data.notifications.map((d)=>{
+        data.notifications.map((d: Notifications)=>{
             populateNotifications(d)
         })
       })
@@ -22,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function () {
   );
 });
 
-function populateCards(d) {
+function populateCards(d: Cards) {
   const ele1 = document.querySelector(".courseItems");
   const card = document.createElement("div");
   card.className = "card";
@@ -43,7 +69,7 @@ function populateCards(d) {
   const cc2 = document.createElement("p");
   cc2.className = "cc-2";
   cc2.innerHTML = `
-            ${d.subject} | ${d.garde} <span>${d.addition}</span>
+            ${d.subject} | ${d.grade} <span>${d.addition}</span>
           `;
   const cc3 = document.createElement("p");
   cc3.className = "cc-3";
@@ -111,10 +137,10 @@ function populateCards(d) {
   card.appendChild(courseItemsMain);
   card.appendChild(courseItemsIcons);
 
-  ele1.appendChild(card);
+  ele1?.appendChild(card);
 }
 
-function populateAnnouncements(d) {
+function populateAnnouncements(d: Announcements) {
     const ele2 = document.querySelector(".db-list")
 
     const ashish = document.createElement('div');
@@ -142,10 +168,10 @@ function populateAnnouncements(d) {
     ashish.appendChild(p2)
     ashish.appendChild(pBottom)
 
-    ele2.appendChild(ashish)
+    ele2?.appendChild(ashish)
 }
 
-function populateNotifications(d) {
+function populateNotifications(d: Notifications) {
     const ele3 = document.querySelector(".db2-list")
 
     const ashish = document.createElement('div');
@@ -165,5 +191,5 @@ function populateNotifications(d) {
     ashish.appendChild(p2)
     ashish.appendChild(p3)
 
-    ele3.appendChild(ashish)
+    ele3?.appendChild(ashish)
 }
