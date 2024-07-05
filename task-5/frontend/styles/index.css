@@ -1,0 +1,80 @@
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+body .ribbon {
+  height: 20vh;
+  width: 100vw;
+  border: 1px solid red;
+  background-color: #f0f8ff;
+}
+body .ribbon > .rTitle {
+  display: flex;
+  align-items: center;
+  height: 30%;
+  width: 100%;
+  margin-left: 40px;
+}
+body .ribbon > .rTitle > p {
+  margin: 10px;
+  font-size: 30px;
+}
+body .ribbon > .rTitle > p:hover {
+  border-bottom: 2px solid black;
+}
+body .ribbon > .rOptions {
+  height: 70%;
+  width: 100%;
+  display: flex;
+}
+body .ribbon > .rOptions > .r-1 {
+  flex: 0.02;
+  background-color: #b9d9eb;
+  border-top-right-radius: 60%;
+}
+body .ribbon > .rOptions > .r-1 > .curved {
+  background-color: #f0f8ff;
+  border-bottom-right-radius: 80%;
+  height: 100%;
+}
+body .ribbon > .rOptions > .r-2 {
+  flex: 0.08;
+  background-color: #b9d9eb;
+  border-top-left-radius: 50%;
+}
+body .ribbon > .rOptions > .r-3 {
+  flex: 0.9;
+  background-color: #b9d9eb;
+  display: flex;
+  align-items: center;
+  justify-content: start;
+}
+body .ribbon > .rOptions > .r-3 > div > img {
+  height: 40px;
+  width: 40px;
+}
+body .excel {
+  position: relative;
+}
+body .excel > #spreadsheet {
+  border: 1px solid #000;
+  cursor: default;
+}
+body .excel > #cellInput {
+  position: absolute;
+  display: none;
+  font: 14px Arial;
+  padding: 0;
+  margin: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+}
+body .excel > .excelInp {
+  display: none;
+  margin: 0;
+  padding: 0;
+}/*# sourceMappingURL=index.css.map */

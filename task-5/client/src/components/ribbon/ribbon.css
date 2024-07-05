@@ -1,0 +1,51 @@
+.ribbon {
+  height: 20vh;
+  width: 100vw;
+  border: 1px solid red;
+  background-color: #f0f8ff;
+}
+.ribbon > .rTitle {
+  display: flex;
+  align-items: center;
+  height: 30%;
+  width: 100%;
+  margin-left: 40px;
+}
+.ribbon > .rTitle > p {
+  margin: 10px;
+  font-size: 30px;
+}
+.ribbon > .rTitle > p:hover {
+  border-bottom: 2px solid black;
+}
+.ribbon > .rOptions {
+  height: 70%;
+  width: 100%;
+  display: flex;
+}
+.ribbon > .rOptions > .r-1 {
+  flex: 0.02;
+  background-color: #b9d9eb;
+  border-top-right-radius: 60%;
+}
+.ribbon > .rOptions > .r-1 > .curved {
+  background-color: #f0f8ff;
+  border-bottom-right-radius: 80%;
+  height: 100%;
+}
+.ribbon > .rOptions > .r-2 {
+  flex: 0.08;
+  background-color: #b9d9eb;
+  border-top-left-radius: 50%;
+}
+.ribbon > .rOptions > .r-3 {
+  flex: 0.9;
+  background-color: #b9d9eb;
+  display: flex;
+  align-items: center;
+  justify-content: start;
+}
+.ribbon > .rOptions > .r-3 > div > img {
+  height: 40px;
+  width: 40px;
+}/*# sourceMappingURL=ribbon.css.map */
