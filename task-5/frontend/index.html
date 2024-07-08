@@ -20,22 +20,31 @@
         </div>
         <div class="r-2"></div>
         <div class="r-3">
+          <!-- <button class="upload">
+          <p>Upload</p>
+        </button> -->
           <div class="upload">
-            <img src="assets/upload.jpg" alt="" />
-            <p>Upload</p>
+            <label for="file-upload" class="custom-file-upload">
+              <img src="assets/upload.jpg" alt="" />
+              <p>Custom Upload</p>
+            </label>
+            <input id="file-upload" type="file" />
           </div>
           <div class="open">
-            <img src="assets/open.png" alt="" />
-            <p>Open</p>
+            <label for="file-upload" class="custom-file-upload">
+              <img src="assets/open.png" alt="" />
+              <p>Open</p>
+            </label>
+            <input id="file-upload" type="file" />
           </div>
         </div>
       </div>
     </div>
     <div class="excel">
-      <canvas id="spreadsheet" width="1870" height="1000"></canvas>
-      <input type="text" class="excelInp">
+      <canvas id="gridCanvas" width="3000" height="2000"></canvas>
+      <!-- <input type="text" class="excelInp"> -->
     </div>
 
-    <script src="src/index.js"></script>
+    <script src="test/index.js"></script>
   </body>
 </html>

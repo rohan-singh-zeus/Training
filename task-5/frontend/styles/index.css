@@ -51,10 +51,35 @@ body .ribbon > .rOptions > .r-3 {
   display: flex;
   align-items: center;
   justify-content: start;
+  margin-left: -60px;
 }
-body .ribbon > .rOptions > .r-3 > div > img {
+body .ribbon > .rOptions > .r-3 > div > label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+body .ribbon > .rOptions > .r-3 > div > input[type=file] {
+  display: none;
+}
+body .ribbon > .rOptions > .r-3 > div > .custom-file-upload {
+  display: inline-flex;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+body .ribbon > .rOptions > .r-3 > div > .custom-file-upload > img {
+  border-radius: 50%;
   height: 40px;
   width: 40px;
+}
+body .ribbon > .rOptions > .r-3 > button {
+  margin: 10px;
+  border: none;
+  padding: 8px;
+  background-color: transparent;
+}
+body .ribbon > .rOptions > .r-3 > .open {
+  margin-left: 30px;
 }
 body .excel {
   position: relative;

@@ -1,165 +1,223 @@
-const canvas = document.getElementById("spreadsheet");
+const canvas = document.getElementById("gridCanvas");
 const ctx = canvas.getContext("2d");
-const cellInput = document.getElementById("cellInput");
-
-const CELL_HEIGHT = 30;
-const ROWS = 200;
-const COLS = 40;
-const RESIZE_HANDLE_WIDTH = 5;
-
-let columnWidths = Array(COLS).fill(100);
-let data = Array(ROWS)
-  .fill()
-  .map(() => Array(COLS).fill(""));
+ 
+const defaultCellWidth = 100;
+const cellHeight = 30;
+const numRows = 100;
+const numCols = 10;
+let columnWidths = Array(numCols).fill(defaultCellWidth);
+const gridData = Array.from({ length: numRows }, () => Array(numCols).fill(""));
+ 
+let selectedCells = [];
+let isDragging = false;
 let isResizing = false;
-let resizingColumn = -1;
-
+let resizeColIndex = -1;
+let startX = 0;
+let startCell = null;
+let currentCell = null;
+ 
+canvas.addEventListener("mousedown", handleMouseDown);
+canvas.addEventListener("mousemove", handleMouseMove);
+canvas.addEventListener("mouseup", handleMouseUp);
+canvas.addEventListener("dblclick", handleDoubleClick);
+document.addEventListener("keydown", handleKeyDown);
+ 
+document.addEventListener("DOMContentLoaded", () => {
+  fetchDataAndPopulateGrid();
+});
+ 
+function fetchDataAndPopulateGrid() {
+fetch("https://your-backend-api.com/data") // Replace with your backend API endpoint
+    .then((response) => response.json())
+    .then((data) => {
+      gridData.length = 0; // Clear existing data
+      data.forEach((row, rowIndex) => {
+        gridData[rowIndex] = row;
+      });
+      drawGrid();
+    })
+    .catch((error) => console.error("Error fetching data:", error));
+}
+ 
 function drawGrid() {
-  ctx.strokeStyle = "#ccc";
-  ctx.lineWidth = 0.5;
-
-  let x = 0;
-  for (let j = 0; j <= COLS; j++) {
-    ctx.beginPath();
-    ctx.moveTo(x, 0);
-    ctx.lineTo(x, ROWS * CELL_HEIGHT);
-    ctx.stroke();
-
-    if (j < COLS) {
-      // Draw resize handle
-      ctx.fillStyle = "#f0f0f0";
-      ctx.fillRect(
-        x - RESIZE_HANDLE_WIDTH / 2,
-        0,
-        RESIZE_HANDLE_WIDTH,
-        ROWS * CELL_HEIGHT
-      );
-    }
-
-    if (j < COLS) x += columnWidths[j];
-  }
-
-  for (let i = 0; i <= ROWS; i++) {
-    ctx.beginPath();
-    ctx.moveTo(0, i * CELL_HEIGHT);
-    ctx.lineTo(canvas.width, i * CELL_HEIGHT);
-    ctx.stroke();
-  }
-}
-
-function drawCellContents() {
-  ctx.font = "14px Arial";
-  ctx.textAlign = "left";
-  ctx.textBaseline = "middle";
-  ctx.fillStyle = "#000";
-
-  let x = 0;
-  for (let j = 0; j < COLS; j++) {
-    for (let i = 0; i < ROWS; i++) {
-      ctx.fillText(data[i][j], x + 5, i * CELL_HEIGHT + CELL_HEIGHT / 2);
-    }
-    x += columnWidths[j];
-  }
-}
-
-function render() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawGrid();
-  drawCellContents();
-}
-
-function getColumnAtX(x) {
-  let accumulatedWidth = 0;
-  for (let i = 0; i < COLS; i++) {
-    accumulatedWidth += columnWidths[i];
-    if (x < accumulatedWidth) return i;
+ 
+  for (let row = 0; row < numRows; row++) {
+    let x = 0;
+    for (let col = 0; col < numCols; col++) {
+      const width = columnWidths[col];
+      const y = row * cellHeight;
+      ctx.strokeRect(x, y, width, cellHeight);
+      ctx.fillText(gridData[row][col], x + 5, y + 20);
+      x += width;
+    }
   }
-  return -1;
-}
-
-function getColumnLeftPosition(col) {
-  let x = 0;
-  for (let i = 0; i < col; i++) {
-    x += columnWidths[i];
-  }
-  return x;
-}
-
-canvas.addEventListener("mousedown", (e) => {
-  const rect = canvas.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
-
-  const col = getColumnAtX(x);
-
-  if (
-    col > 0 &&
-    Math.abs(x - getColumnLeftPosition(col)) < RESIZE_HANDLE_WIDTH / 2
-  ) {
-    isResizing = true;
-    resizingColumn = col - 1;
-    canvas.style.cursor = "col-resize";
-  }
-
-  canvas.addEventListener("mouseup", () => {
-    return;
+ 
+  selectedCells.forEach(([row, col]) => {
+    let x = columnWidths.slice(0, col).reduce((acc, val) => acc + val, 0);
+    const y = row * cellHeight;
+    ctx.fillStyle = "rgba(0, 0, 255, 0.2)";
+    ctx.fillRect(x, y, columnWidths[col], cellHeight);
+    ctx.fillStyle = "black";
   });
-});
-canvas.addEventListener("mousemove", (e) => {
-  const rect = canvas.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-
-  if (isResizing) {
-    const newWidth = x - getColumnLeftPosition(resizingColumn);
-    if (newWidth > 10) {
-      // Minimum column width
-      columnWidths[resizingColumn] = newWidth;
-      render();
+ 
+  if (currentCell) {
+    let x = columnWidths
+      .slice(0, currentCell[1])
+      .reduce((acc, val) => acc + val, 0);
+    const y = currentCell[0] * cellHeight;
+    ctx.strokeStyle = "red";
+    ctx.strokeRect(x, y, columnWidths[currentCell[1]], cellHeight);
+    ctx.strokeStyle = "black";
+  }
+}
+ 
+function handleMouseDown(event) {
+  const { offsetX, offsetY } = event;
+  let col = 0;
+  let x = 0;
+ 
+  for (let i = 0; i < numCols; i++) {
+    x += columnWidths[i];
+    if (offsetX < x) {
+      col = i;
+      break;
     }
+  }
+ 
+  const row = Math.floor(offsetY / cellHeight);
+ 
+  if (offsetX > x - 5 && offsetX < x + 5) {
+    isResizing = true;
+    resizeColIndex = col;
+    startX = offsetX;
+canvas.style.cursor = "col-resize";
   } else {
-    const col = getColumnAtX(x);
-    if (
-      col > 0 &&
-      Math.abs(x - getColumnLeftPosition(col)) < RESIZE_HANDLE_WIDTH / 2
-    ) {
-      canvas.style.cursor = "col-resize";
-    } else {
-      canvas.style.cursor = "default";
+    isDragging = true;
+    startCell = [row, col];
+    currentCell = [row, col];
+    updateSelectedCells(startCell, currentCell);
+    drawGrid();
+  }
+}
+ 
+function handleMouseMove(event) {
+  const { offsetX, offsetY } = event;
+ 
+  if (isResizing) {
+    const delta = offsetX - startX;
+    columnWidths[resizeColIndex] += delta;
+    startX = offsetX;
+    drawGrid();
+  } else if (isDragging) {
+    let col = 0;
+    let x = 0;
+    for (let i = 0; i < numCols; i++) {
+      x += columnWidths[i];
+      if (offsetX < x) {
+        col = i;
+        break;
+      }
+    }
+    const row = Math.floor(offsetY / cellHeight);
+    currentCell = [row, col];
+    updateSelectedCells(startCell, currentCell);
+    drawGrid();
+  } else {
+    let x = 0;
+    for (let i = 0; i < numCols; i++) {
+      x += columnWidths[i];
+      if (offsetX > x - 5 && offsetX < x + 5) {
+canvas.style.cursor = "col-resize";
+        return;
+      }
+    }
+canvas.style.cursor = "default";
+  }
+}
+ 
+function handleMouseUp(event) {
+  if (isDragging) {
+    isDragging = false;
+    startCell = null;
+    currentCell = null;
+  }
+  if (isResizing) {
+    isResizing = false;
+canvas.style.cursor = "default";
+  }
+}
+ 
+function handleDoubleClick(event) {
+  const { offsetX, offsetY } = event;
+  let col = 0;
+  let x = 0;
+ 
+  for (let i = 0; i < numCols; i++) {
+    x += columnWidths[i];
+    if (offsetX < x) {
+      col = i;
+      break;
     }
   }
-});
-
-canvas.addEventListener("mouseup", () => {
-  isResizing = false;
-  resizingColumn = -1;
-  canvas.style.cursor = "default";
-});
-
-canvas.addEventListener("click", (e) => {
-  if (!isResizing) {
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    const col = getColumnAtX(x);
-    const row = Math.floor(y / CELL_HEIGHT);
-
-    if (col !== -1 && row < ROWS) {
-      cellInput.style.display = "block";
-      cellInput.style.left = `${rect.left + getColumnLeftPosition(col)}px`;
-      cellInput.style.top = `${rect.top + row * CELL_HEIGHT}px`;
-      cellInput.style.width = `${columnWidths[col]}px`;
-      cellInput.style.height = `${CELL_HEIGHT}px`;
-      cellInput.value = data[row][col];
-      cellInput.focus();
-
-      cellInput.onblur = () => {
-        data[row][col] = cellInput.value;
-        cellInput.style.display = "none";
-        render();
-      };
+ 
+  const row = Math.floor(offsetY / cellHeight);
+  const value = prompt("Enter new value:", gridData[row][col]);
+  if (value !== null) {
+    gridData[row][col] = value;
+    drawGrid();
+  }
+}
+ 
+function updateSelectedCells(start, end) {
+  selectedCells = [];
+  const [startRow, startCol] = start;
+  const [endRow, endCol] = end;
+  const rowRange = [Math.min(startRow, endRow), Math.max(startRow, endRow)];
+  const colRange = [Math.min(startCol, endCol), Math.max(startCol, endCol)];
+ 
+  for (let row = rowRange[0]; row <= rowRange[1]; row++) {
+    for (let col = colRange[0]; col <= colRange[1]; col++) {
+      selectedCells.push([row, col]);
     }
   }
-});
+}
+ 
+function handleKeyDown(event) {
+  if (currentCell) {
+    let [row, col] = currentCell;
+ 
+    switch (event.key) {
+      case "ArrowUp":
+        row = row > 0 ? row - 1 : row;
+        break;
+      case "ArrowDown":
+        row = row < numRows - 1 ? row + 1 : row;
+        break;
+      case "ArrowLeft":
+        col = col > 0 ? col - 1 : col;
+        break;
+      case "ArrowRight":
+        col = col < numCols - 1 ? col + 1 : col;
+        break;
+      case "Enter":
+        const value = prompt("Enter new value:", gridData[row][col]);
+        if (value !== null) {
+          gridData[row][col] = value;
+          drawGrid();
+        }
+        break;
+    }
+ 
+    currentCell = [row, col];
+    updateSelectedCells(currentCell, currentCell);
+    drawGrid();
+  }
+}
 
-render();
+const upload = document.querySelector("#uploadFile");
+
+upload.addEventListener('change', () => {
+  const selectedFile = upload.files[0];
+  console.log('Selected file:', selectedFile);
+});
