@@ -4,6 +4,7 @@ body {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 body .ribbon {
   height: 20vh;
@@ -16,7 +17,7 @@ body .ribbon > .rTitle {
   align-items: center;
   height: 30%;
   width: 100%;
-  margin-left: 40px;
+  margin-left: 0;
 }
 body .ribbon > .rTitle > p {
   margin: 10px;
@@ -82,24 +83,15 @@ body .ribbon > .rOptions > .r-3 > .open {
   margin-left: 30px;
 }
 body .excel {
+  height: 78vh;
+  width: 100vw;
+  overflow: scroll;
+  border: 1px solid blue;
   position: relative;
 }
-body .excel > #spreadsheet {
-  border: 1px solid #000;
+body .excel > #gridCanvas {
   cursor: default;
-}
-body .excel > #cellInput {
   position: absolute;
-  display: none;
-  font: 14px Arial;
-  padding: 0;
-  margin: 0;
-  border: none;
-  outline: none;
-  background: transparent;
-}
-body .excel > .excelInp {
-  display: none;
-  margin: 0;
-  padding: 0;
+  top: 0;
+  left: 0;
 }/*# sourceMappingURL=index.css.map */

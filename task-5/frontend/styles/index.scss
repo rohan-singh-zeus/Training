@@ -4,6 +4,7 @@ body {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 
   .ribbon {
     height: 20vh;
@@ -16,7 +17,7 @@ body {
       align-items: center;
       height: 30%;
       width: 100%;
-      margin-left: 40px;
+      margin-left: 0;
 
       > p {
         margin: 10px;
@@ -105,29 +106,20 @@ body {
   .excel {
     // height: 77vh;
     // width: 100vw;
-    // border: 1px solid blue;
+    height: 78vh;
+    width: 100vw;
+    overflow: scroll;
+    border: 1px solid blue;
     position: relative;
 
-    > #spreadsheet {
-      border: 1px solid #000;
+    > #gridCanvas {
+      // border: 1px solid #000;
       cursor: default;
-    }
-
-    > #cellInput {
       position: absolute;
-      display: none;
-      font: 14px Arial;
-      padding: 0;
-      margin: 0;
-      border: none;
-      outline: none;
-      background: transparent;
+      top: 0;
+      left: 0;
     }
 
-    > .excelInp {
-      display: none;
-      margin: 0;
-      padding: 0;
-    }
+    
   }
 }
