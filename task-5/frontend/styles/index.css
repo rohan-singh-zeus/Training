@@ -88,10 +88,21 @@ body .excel {
   overflow: scroll;
   border: 1px solid blue;
   position: relative;
+  display: flex;
 }
 body .excel > #gridCanvas {
   cursor: default;
   position: absolute;
   top: 0;
   left: 0;
+}
+body .excel > .cols {
+  display: flex;
+  flex-direction: column;
+}
+body .excel > .cols > #gridCanvas1 {
+  cursor: default;
+  position: absolute;
+  top: 0;
+  left: 100px;
 }/*# sourceMappingURL=index.css.map */

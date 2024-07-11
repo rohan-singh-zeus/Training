@@ -7,7 +7,8 @@ const numRows = 100;
 const numCols = 1000;
 let columnWidths = Array(numCols).fill(defaultCellWidth);
 let gridData = Array.from({ length: numRows }, () => Array(numCols).fill(""));
-// console.log(gridData);
+let gridCols = []
+// console.log(gridCols);
 
 let selectedCells = [];
 let isDragging = false;
@@ -21,6 +22,8 @@ canvas.addEventListener("mousedown", handleMouseDown);
 canvas.addEventListener("mousemove", handleMouseMove);
 canvas.addEventListener("mouseup", handleMouseUp);
 canvas.addEventListener("dblclick", handleDoubleClick);
+
+
 document.addEventListener("keydown", handleKeyDown);
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -33,12 +36,10 @@ function fetchDataAndPopulateGrid() {
   fetch("test.json")
     .then((response) => response.json())
     .then((data) => {
-      // data.map((d)=>{
-      //   console.log(d.name);
-      // })
-      // console.log(data[0]);
-      // gridData.length = 0; // Clear existing data
-      console.log(Object.keys(data[0]));
+      gridData.length = 0; // Clear existing data
+      Object.keys(data[0]).forEach((d, i)=>{
+        gridCols.push(d)
+      })
       data.forEach((row, rowIndex) => {
         gridData[rowIndex] = Object.values(row);
       });
@@ -50,24 +51,26 @@ function fetchDataAndPopulateGrid() {
 function drawFirstCol() {
   for (let row = 0; row < numRows; row++) {
     // let x = columnWidths[0];
-    for (let col = 0; col < numCols; col++) {
+    for (let col = 0; col < 1; col++) {
       const width = columnWidths[col];
       const y = row * cellHeight;
+      ctx.strokeStyle = "red"
       ctx.strokeRect(0, y, width, cellHeight);
-      // ctx.fillText(gridData[row][col], x + 5, y + 20);
+      // ctx.fillText("A", x + 5, y + 20);
       // x += width;
     }
   }
 }
 
 function drawFirstRow() {
-  for (let row = 0; row < numRows; row++) {
+  for (let row = 0; row < 1; row++) {
     let x = columnWidths[0];
     for (let col = 0; col < numCols; col++) {
-      const width = columnWidths[col];
+      const width = columnWidths[col+1];
       // const y = row * cellHeight;
+      ctx.strokeStyle = "blue"
       ctx.strokeRect(x, 0, width, cellHeight);
-      // ctx.fillText(gridData[row][col], x + 5, y + 20);
+      // ctx.fillText("", x + 5, y + 20);
       x += width;
     }
   }
@@ -76,16 +79,25 @@ function drawFirstRow() {
 function drawGrid() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // drawFirstCol()
-  // drawFirstRow()
+  drawFirstCol()
+  drawFirstRow()
 
-  for (let row = 1; row < numRows; row++) {
+  for (let row = 0; row < numRows; row++) {
+    // let x = columnWidths[1];
     let x = columnWidths[0];
-    for (let col = 1; col < numCols; col++) {
-      const width = columnWidths[col];
-      const y = row * cellHeight;
+    for (let col = 0; col < numCols; col++) {
+      const width = columnWidths[col+1];
+      // if(row == 0)
+      const y = (row+1) * cellHeight;
+      ctx.strokeStyle = "green"
       ctx.strokeRect(x, y, width, cellHeight);
-      ctx.fillText(gridData[row][col], x + 5, y + 20);
+      if(gridData[row][col]){
+
+        ctx.fillText(gridData[row][col], x + 5, y + 20);
+      }else{
+        ctx.fillText("", x + 5, y + 20);
+
+      }
       x += width;
     }
   }
@@ -124,7 +136,7 @@ function handleMouseDown(event) {
 
   const row = Math.floor(offsetY / cellHeight);
 
-  if (offsetX > x - 5 && offsetX < x + 5) {
+  if (offsetX > x - 10 && offsetX < x + 10) {
     isResizing = true;
     resizeColIndex = col;
     startX = offsetX;
@@ -188,7 +200,7 @@ function handleMouseUp(event) {
 function handleDoubleClick(event) {
   const { offsetX, offsetY } = event;
   let col = 0;
-  let x = 0;
+  let x =0;
 
   for (let i = 0; i < numCols; i++) {
     x += columnWidths[i];
@@ -199,9 +211,9 @@ function handleDoubleClick(event) {
   }
 
   const row = Math.floor(offsetY / cellHeight);
-  const value = prompt("Enter new value:", gridData[row][col]);
+  const value = prompt("Enter new value:", gridData[row-1][col-1]);
   if (value !== null) {
-    gridData[row][col] = value;
+    gridData[row-1][col-1] = value;
     drawGrid();
   }
 }

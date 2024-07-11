@@ -111,6 +111,8 @@ body {
     overflow: scroll;
     border: 1px solid blue;
     position: relative;
+    display: flex;
+    // flex-direction: column;
 
     > #gridCanvas {
       // border: 1px solid #000;
@@ -119,6 +121,19 @@ body {
       top: 0;
       left: 0;
     }
+    >.cols{
+      display: flex;
+      flex-direction: column;
+
+
+      >#gridCanvas1{
+        cursor: default;
+        position: absolute;
+        top: 0;
+        left: 100px;
+      }
+    }
+
 
     
   }
