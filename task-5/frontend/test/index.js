@@ -1,5 +1,6 @@
 const canvas = document.getElementById("gridCanvas");
 const ctx = canvas.getContext("2d");
+// canvas.height = "728"
 
 const defaultCellWidth = 100;
 const cellHeight = 30;
@@ -24,6 +25,23 @@ let max = 0;
 let avg = 0;
 let count = 0;
 
+// console.log(window.scrollX);
+const excel = document.querySelector('.excel')
+const ribbon = document.querySelector('.ribbon')
+let currentHeight = canvas.height
+let currentWidth = canvas.width
+// console.log(document.body.scrollWidth);
+console.log();
+excel.onscroll = function(ev) {
+  // if ((window.innerHeight + window.scrollY) >= document.body.scrollHeight) {
+  //   // you're at the bottom of the page
+  //   console.log("Bottom of page");
+  // }
+  // canvas.height += "20"
+  // drawGrid()
+  // console.log(window.innerHeight);
+};
+
 canvas.addEventListener("mousedown", handleMouseDown);
 canvas.addEventListener("mousemove", handleMouseMove);
 canvas.addEventListener("mouseup", handleMouseUp);
@@ -35,6 +53,30 @@ document.addEventListener("DOMContentLoaded", () => {
   fetchDataAndPopulateGrid();
   // drawGrid();
 });
+
+excel.addEventListener('scroll', resizeCanvas)
+
+function resizeCanvas() {
+  const scrollHeight = excel.scrollHeight;
+  const clientHeight = excel.clientHeight;
+  const scrollTop = excel.scrollTop;
+
+  const scrollWidth = excel.scrollWidth;
+  const clientWidth = excel.clientWidth;
+  const scrollLeft = excel.scrollLeft;
+
+  // Increase the canvas height if scrolling reaches near the bottom
+  if (scrollTop + clientHeight >= scrollHeight - 50) { // 50px before the bottom
+      currentHeight += 100; // Increase height by 100px (or any desired amount)
+      canvas.height = currentHeight;
+      drawGrid(); // Redraw the content if needed
+  }
+  if(scrollLeft + clientWidth >= scrollWidth - 50){
+      currentWidth += 100
+      canvas.width = currentWidth
+      drawGrid()
+  }
+}
 
 function fetchDataAndPopulateGrid() {
   // fetch("https://your-backend-api.com/data")
@@ -141,13 +183,11 @@ function drawGrid() {
   });
 
   if (currentCell) {
-    let x = columnWidths
-      .slice(0, currentCell[1])
-      .reduce((acc, val) => acc + val, 0);
+    let x = columnWidths.slice(0, currentCell[1]).reduce((acc, val) => acc + val, 0);
     const y = currentCell[0] * cellHeight;
     ctx.strokeStyle = "green";
     ctx.strokeRect(x, y, columnWidths[currentCell[1]], cellHeight);
-    ctx.strokeStyle = "rgba(0,0,0,0.25)";
+    ctx.strokeStyle = "rgba(231,241,236,0.25)";
   }
 
   // for (let i = 0; i < selectedCells.length; i++) {
@@ -169,6 +209,8 @@ function handleMouseDown(event) {
     }
   }
 
+  console.log(offsetX, x);
+
   const row = Math.floor(offsetY / cellHeight);
 
   if (offsetX > x - 10 && offsetX < x + 10) {
@@ -176,12 +218,14 @@ function handleMouseDown(event) {
     resizeColIndex = col;
     startX = offsetX;
     canvas.style.cursor = "col-resize";
+    console.log("Yayy");
   } else {
     isDragging = true;
     startCell = [row, col];
     currentCell = [row, col];
     updateSelectedCells(startCell, currentCell);
     drawGrid();
+    console.log("Nayy");
   }
 }
 
@@ -195,7 +239,7 @@ function handleMouseMove(event) {
     drawGrid();
   } else if (isDragging) {
     let col = 0;
-    let x = 0;
+    let x = 0; 
     for (let i = 0; i < numCols; i++) {
       x += columnWidths[i];
       if (offsetX < x) {
@@ -238,10 +282,20 @@ function handleMouseUp(event) {
   if (selectedCells.length > 0) {
     for (let i = 0; i < selectedCells.length; i++) {
       // const element = array[i];
-      sum += selectedCells[i][2];
-      count += 1;
-      min = Math.min(min, selectedCells[i][2]);
-      max = Math.max(max, selectedCells[i][2]);
+      // if(selectedCells[i][2] )
+      if(typeof(selectedCells[i][2]) === "number"){
+
+        sum += selectedCells[i][2];
+        count += 1;
+        min = Math.min(min, selectedCells[i][2]);
+        max = Math.max(max, selectedCells[i][2]);
+        // console.log(typeof(selectedCells[i][2]));
+      }else{
+        sum = 0;
+        count = 0;
+        min = 0;
+        max = 0;
+      }
     }
     console.log(
       `Sum: ${sum}, Average: ${sum / count}, Min: ${min}, Max: ${max}`
@@ -285,35 +339,59 @@ function updateSelectedCells(start, end) {
 }
 
 function handleKeyDown(event) {
-  if (currentCell) {
-    let [row, col] = currentCell;
+  // if (currentCell) {
+  //   let [row, col] = currentCell;
 
-    switch (event.key) {
-      case "ArrowUp":
-        row = row > 0 ? row - 1 : row;
-        break;
-      case "ArrowDown":
-        row = row < numRows - 1 ? row + 1 : row;
-        break;
-      case "ArrowLeft":
-        col = col > 0 ? col - 1 : col;
-        break;
-      case "ArrowRight":
-        col = col < numCols - 1 ? col + 1 : col;
-        break;
-      case "Enter":
-        const value = prompt("Enter new value:", gridData[row][col]);
-        if (value !== null) {
-          gridData[row][col] = value;
-          drawGrid();
-        }
-        break;
+  //   switch (event.key) {
+  //     case "ArrowUp":
+  //       row = row > 0 ? row - 1 : row;
+  //       break;
+  //     case "ArrowDown":
+  //       row = row < numRows - 1 ? row + 1 : row;
+  //       break;
+  //     case "ArrowLeft":
+  //       col = col > 0 ? col - 1 : col;
+  //       break;
+  //     case "ArrowRight":
+  //       col = col < numCols - 1 ? col + 1 : col;
+  //       break;
+  //     case "Enter":
+  //       const value = prompt("Enter new value:", gridData[row][col]);
+  //       if (value !== null) {
+  //         gridData[row][col] = value;
+  //         drawGrid();
+  //       }
+  //       break;
+  //   }
+
+  //   currentCell = [row, col];
+  //   updateSelectedCells(currentCell, currentCell);
+  //   drawGrid();
+  // }
+  // console.log(currentCell);
+}
+
+const findReplace = document.querySelector('.findReplace')
+findReplace.addEventListener('click', handleFindReplace)
+
+function handleFindReplace() {
+  const findValue = prompt("Enter the value to find:");
+  if (findValue === null) return; // Cancelled
+ 
+  const replaceValue = prompt("Enter the value to replace it with:");
+  if (replaceValue === null) return; // Cancelled
+ 
+  // Iterate through gridData and replace values
+  for (let row = 0; row < numRows; row++) {
+    for (let col = 0; col < numCols; col++) {
+      if (gridData[row][col] === findValue) {
+        gridData[row][col] = replaceValue;
+      }
     }
-
-    currentCell = [row, col];
-    updateSelectedCells(currentCell, currentCell);
-    drawGrid();
   }
+ 
+  // Re-render the grid
+  drawGrid();
 }
 
 // const upload = document.querySelector("#uploadFile");
@@ -322,3 +400,18 @@ function handleKeyDown(event) {
 //   const selectedFile = upload.files[0];
 //   console.log("Selected file:", selectedFile);
 // });
+
+const file = document.querySelector('.file')
+const opeartions = document.querySelector('.operations')
+const r31 = document.querySelector('.r-31')
+const r32 = document.querySelector('.r-32')
+
+file.addEventListener('click', ()=>{
+    r31.style.display = "inline-flex"
+    r32.style.display = "none"
+})
+
+opeartions.addEventListener('click', ()=>{
+  r31.style.display = "none"
+  r32.style.display = "inline-flex"
+})
