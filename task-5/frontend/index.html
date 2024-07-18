@@ -4,6 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="styles/index.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+      integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
     <title>Document</title>
   </head>
   <body>
@@ -15,57 +23,66 @@
         <p>Graph</p>
       </div>
       <div class="rOptions">
-        <div class="r-1">
-          <div class="curved"></div>
+        <div class="rLeft">
+          <div class="r-31">
+            <div class="upload">
+              <label for="file-upload" class="custom-file-upload">
+                <i class="fa-solid fa-circle-chevron-up fa-2xl"></i>
+                <p>Custom Upload</p>
+              </label>
+              <input id="file-upload" type="file" />
+            </div>
+            <div class="open">
+              <label for="file-upload" class="custom-file-upload">
+                <i class="fa-solid fa-folder-open fa-2xl"></i>
+                <p>Open</p>
+              </label>
+              <input id="file-upload" type="file" />
+            </div>
+          </div>
+          <div class="r-32">
+            <div>
+              <button class="find">
+                <i class="fa-solid fa-folder-tree fa-2xl"></i>
+              </button>
+              <p>Find</p>
+            </div>
+            <div>
+              <button class="findReplace">
+                <i class="fa-solid fa-wind fa-2xl"></i>
+              </button>
+              <p>Find and Replace</p>
+            </div>
+            <div>
+              <button class="sort">
+                <i class="fa-solid fa-arrow-down-short-wide fa-2xl"></i>
+              </button>
+              <p>Sort</p>
+            </div>
+            <!-- <div>
+              <p>
+                Sum : 
+              </p>
+            </div> -->
+          </div>
         </div>
-        <div class="r-2"></div>
-        <div class="r-31">
-          <div class="upload">
-            <label for="file-upload" class="custom-file-upload">
-              <img src="assets/upload.jpg" alt="" />
-              <p>Custom Upload</p>
-            </label>
-            <input id="file-upload" type="file" />
-          </div>
-          <div class="open">
-            <label for="file-upload" class="custom-file-upload">
-              <img src="assets/open.png" alt="" />
-              <p>Open</p>
-            </label>
-            <input id="file-upload" type="file" />
-          </div>
+        <div class="rRight">
+          <p class="sum">Sum: <span>0</span></p>
+          <p class="min">Min: <span>0</span></p>
+          <p class="max">Max <span>0</span></p>
+          <p class="avg">Average <span>0</span></p>
         </div>
-        <div class="r-32">
-          <div>
-            <button class="find">
-              <img src="assets/find.png" alt="" />
-            </button>
-            <p>Find</p>
-          </div>
-          <div>
-            <button class="findReplace">
-              <img src="assets/find_replace.png" alt="" />
-            </button>
-            <p>Find and Replace</p>
-          </div>
-          <div>
-            <button class="sort">
-              <img src="assets/sort.jfif" alt="" />
-            </button>
-            <p>Sort</p>
-          </div>
-        </div>
+        <div></div>
       </div>
     </div>
     <div class="excel">
-      <!-- <canvas id="gridCanvas3" height="2000" width="100"></canvas>
-      <div class="cols"> -->
-      <!-- <canvas id="gridCanvas1" width="3000" height="30"></canvas> -->
-      <canvas id="gridCanvas" height="728" width="1096"></canvas>
-      <!-- </div> -->
-
-      <!-- <input type="text" class="excelInp"> -->
+      <canvas id="gridCanvas" height="728" width="2096"></canvas>
     </div>
+    <!-- <div class="graph"> -->
+    <!-- <div class="graph">
+      <canvas id="myChart"></canvas>
+    </div> -->
+    <!-- </div> -->
 
     <script src="test/index.js"></script>
   </body>

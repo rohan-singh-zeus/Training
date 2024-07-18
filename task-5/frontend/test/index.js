@@ -1,12 +1,12 @@
 const canvas = document.getElementById("gridCanvas");
 const ctx = canvas.getContext("2d");
-// canvas.height = "728"
 
 const defaultCellWidth = 100;
 const cellHeight = 30;
 const numRows = 100;
 const numCols = 1000;
 let columnWidths = Array(numCols).fill(defaultCellWidth);
+let rowHeights = Array(numRows).fill(cellHeight);
 let gridData = Array.from({ length: numRows }, () => Array(numCols).fill(""));
 let gridCols = [];
 let gridRows = [];
@@ -25,22 +25,10 @@ let max = 0;
 let avg = 0;
 let count = 0;
 
-// console.log(window.scrollX);
-const excel = document.querySelector('.excel')
-const ribbon = document.querySelector('.ribbon')
-let currentHeight = canvas.height
-let currentWidth = canvas.width
-// console.log(document.body.scrollWidth);
-console.log();
-excel.onscroll = function(ev) {
-  // if ((window.innerHeight + window.scrollY) >= document.body.scrollHeight) {
-  //   // you're at the bottom of the page
-  //   console.log("Bottom of page");
-  // }
-  // canvas.height += "20"
-  // drawGrid()
-  // console.log(window.innerHeight);
-};
+const excel = document.querySelector(".excel");
+const ribbon = document.querySelector(".ribbon");
+let currentHeight = canvas.height;
+let currentWidth = canvas.width;
 
 canvas.addEventListener("mousedown", handleMouseDown);
 canvas.addEventListener("mousemove", handleMouseMove);
@@ -48,13 +36,11 @@ canvas.addEventListener("mouseup", handleMouseUp);
 canvas.addEventListener("dblclick", handleDoubleClick);
 
 document.addEventListener("keydown", handleKeyDown);
-
 document.addEventListener("DOMContentLoaded", () => {
   fetchDataAndPopulateGrid();
-  // drawGrid();
 });
 
-excel.addEventListener('scroll', resizeCanvas)
+excel.addEventListener("scroll", resizeCanvas);
 
 function resizeCanvas() {
   const scrollHeight = excel.scrollHeight;
@@ -66,15 +52,16 @@ function resizeCanvas() {
   const scrollLeft = excel.scrollLeft;
 
   // Increase the canvas height if scrolling reaches near the bottom
-  if (scrollTop + clientHeight >= scrollHeight - 50) { // 50px before the bottom
-      currentHeight += 100; // Increase height by 100px (or any desired amount)
-      canvas.height = currentHeight;
-      drawGrid(); // Redraw the content if needed
+  if (scrollTop + clientHeight >= scrollHeight - 50) {
+    // 50px before the bottom
+    currentHeight += 100; // Increase height by 100px (or any desired amount)
+    canvas.height = currentHeight;
+    drawGrid(); // Redraw the content if needed
   }
-  if(scrollLeft + clientWidth >= scrollWidth - 50){
-      currentWidth += 100
-      canvas.width = currentWidth
-      drawGrid()
+  if (scrollLeft + clientWidth >= scrollWidth - 50) {
+    currentWidth += 100;
+    canvas.width = currentWidth;
+    drawGrid();
   }
 }
 
@@ -183,7 +170,9 @@ function drawGrid() {
   });
 
   if (currentCell) {
-    let x = columnWidths.slice(0, currentCell[1]).reduce((acc, val) => acc + val, 0);
+    let x = columnWidths
+      .slice(0, currentCell[1])
+      .reduce((acc, val) => acc + val, 0);
     const y = currentCell[0] * cellHeight;
     ctx.strokeStyle = "green";
     ctx.strokeRect(x, y, columnWidths[currentCell[1]], cellHeight);
@@ -196,10 +185,11 @@ function drawGrid() {
   // }
 }
 
-function handleMouseDown(event) {
+function handleMouseDown(event) { 1
   const { offsetX, offsetY } = event;
   let col = 0;
   let x = 0;
+  let y = 0;
 
   for (let i = 0; i < numCols; i++) {
     x += columnWidths[i];
@@ -209,7 +199,15 @@ function handleMouseDown(event) {
     }
   }
 
-  console.log(offsetX, x);
+  // for (let i = 0; i < numRows; i++) {
+  //   y += rowHeights[i];
+  //   // if (offsetY < y) {
+  //   //   col = i;
+  //   //   break;
+  //   // }
+  // }
+
+  // console.log(offsetX, x);
 
   const row = Math.floor(offsetY / cellHeight);
 
@@ -218,14 +216,20 @@ function handleMouseDown(event) {
     resizeColIndex = col;
     startX = offsetX;
     canvas.style.cursor = "col-resize";
-    console.log("Yayy");
-  } else {
+    // console.log("Yayy");
+    // console.log("Col resize");
+  }
+  // }else if(offsetY > y-10 && offsetY < y+10){
+  //   canvas.style.cursor = "row-resize"
+  //   console.log("Row resize");
+  // } 
+  else {
     isDragging = true;
     startCell = [row, col];
     currentCell = [row, col];
     updateSelectedCells(startCell, currentCell);
     drawGrid();
-    console.log("Nayy");
+    // console.log("Nayy");
   }
 }
 
@@ -239,7 +243,7 @@ function handleMouseMove(event) {
     drawGrid();
   } else if (isDragging) {
     let col = 0;
-    let x = 0; 
+    let x = 0;
     for (let i = 0; i < numCols; i++) {
       x += columnWidths[i];
       if (offsetX < x) {
@@ -265,6 +269,19 @@ function handleMouseMove(event) {
 }
 
 function handleMouseUp(event) {
+  const { offsetX, offsetY } = event;
+  let col = 0;
+  let x = 0;
+
+  for (let i = 0; i < numCols; i++) {
+    x += columnWidths[i];
+    if (offsetX < x) {
+      col = i;
+      break;
+    }
+  }
+
+  const row = Math.floor(offsetY / cellHeight);
   count = 0;
   sum = 0;
   avg = 0;
@@ -283,23 +300,54 @@ function handleMouseUp(event) {
     for (let i = 0; i < selectedCells.length; i++) {
       // const element = array[i];
       // if(selectedCells[i][2] )
-      if(typeof(selectedCells[i][2]) === "number"){
-
+      if (typeof selectedCells[i][2] === "number") {
         sum += selectedCells[i][2];
         count += 1;
         min = Math.min(min, selectedCells[i][2]);
         max = Math.max(max, selectedCells[i][2]);
         // console.log(typeof(selectedCells[i][2]));
-      }else{
-        sum = 0;
-        count = 0;
-        min = 0;
-        max = 0;
+      } else {
+        // sum = 0;
+        // count = 0;
+        // min = 0;
+        // max = 0;
+        // count = 0;
+        continue
       }
     }
-    console.log(
-      `Sum: ${sum}, Average: ${sum / count}, Min: ${min}, Max: ${max}`
-    );
+    // console.log(
+    //   `Sum: ${sum}, Average: ${sum / count}, Min: ${min}, Max: ${max}`
+    // );
+    const sumText = document.querySelector(".sum");
+    sumText.innerHTML = `Sum: <span>${sum}</span>`;
+    const minText = document.querySelector(".min");
+    minText.innerHTML = `Min: <span>${min}</span>`;
+    const maxText = document.querySelector(".max");
+    maxText.innerHTML = `Max: <span>${max}</span>`;
+    const avgText = document.querySelector(".avg");
+    avgText.innerHTML = `Average: <span>${sum / count}</span>`;
+  }
+  if (row === 0) {
+    updateSelectedCol(col)
+    drawGrid()
+  }
+  if (col === 0) {
+    updateSelectedRow(row);
+    drawGrid()
+  }
+}
+
+function updateSelectedCol(col){
+  selectedCells = [];
+  for (let row = 0; row < numRows; row++) {
+    selectedCells.push([row, col, gridData[row][col-1]])
+  }
+}
+
+function updateSelectedRow(row){
+  selectedCells = [];
+  for (let col = 0; col < numCols; col++) {
+    selectedCells.push([row, col, gridData[row-1][col]])
   }
 }
 
@@ -341,7 +389,6 @@ function updateSelectedCells(start, end) {
 function handleKeyDown(event) {
   // if (currentCell) {
   //   let [row, col] = currentCell;
-
   //   switch (event.key) {
   //     case "ArrowUp":
   //       row = row > 0 ? row - 1 : row;
@@ -363,7 +410,6 @@ function handleKeyDown(event) {
   //       }
   //       break;
   //   }
-
   //   currentCell = [row, col];
   //   updateSelectedCells(currentCell, currentCell);
   //   drawGrid();
@@ -371,16 +417,16 @@ function handleKeyDown(event) {
   // console.log(currentCell);
 }
 
-const findReplace = document.querySelector('.findReplace')
-findReplace.addEventListener('click', handleFindReplace)
+const findReplace = document.querySelector(".findReplace");
+findReplace.addEventListener("click", handleFindReplace);
 
 function handleFindReplace() {
   const findValue = prompt("Enter the value to find:");
   if (findValue === null) return; // Cancelled
- 
+
   const replaceValue = prompt("Enter the value to replace it with:");
   if (replaceValue === null) return; // Cancelled
- 
+
   // Iterate through gridData and replace values
   for (let row = 0; row < numRows; row++) {
     for (let col = 0; col < numCols; col++) {
@@ -389,7 +435,7 @@ function handleFindReplace() {
       }
     }
   }
- 
+
   // Re-render the grid
   drawGrid();
 }
@@ -401,17 +447,38 @@ function handleFindReplace() {
 //   console.log("Selected file:", selectedFile);
 // });
 
-const file = document.querySelector('.file')
-const opeartions = document.querySelector('.operations')
-const r31 = document.querySelector('.r-31')
-const r32 = document.querySelector('.r-32')
+const file = document.querySelector(".file");
+const opeartions = document.querySelector(".operations");
+const r31 = document.querySelector(".r-31");
+const r32 = document.querySelector(".r-32");
 
-file.addEventListener('click', ()=>{
-    r31.style.display = "inline-flex"
-    r32.style.display = "none"
-})
+file.addEventListener("click", () => {
+  r31.style.display = "inline-flex";
+  r32.style.display = "none";
+});
 
-opeartions.addEventListener('click', ()=>{
-  r31.style.display = "none"
-  r32.style.display = "inline-flex"
-})
+opeartions.addEventListener("click", () => {
+  r31.style.display = "none";
+  r32.style.display = "inline-flex";
+});
+
+// const ctx = document.getElementById('myChart');
+
+// new Chart(ctx, {
+//   type: 'bar',
+//   data: {
+//     labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+//     datasets: [{
+//       label: '# of Votes',
+//       data: [12, 19, 3, 5, 2, 3],
+//       borderWidth: 1
+//     }]
+//   },
+//   options: {
+//     scales: {
+//       y: {
+//         beginAtZero: true
+//       }
+//     }
+//   }
+// });
