@@ -120,14 +120,20 @@ body .ribbon > .rOptions > .rRight {
   align-items: center;
   justify-content: space-evenly;
 }
-body .excel {
+body .grid .rowExcel {
+  width: 100vw;
+}
+body .grid .rowExcel > #gridCanvas2 {
+  cursor: default;
+}
+body .grid .excel {
   height: 78vh;
   width: 100vw;
-  overflow: scroll;
+  overflow: auto;
   position: relative;
   display: flex;
 }
-body .excel > #gridCanvas {
+body .grid .excel > #gridCanvas {
   cursor: default;
   position: absolute;
   top: 0;
