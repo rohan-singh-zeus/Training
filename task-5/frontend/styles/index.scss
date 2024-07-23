@@ -164,6 +164,45 @@ body {
             }
           }
         }
+
+        > .r-33{
+          display: none;
+          flex: 0.9;
+          // background-color: #b9d9eb;
+          // display: flex;
+          align-items: center;
+          justify-content: start;
+          // margin-left: -60px;
+
+          > div {
+            height: 50px;
+            width: 100px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            // justify-content: center;
+            // margin: 10px 30px;
+
+            > button {
+              height: 70%;
+              width: 50%;
+              border-radius: 50%;
+              border: none;
+              background: transparent;
+
+              > img {
+                height: 100%;
+                width: 100%;
+                border-radius: 50%;
+              }
+            }
+
+            > p {
+              text-align: center;
+            }
+          }
+        }
       }
 
       > .rRight {
@@ -219,10 +258,15 @@ body {
   }
 
   .graph {
-    height: 500px;
+    display: none;
+    height: fit-content;
     width: 500px;
     position: absolute;
     top: 340px;
     left: 35%;
+    border: 1px dotted;
+    padding: 30px;
+    background-color: white;
+    border-radius: 10px;
   }
 }

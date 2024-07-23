@@ -1,5 +1,21 @@
+import { Graph } from "./graph.js";
+
 export class Grid {
-  constructor(canvasId, columnWidths, selectedCells, isDragging, isResizing, resizeColIndex, startX, startCell, currentCell, numRows, numCols) {
+  constructor(
+    canvasId,
+    columnWidths,
+    selectedCells,
+    isDragging,
+    isResizing,
+    resizeColIndex,
+    startX,
+    startCell,
+    currentCell,
+    numRows,
+    numCols,
+    cellsData,
+    cellsCol
+  ) {
     this.canvas = document.getElementById(canvasId);
     this.ctx = this.canvas.getContext("2d");
     this.defaultCellWidth = 100;
@@ -14,6 +30,8 @@ export class Grid {
     this.gridCols = [];
     this.gridRows = [];
     this.selectedCells = selectedCells;
+    this.cellsData = cellsData;
+    this.cellsCol = cellsCol
     this.isDragging = isDragging;
     this.isResizing = isResizing;
     this.resizeColIndex = resizeColIndex;
@@ -126,7 +144,6 @@ export class Grid {
   }
 
   drawGrid() {
-    console.log("Draw Grid called");
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.drawFirstCol();
     this.drawFirstRow();
@@ -217,10 +234,10 @@ export class Grid {
     }
     const row = Math.floor(offsetY / this.cellHeight);
     if (offsetX > x - 10 && offsetX < x + 10) {
-    //   this.isResizing = true;
-    //   this.resizeColIndex = col;
-    //   this.startX = offsetX;
-    //   this.canvas.style.cursor = "col-resize";
+      //   this.isResizing = true;
+      //   this.resizeColIndex = col;
+      //   this.startX = offsetX;
+      //   this.canvas.style.cursor = "col-resize";
     } else {
       this.isDragging = true;
       this.startCell = [row, col];
@@ -311,7 +328,14 @@ export class Grid {
       const maxText = document.querySelector(".max");
       maxText.innerHTML = `Max: <span>${this.max}</span>`;
       const avgText = document.querySelector(".avg");
-      avgText.innerHTML = `Average: <span>${(this.sum / this.count).toFixed(2)}</span>`;
+      avgText.innerHTML = `Average: <span>${(this.sum / this.count).toFixed(
+        2
+      )}</span>`;
+      for (let i = 0; i < this.selectedCells.length; i++) {
+        this.cellsData.push(this.selectedCells[i][2]);
+        this.cellsCol.push(i)
+        
+      }
     }
     if (row === 0) {
       this.updateSelectedCol(col);
@@ -347,11 +371,12 @@ export class Grid {
     for (let row = rowRange[0]; row <= rowRange[1]; row++) {
       for (let col = colRange[0]; col <= colRange[1]; col++) {
         this.selectedCells.push([row, col, this.gridData[row - 1][col - 1]]);
+        
       }
     }
   }
 
-  filteredRows(findValue) {
+  filterRows(findValue) {
     this.filteredRows = [];
     for (let row = 0; row < this.numRows; row++) {
       for (let col = 0; col < this.numCols; col++) {
@@ -365,5 +390,20 @@ export class Grid {
 
   clearFilter() {
     this.filteredRows = null;
+  }
+
+  constructBar(){
+    const graph = new Graph("myChart", this.cellsData, this.cellsCol)
+    graph.drawBarGraph();
+  }
+
+  constructLine(){
+    const graph = new Graph("myChart", this.cellsData, this.cellsCol)
+    graph.drawLineGraph();
+  }
+
+  constructPie(){
+    const graph = new Graph("myChart", this.cellsData, this.cellsCol)
+    graph.drawPieGraph()
   }
 }
