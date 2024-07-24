@@ -1,0 +1,31 @@
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  top: 100px;
+  position: relative;
+  background-color: #e0e6e1;
+}
+body .container {
+  height: 70vh;
+  overflow: auto;
+  width: 60vw;
+  background-color: whitesmoke;
+  display: flex;
+}
+body .container > #gridCol {
+  position: sticky;
+  margin-top: 33px;
+  left: 0;
+  background-color: rgba(0, 0, 128, 0.03);
+}
+body .container > .main > #gridRow {
+  background-color: rgba(0, 0, 128, 0.03);
+  position: sticky;
+  top: 0;
+}/*# sourceMappingURL=index.css.map */
