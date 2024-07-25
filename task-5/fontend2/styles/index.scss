@@ -29,6 +29,7 @@ body {
 
     > .main {
       // overflow: auto;
+      position: relative;
 
       > #gridRow {
         // border: 1px solid green;
@@ -42,6 +43,14 @@ body {
       > #gridMain {
         // border: 1px solid blue;
       }
+
+      >.inpText{
+        display: none;
+        // position: absolute;
+        // top: 20px;
+        // left: 30px;
+      }
     }
   }
+
 }

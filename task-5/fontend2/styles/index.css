@@ -24,8 +24,14 @@ body .container > #gridCol {
   left: 0;
   background-color: rgba(0, 0, 128, 0.03);
 }
+body .container > .main {
+  position: relative;
+}
 body .container > .main > #gridRow {
   background-color: rgba(0, 0, 128, 0.03);
   position: sticky;
   top: 0;
+}
+body .container > .main > .inpText {
+  display: none;
 }/*# sourceMappingURL=index.css.map */

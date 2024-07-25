@@ -1,4 +1,3 @@
-import { GridCol } from "./gridCol.js"
 import { GridMain } from "./gridMain.js"
 import { GridRow } from "./gridRow.js"
 
@@ -23,6 +22,6 @@ import { GridRow } from "./gridRow.js"
 //     console.log(gridmain.scrollTop);
 // })
 
-new GridCol("gridCol")
+// new GridCol("gridCol")
 new GridRow("gridRow")
 new GridMain("gridMain")
