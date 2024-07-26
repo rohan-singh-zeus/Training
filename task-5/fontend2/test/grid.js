@@ -14,5 +14,6 @@ export class Grid {
     this.isResizing = false
     this.startX = 0
     this.resizeColIndex = -1;
+    this.posX = Array(this.numCols).fill(0)
   }
 }

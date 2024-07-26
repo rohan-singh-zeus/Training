@@ -24,12 +24,12 @@ export class GridMain extends Grid {
 
   drawMainGrid() {
     // this.ctx.clearRect(0,0, this.canvas.width, this.canvas.height)
-
+    // console.log("Main Grid called");
     let cellPositionX = 0;
     let cellPositionY = 0;
 
-    for (let x = 1; cellPositionX <= this.canvas.width; ++x) {
-      cellPositionX += this.defCellWidth;
+    for (let x = 0; cellPositionX <= this.canvas.width; ++x) {
+      cellPositionX += this.defCellWidth + this.posX[x];
       this.ctx.save();
       this.ctx.beginPath();
       this.ctx.moveTo(cellPositionX + 0.5, 0);
@@ -40,7 +40,7 @@ export class GridMain extends Grid {
       this.ctx.restore();
     }
 
-    for (let y = 1; cellPositionY <= this.canvas.width; ++y) {
+    for (let y = 0; cellPositionY <= this.canvas.width; ++y) {
       cellPositionY += this.defCellHeight;
       this.ctx.save();
       this.ctx.beginPath();
@@ -58,6 +58,7 @@ export class GridMain extends Grid {
       this.ctx.strokeStyle = "rgb(0, 128, 0, 0.8)";
       this.ctx.strokeRect(x, y, this.defCellWidth, this.defCellHeight);
     });
+    console.log(this.posX);
     // if (this.isSelected) {
     //   // console.log(this.selectedX - this.defCellWidth, this.selectedY - this.defCellHeight);
     //   // this.ctx.fillStyle = "white";

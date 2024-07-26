@@ -2,11 +2,12 @@ import { Grid } from "./grid.js";
 import { GridMain } from "./gridMain.js";
 
 export class GridRow extends Grid {
-  constructor(canvasId) {
+  constructor(canvasId, gMain) {
     super();
     this.canvasId = canvasId;
     this.canvas = document.getElementById(this.canvasId);
     this.ctx = this.canvas.getContext("2d");
+    this.gMain = gMain;
 
     this.init();
   }
@@ -14,18 +15,19 @@ export class GridRow extends Grid {
   init() {
     this.canvas.addEventListener("mousedown", this.handleMouseDown.bind(this));
     this.canvas.addEventListener("mousemove", this.handleMouseMove.bind(this));
-    // this.canvas.addEventListener("mouseup", this.handleMouseUp.bind(this));
+    this.canvas.addEventListener("mouseup", this.handleMouseUp.bind(this));
     document.addEventListener("DOMContentLoaded", () => {
       this.drawRowGrid();
     });
   }
 
   drawRowGrid() {
-    console.log("drawGridCol called");
+    // console.log("drawGridCol called");
+    this.ctx.reset();
     let cellPositionX = 0;
     // let cellPositionY = 0;
-    for (let x = 1; cellPositionX <= this.canvas.width; ++x) {
-      cellPositionX += this.defCellWidth;
+    for (let x = 0; cellPositionX <= this.canvas.width; ++x) {
+      cellPositionX += this.defCellWidth + this.posX[x];
       this.ctx.save();
       this.ctx.beginPath();
       this.ctx.moveTo(cellPositionX + 0.5, 0);
@@ -79,34 +81,18 @@ export class GridRow extends Grid {
       this.startX = offsetX;
       this.canvas.style.cursor = "col-resize";
     }
-    // console.log(x,y);
-    // console.log(row, col);
   }
 
   handleMouseMove(e) {
-    console.log("Mousemove called");
     const { offsetX, offsetY } = e;
 
     if (this.isResizing) {
       const delta = offsetX - this.startX;
+      this.posX[this.resizeColIndex] += delta;
       this.colWidth[this.resizeColIndex] += delta;
       this.startX = offsetX;
       this.drawRowGrid();
-      new GridMain("gridMain").drawMainGrid()
-      // } else if (this.isDragging) {
-      //   let col = 0;
-      //   let x = 0;
-      //   for (let i = 0; i < this.numCols; i++) {
-      //     x += this.columnWidths[i];
-      //     if (offsetX < x) {
-      //       col = i;
-      //       break;
-      //     }
-      //   }
-      //   const row = Math.floor(offsetY / this.cellHeight);
-      //   this.currentCell = [row, col];
-      //   this.updateSelectedCells(this.startCell, this.currentCell);
-      //   this.drawGrid();
+      this.gMain.drawMainGrid();
     } else {
       let x = 0;
       for (let i = 0; i < this.numCols; i++) {
@@ -120,5 +106,10 @@ export class GridRow extends Grid {
     }
   }
 
-  handleMouseUp(e) {}
+  handleMouseUp(e) {
+    this.isResizing = false;
+    // this.startX = 0
+
+    console.log(this.posX);
+  }
 }

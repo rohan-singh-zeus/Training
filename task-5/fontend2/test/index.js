@@ -23,5 +23,5 @@ import { GridRow } from "./gridRow.js"
 // })
 
 // new GridCol("gridCol")
-new GridRow("gridRow")
-new GridMain("gridMain")
+const gMain = new GridMain("gridMain")
+new GridRow("gridRow", gMain)
