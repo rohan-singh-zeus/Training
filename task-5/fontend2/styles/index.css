@@ -13,10 +13,11 @@ body {
 }
 body .container {
   height: 70vh;
-  overflow: auto;
+  overflow: hidden;
   width: 60vw;
   background-color: whitesmoke;
   display: flex;
+  position: relative;
 }
 body .container > #gridCol {
   position: sticky;
@@ -34,4 +35,48 @@ body .container > .main > #gridRow {
 }
 body .container > .main > .inpText {
   display: none;
+}
+body .container > .horizontalScroll {
+  box-sizing: border-box;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2%;
+  width: 99%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  background-color: #e0e6e1;
+}
+body .container > .horizontalScroll > .horizontalScrollBar {
+  height: 50%;
+  width: 80%;
+  background-color: gray;
+  position: absolute;
+  left: 0px;
+  transition: all 0.1s;
+  border-radius: 25px;
+}
+body .container > .verticalScroll {
+  box-sizing: border-box;
+  position: absolute;
+  height: 98%;
+  top: 0;
+  right: 0;
+  width: 1%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  background-color: #e0e6e1;
+}
+body .container > .verticalScroll > .verticalScrollBar {
+  height: 80%;
+  width: 50%;
+  background-color: gray;
+  position: absolute;
+  top: 0;
+  transition: all 0.1s;
+  border-radius: 25px;
 }/*# sourceMappingURL=index.css.map */

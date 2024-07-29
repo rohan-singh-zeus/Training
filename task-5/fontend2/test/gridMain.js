@@ -1,13 +1,13 @@
 import { Grid } from "./grid.js";
 
 export class GridMain extends Grid {
-  constructor(canvasId) {
+  constructor(canvasId, posX) {
     super();
     this.canvas = document.getElementById(canvasId);
     this.ctx = this.canvas.getContext("2d");
     this.selectedX = 0;
     this.selectedY = 0;
-    
+    this.posX = posX
 
     this.init();
   }
@@ -23,13 +23,11 @@ export class GridMain extends Grid {
   }
 
   drawMainGrid() {
-    // this.ctx.clearRect(0,0, this.canvas.width, this.canvas.height)
-    // console.log("Main Grid called");
+    console.log(this.posX)
+    this.ctx.reset()
     let cellPositionX = 0;
     let cellPositionY = 0;
-
     for (let x = 0; cellPositionX <= this.canvas.width; ++x) {
-      cellPositionX += this.defCellWidth + this.posX[x];
       this.ctx.save();
       this.ctx.beginPath();
       this.ctx.moveTo(cellPositionX + 0.5, 0);
@@ -38,10 +36,11 @@ export class GridMain extends Grid {
       this.ctx.strokeStyle = "#ccc";
       this.ctx.stroke();
       this.ctx.restore();
+      cellPositionX += this.defCellWidth + this.posX[x];
+      
     }
 
     for (let y = 0; cellPositionY <= this.canvas.width; ++y) {
-      cellPositionY += this.defCellHeight;
       this.ctx.save();
       this.ctx.beginPath();
       this.ctx.moveTo(0, cellPositionY + 0.5);
@@ -50,29 +49,15 @@ export class GridMain extends Grid {
       this.ctx.strokeStyle = "#ccc";
       this.ctx.stroke();
       this.ctx.restore();
+      cellPositionY += this.defCellHeight;
     }
-
-    this.selectedCells.forEach(([row, col]) => {
-      let x = this.colWidth.slice(0, col).reduce((acc, val) => acc + val, 0);
-      const y = row * this.defCellHeight;
-      this.ctx.strokeStyle = "rgb(0, 128, 0, 0.8)";
-      this.ctx.strokeRect(x, y, this.defCellWidth, this.defCellHeight);
-    });
-    console.log(this.posX);
-    // if (this.isSelected) {
-    //   // console.log(this.selectedX - this.defCellWidth, this.selectedY - this.defCellHeight);
-    //   // this.ctx.fillStyle = "white";
-    //   // this.ctx.fillRect(this.selectedX, this.selectedY, this.defCellWidth, this.defCellHeight);
+ 
+    // this.selectedCells.forEach(([row, col]) => {
+    //   let x = this.colWidth.slice(0, col).reduce((acc, val) => acc + val, 0);
+    //   const y = row * this.defCellHeight;
     //   this.ctx.strokeStyle = "rgb(0, 128, 0, 0.8)";
-    //   this.ctx.strokeRect(
-    //     this.selectedX,
-    //     this.selectedY,
-    //     this.defCellWidth,
-    //     this.defCellHeight
-    //   );
-    //   // this.ctx.fillStyle = "#000000";
-    //   // this.ctx.font = "11px Arial";
-    // }
+    //   this.ctx.strokeRect(x, y, this.defCellWidth, this.defCellHeight);
+    // });
   }
 
   handleMouseDown(e) {
@@ -90,6 +75,7 @@ export class GridMain extends Grid {
     // console.log(offsetX, offsetY);
     this.isSelected = true;
     this.isDragging = true;
+    
     let x = 0;
     let y = 0;
     let col = 0;
@@ -117,6 +103,7 @@ export class GridMain extends Grid {
     this.startCell = [row, col];
     this.currentCell = [row, col];
     this.fillUpdatedCells(this.startCell, this.currentCell)
+    this.highlightSelection()
     this.drawMainGrid();
   }
 
@@ -136,6 +123,7 @@ export class GridMain extends Grid {
       const row = Math.floor(offsetY / this.defCellHeight);
       this.currentCell = [row, col];
       this.fillUpdatedCells(this.startCell, this.currentCell);
+      this.highlightSelection()
       this.drawMainGrid();
     }
   }
@@ -172,6 +160,58 @@ export class GridMain extends Grid {
     inpText.style.top = `${y}px`
     inpText.style.left = `${x - this.defCellWidth}px`
     console.log(x, y);
+  }
+
+  getColumnLeftPosition(col) {
+    let x = 0;
+    for (let i = 0; i < col; i++) {
+      x += this.colWidth[i];
+    }
+    return x;
+  }
+
+  highlightSelection() {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    // this.drawGrid(this.data.map(() => true));
+    // this.drawCellContents(this.data.map(() => true));
+
+ 
+    if (this.selectedCells.length == 1) {
+      this.ctx.fillStyle = "white";
+      this.selectedCells.forEach((cell) => {
+        // console.log(cell);
+        const x = this.getColumnLeftPosition(cell[1]);
+        const y = cell[0] * this.defCellHeight;
+        this.ctx.fillRect(x, y, this.colWidth[cell[1]], this.defCellHeight);
+      });
+    }
+ 
+    this.ctx.fillStyle = "rgb(0, 128, 0, 0.1)";
+    this.selectedCells.slice(1).forEach((cell) => {
+      const x = this.getColumnLeftPosition(cell[1]);
+      const y = cell[0] * this.defCellHeight;
+      this.ctx.fillRect(x, y, this.colWidth[cell[1]], this.defCellHeight);
+    });
+ 
+    if (this.selectedCells.length > 0) {
+      const minRow = Math.min(...this.selectedCells.map((cell) => cell[0]));
+      const maxRow = Math.max(...this.selectedCells.map((cell) => cell[0]));
+      const minCol = Math.min(...this.selectedCells.map((cell) => cell[1]));
+      const maxCol = Math.max(...this.selectedCells.map((cell) => cell[1]));
+ 
+      const xStart = this.getColumnLeftPosition(minCol);
+      const yStart = minRow * this.defCellHeight;
+      const xEnd =
+        this.getColumnLeftPosition(maxCol) + this.colWidth[maxCol];
+      const yEnd = (maxRow + 1) * this.defCellHeight;
+ 
+      // border
+      this.ctx.strokeStyle = "rgba(0, 128, 0, 0.8)";
+      this.ctx.lineWidth = 2;
+      this.ctx.strokeRect(xStart, yStart, xEnd - xStart, yEnd - yStart);
+    }
+ 
+    // this.drawCellContents(this.data.map(() => true));
   }
 
   fillUpdatedCells(start, end) {

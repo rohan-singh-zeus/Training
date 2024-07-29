@@ -22,6 +22,8 @@ import { GridRow } from "./gridRow.js"
 //     console.log(gridmain.scrollTop);
 // })
 
+let posX = Array(1000).fill(0)
+
 // new GridCol("gridCol")
-const gMain = new GridMain("gridMain")
-new GridRow("gridRow", gMain)
+const gMain = new GridMain("gridMain", posX)
+new GridRow("gridRow", gMain, posX)
