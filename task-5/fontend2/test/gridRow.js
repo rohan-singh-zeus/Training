@@ -1,13 +1,50 @@
-import { Grid } from "./grid.js";
+// import { Grid } from "./grid.js";
 
-export class GridRow extends Grid {
-  constructor(canvasId, gMain, posX) {
-    super();
+export class GridRow {
+  constructor(
+    canvasId,
+    gMain,
+    posX,
+    numRows,
+    numCols,
+    defCellHeight,
+    defCellWidth,
+    colWidth,
+    rowHeight,
+    selectedCells,
+    startCell,
+    currentCell,
+    isSelected,
+    isDragging,
+    isResizing,
+    startX,
+    resizeColIndex,
+    rowSelected
+  ) {
+    // super();
     this.canvasId = canvasId;
     this.canvas = document.getElementById(this.canvasId);
     this.ctx = this.canvas.getContext("2d");
     this.gMain = gMain;
-    this.posX = posX
+    this.posX = posX;
+    this.selectedX = 0;
+    this.selectedY = 0;
+    // this.posX = posX
+    this.numRows = numRows;
+    this.numCols = numCols;
+    this.defCellHeight = defCellHeight;
+    this.defCellWidth = defCellWidth;
+    this.colWidth = colWidth;
+    this.rowHeight = rowHeight;
+    this.selectedCells = selectedCells;
+    this.startCell = startCell;
+    this.currentCell = currentCell;
+    this.isSelected = isSelected;
+    this.isDragging = isDragging;
+    this.isResizing = isResizing;
+    this.startX = startX;
+    this.resizeColIndex = resizeColIndex;
+    this.rowSelected = rowSelected
 
     this.init();
   }
@@ -16,7 +53,7 @@ export class GridRow extends Grid {
     this.canvas.addEventListener("mousedown", this.handleMouseDown.bind(this));
     this.canvas.addEventListener("mousemove", this.handleMouseMove.bind(this));
     this.canvas.addEventListener("mouseup", this.handleMouseUp.bind(this));
-    this.canvas.addEventListener("dblclick", this.handleDblClick.bind(this))
+    this.canvas.addEventListener("dblclick", this.handleDblClick.bind(this));
     // this.canvas.addEventListener("click", this.fixedColCanvasClick.bind(this))
     document.addEventListener("DOMContentLoaded", () => {
       this.drawRowGrid();
@@ -37,8 +74,12 @@ export class GridRow extends Grid {
       this.ctx.strokeStyle = "#ccc";
       this.ctx.stroke();
       this.ctx.restore();
-      // this.ctx.fillStyle = "lightgray";
-      // this.ctx.fillRect(cellPositionX, 0, this.colWidth[x], this.CELL_HEIGHT);
+      if(this.rowSelected[x]){
+        
+        // this.ctx.fillStyle = "lightgray";
+        // this.ctx.fillRect(0, cellPositionX, this.colWidth[x], this.defCellHeight);
+        console.log("Row selected");
+      }
       this.ctx.fillStyle = "black";
       this.ctx.fillText(
         this.getColName(x),
@@ -46,6 +87,7 @@ export class GridRow extends Grid {
         this.defCellHeight / 2
       );
       cellPositionX += this.defCellWidth + this.posX[x];
+      // console.log(cellPositionX);
     }
 
     this.ctx.save();
@@ -56,10 +98,12 @@ export class GridRow extends Grid {
     this.ctx.strokeStyle = "#ccc";
     this.ctx.stroke();
     this.ctx.restore();
-    console.log(this.posX);
+
+
+    // console.log(this.posX);
   }
 
-  handleDblClick(e){
+  handleDblClick(e) {
     const { offsetX, offsetY } = e;
     // this.isSelected = true;
     // this.isDragging = true;
@@ -86,6 +130,7 @@ export class GridRow extends Grid {
       }
     }
     console.log(row, col);
+    this.rowSelected[col] = true
   }
 
   handleMouseDown(e) {
@@ -131,9 +176,8 @@ export class GridRow extends Grid {
       this.posX[this.resizeColIndex] += delta;
       this.colWidth[this.resizeColIndex] += delta;
       this.startX = offsetX;
-      this.gMain.drawMainGrid();
+      // this.gMain.drawMainGrid();
       this.drawRowGrid();
-      
     } else {
       let x = 0;
       for (let i = 0; i < this.numCols; i++) {
@@ -148,6 +192,7 @@ export class GridRow extends Grid {
   }
 
   handleMouseUp(e) {
+    this.gMain.drawMainGrid();
     this.isResizing = false;
     const { offsetX, offsetY } = e;
     // this.isSelected = true;
@@ -175,13 +220,13 @@ export class GridRow extends Grid {
       }
     }
     // console.log(row, col);
-    if(row == 0){
-      console.log("Row 0");
+    if (row == 0) {
+      // console.log("Row 0");
       this.updateSelectedCol(col);
-      console.log(this.selectedCells);
-      this.highlightSelection()
+      // console.log(this.selectedCells);
+      this.highlightSelection();
       this.drawRowGrid();
-      this.gMain.drawMainGrid()
+      this.gMain.drawMainGrid();
     }
     // console.log(row);
     // this.startX = 0
@@ -210,7 +255,6 @@ export class GridRow extends Grid {
     // this.drawGrid(this.data.map(() => true));
     // this.drawCellContents(this.data.map(() => true));
 
- 
     if (this.selectedCells.length == 1) {
       this.ctx.fillStyle = "white";
       this.selectedCells.forEach((cell) => {
@@ -220,33 +264,32 @@ export class GridRow extends Grid {
         this.ctx.fillRect(x, y, this.colWidth[cell[1]], this.defCellHeight);
       });
     }
- 
+
     this.ctx.fillStyle = "rgb(0, 128, 0, 0.1)";
     this.selectedCells.slice(1).forEach((cell) => {
       const x = this.getColumnLeftPosition(cell[1]);
       const y = cell[0] * this.defCellHeight;
       this.ctx.fillRect(x, y, this.colWidth[cell[1]], this.defCellHeight);
     });
- 
+
     if (this.selectedCells.length > 0) {
       // console.log("SJCBSJB");
       const minRow = Math.min(...this.selectedCells.map((cell) => cell[0]));
       const maxRow = Math.max(...this.selectedCells.map((cell) => cell[0]));
       const minCol = Math.min(...this.selectedCells.map((cell) => cell[1]));
       const maxCol = Math.max(...this.selectedCells.map((cell) => cell[1]));
- 
+
       const xStart = this.getColumnLeftPosition(minCol);
       const yStart = minRow * this.defCellHeight;
-      const xEnd =
-        this.getColumnLeftPosition(maxCol) + this.colWidth[maxCol];
+      const xEnd = this.getColumnLeftPosition(maxCol) + this.colWidth[maxCol];
       const yEnd = (maxRow + 1) * this.defCellHeight;
- 
+
       // border
       this.ctx.strokeStyle = "rgba(0, 128, 0, 0.8)";
       this.ctx.lineWidth = 2;
       this.ctx.strokeRect(xStart, yStart, xEnd - xStart, yEnd - yStart);
     }
- 
+
     // this.drawCellContents(this.data.map(() => true));
   }
 
@@ -257,7 +300,6 @@ export class GridRow extends Grid {
     }
     return x;
   }
-
 
   getColName(n) {
     let columnName = "";

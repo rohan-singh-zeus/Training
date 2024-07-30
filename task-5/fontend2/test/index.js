@@ -1,29 +1,23 @@
-import { GridMain } from "./gridMain.js"
-import { GridRow } from "./gridRow.js"
+import { GridMain } from "./gridMain.js";
+import { GridRow } from "./gridRow.js";
 
-// const container = document.querySelector(".container")
-// const gridcol = document.querySelector(".gridCol")
-// const main = document.querySelector(".main")
-// const gridrow = document.querySelector(".gridRow")
-// const gridmain = document.querySelector(".gridMain")
-
-
-// const numCols = 1000
-// const numRows = 1000
-// const defCellWidth = 50
-// const defCellHeight = 30
-// let colWidth = Array(numCols).fill(defCellWidth)
-// let rowHeight = Array(numRows).fill(defCellHeight)
-
-// // console.log(gridmain.scrollTop);
-// // console.log(rowHeight);
-
-// main.addEventListener("scroll", (e)=>{
-//     console.log(gridmain.scrollTop);
-// })
-
-let posX = Array(1000).fill(0)
+const numRows = 1000;
+const numCols = 1000;
+const defCellWidth = 100;
+const defCellHeight = 30;
+let colWidth = Array(numCols).fill(defCellWidth);
+let rowHeight = Array(numRows).fill(defCellHeight);
+let selectedCells = [];
+let startCell = null;
+let currentCell = null;
+let isSelected = false;
+let isDragging = false;
+let isResizing = false;
+let startX = 0;
+let resizeColIndex = -1;
+let posX = Array(numCols).fill(0);
+let rowSelected = Array(numRows).fill(false)
 
 // new GridCol("gridCol")
-const gMain = new GridMain("gridMain", posX)
-new GridRow("gridRow", gMain, posX)
+const gMain = new GridMain("gridMain", posX, numRows, numCols, defCellHeight, defCellWidth, colWidth, rowHeight, selectedCells, startCell, currentCell, isSelected, isDragging, isResizing, startX, resizeColIndex);
+new GridRow("gridRow", gMain, posX, numRows, numCols, defCellHeight, defCellWidth, colWidth, rowHeight, selectedCells, startCell, currentCell, isSelected, isDragging, isResizing, startX, resizeColIndex, rowSelected);

@@ -78,7 +78,7 @@ export class RowGrid {
       this.columnWidths[this.resizeColIndex] += delta;
       this.startX = offsetX;
       this.drawRow();
-      this.grid.drawGrid()
+      // this.grid.drawGrid()
     } else if (this.isDragging) {
       let col = 0;
       let x = 0;
@@ -108,6 +108,7 @@ export class RowGrid {
   }
 
   handleMouseUp(event) {
+
     const { offsetX, offsetY } = event;
     let col = 0;
     let x = 0;
@@ -132,6 +133,8 @@ export class RowGrid {
       this.currentCell = null;
     }
     if (this.isResizing) {
+    this.grid.drawGrid()
+
       this.isResizing = false;
       this.canvas.style.cursor = "default";
     }
