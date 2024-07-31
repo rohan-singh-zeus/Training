@@ -21,7 +21,6 @@ export class GridRow {
     resizeColIndex,
     rowSelected
   ) {
-    // super();
     this.canvasId = canvasId;
     this.canvas = document.getElementById(this.canvasId);
     this.ctx = this.canvas.getContext("2d");
@@ -29,7 +28,6 @@ export class GridRow {
     this.posX = posX;
     this.selectedX = 0;
     this.selectedY = 0;
-    // this.posX = posX
     this.numRows = numRows;
     this.numCols = numCols;
     this.defCellHeight = defCellHeight;

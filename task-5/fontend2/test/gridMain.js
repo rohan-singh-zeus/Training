@@ -1,5 +1,3 @@
-// import { Grid } from "./grid.js";
-
 export class GridMain {
   constructor(
     canvasId,
@@ -19,7 +17,6 @@ export class GridMain {
     startX,
     resizeColIndex
   ) {
-    // super();
     this.canvas = document.getElementById(canvasId);
     this.ctx = this.canvas.getContext("2d");
     this.selectedX = 0;
@@ -41,16 +38,30 @@ export class GridMain {
     this.resizeColIndex = resizeColIndex;
     this.isAnimated = false;
     this.dashOffset = 0;
+    this.wafId = 0;
+    this.xStart = 0;
+    this.xEnd = 0;
+    this.yStart = 0;
+    this.yEnd = 0;
 
     this.init();
   }
 
   init() {
-    this.canvas.addEventListener("mousedown", this.handleMouseDown.bind(this));
-    this.canvas.addEventListener("mousemove", this.handleMouseMove.bind(this));
-    this.canvas.addEventListener("mouseup", this.handleMouseUp.bind(this));
+    this.canvas.addEventListener(
+      "pointerdown",
+      this.handleMouseDown.bind(this)
+    );
+    this.canvas.addEventListener(
+      "pointermove",
+      this.handleMouseMove.bind(this)
+    );
+    this.canvas.addEventListener("pointerup", this.handleMouseUp.bind(this));
     this.canvas.addEventListener("dblclick", this.handleDoubleClick.bind(this));
-    document.addEventListener("keydown", this.handleMarchingAnt.bind(this));
+    document.addEventListener("keydown", (e) => {
+      // console.log(this.dashOffset);
+      this.handleMarchingAnt(e);
+    });
     document.addEventListener("DOMContentLoaded", () => {
       this.drawMainGrid();
       // this.handleDevicePixelRatio()
@@ -58,7 +69,6 @@ export class GridMain {
   }
 
   drawMainGrid() {
-    // console.log(this.posX);
     this.ctx.reset();
     let cellPositionX = 0;
     let cellPositionY = 0;
@@ -99,14 +109,8 @@ export class GridMain {
   }
 
   handleMouseDown(e) {
-    // this.ctx.clearRect(
-    //   this.selectedX,
-    //   this.selectedY,
-    //   this.defCellWidth,
-    //   this.defCellHeight
-    // );
-    // this.ctx.reset();
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    window.cancelAnimationFrame(this.wafId);
 
     const { offsetX, offsetY } = e;
     // console.log(offsetX, offsetY);
@@ -210,23 +214,29 @@ export class GridMain {
     return x;
   }
 
-  handleMarchingAnt(e) {
-    if (e.key === "Control") {
-      console.log("Ctrl key pressed");
-      this.isAnimated = true;
-      // this.animate.bind(this)
-      // requestAnimationFrame(this.drawDottedRect.bind(this));
-      this.drawMainGrid();
+  march() {
+    this.dashOffset++;
+    if (this.dashOffset > 16) {
+      this.dashOffset = 0;
     }
-    // console.log(e);
+    this.drawDottedRect();
+    this.wafId = window.requestAnimationFrame(() => {
+      this.drawMainGrid();
+      this.march();
+    });
+  }
+
+  handleMarchingAnt(e) {
+    if (e.key === "Control" && this.selectedCells.length > 1) {
+      this.isAnimated = true;
+      if (this.isAnimated) {
+        window.cancelAnimationFrame(this.wafId);
+      }
+      this.march();
+    }
   }
 
   highlightSelection() {
-    // console.log("Highlight section called");
-    // this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    // this.drawGrid(this.data.map(() => true));
-    // this.drawCellContents(this.data.map(() => true));
-
     if (this.selectedCells.length == 1) {
       // console.log("Highlight of len 1 called section called");
 
@@ -255,56 +265,39 @@ export class GridMain {
       const minCol = Math.min(...this.selectedCells.map((cell) => cell[1]));
       const maxCol = Math.max(...this.selectedCells.map((cell) => cell[1]));
 
-      const xStart = this.getColumnLeftPosition(minCol);
-      const yStart = minRow * this.defCellHeight;
-      const xEnd = this.getColumnLeftPosition(maxCol) + this.colWidth[maxCol];
-      const yEnd = (maxRow + 1) * this.defCellHeight;
-
-      let xVal = 5;
-      let yVal = 5
+      this.xStart = this.getColumnLeftPosition(minCol);
+      this.yStart = minRow * this.defCellHeight;
+      this.xEnd = this.getColumnLeftPosition(maxCol) + this.colWidth[maxCol];
+      this.yEnd = (maxRow + 1) * this.defCellHeight;
 
       // border
-      if (this.isAnimated) {
-        setInterval(() => {
-          this.drawDottedRect(xStart, yStart, xEnd, yEnd, xVal, yVal)
-          console.log(xVal)
-          if (xVal === 5) {
-            
-            xVal = 0;
-          } else {
-            xVal = 5;
-          }
-          console.log("Inetrval");
-        }, 100);
+      if (this.isAnimated && this.selectedCells.length > 1) {
+        this.drawDottedRect();
       } else {
         this.ctx.strokeStyle = "rgba(0, 128, 0, 0.8)";
         this.ctx.lineWidth = 2;
-        this.ctx.strokeRect(xStart, yStart, xEnd - xStart, yEnd - yStart);
+        this.ctx.strokeRect(
+          this.xStart,
+          this.yStart,
+          this.xEnd - this.xStart,
+          this.yEnd - this.yStart
+        );
       }
     }
-
-    // this.drawCellContents(this.data.map(() => true));
   }
 
-  drawDottedRect(xStart, yStart, xEnd, yEnd, x, y) {
-    // this.ctx.clearRect(0,0, this.canvas.width, this.canvas.height)
-    this.ctx.setLineDash([x, y]);
-    this.ctx.lineDashOffset = this.dashOffset;
+  drawDottedRect() {
+    this.ctx.setLineDash([5,5]);
+    this.ctx.lineDashOffset = -this.dashOffset;
     this.ctx.strokeStyle = "rgba(0, 128, 0, 0.9)";
     this.ctx.lineWidth = 2;
-    // this.ctx.beginPath();
-    this.ctx.strokeRect(xStart+x, yStart+x, xEnd - xStart, yEnd - yStart);
-    
-    // this.drawMainGrid()
-    // this.ctx.stroke();
-    // this.ctx.setLineDash([]);
+    this.ctx.strokeRect(
+      this.xStart,
+      this.yStart,
+      this.xEnd - this.xStart,
+      this.yEnd - this.yStart
+    );
   }
-
-  // animate(){
-  //   this.dashOffset--;
-  //   this.drawDottedRect.bind(this)
-  //   requestAnimationFrame(this.animate)
-  // }
 
   fillUpdatedCells(start, end) {
     this.selectedCells = [];
