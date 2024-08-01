@@ -1,5 +1,6 @@
 import { GridMain } from "./gridMain.js";
 import { GridRow } from "./gridRow.js";
+import { HorizontalScroll } from "./horizontalScroll.js";
 import { VerticalScroll } from "./verticalScroll.js";
 
 const numRows = 1000;
@@ -24,3 +25,4 @@ const gMain = new GridMain("gridMain", posX, numRows, numCols, defCellHeight, de
 new GridRow("gridRow", gMain, posX, numRows, numCols, defCellHeight, defCellWidth, colWidth, rowHeight, selectedCells, startCell, currentCell, isSelected, isDragging, isResizing, startX, resizeColIndex, rowSelected);
 
 new VerticalScroll("verticalScroll")
+new HorizontalScroll("horizontalScroll")

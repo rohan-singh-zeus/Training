@@ -236,6 +236,19 @@ export class GridMain {
     }
   }
 
+  drawDottedRect() {
+    this.ctx.setLineDash([5,5]);
+    this.ctx.lineDashOffset = -this.dashOffset;
+    this.ctx.strokeStyle = "rgba(0, 128, 0, 0.9)";
+    this.ctx.lineWidth = 2;
+    this.ctx.strokeRect(
+      this.xStart,
+      this.yStart,
+      this.xEnd - this.xStart,
+      this.yEnd - this.yStart
+    );
+  }
+
   highlightSelection() {
     if (this.selectedCells.length == 1) {
       // console.log("Highlight of len 1 called section called");
@@ -286,18 +299,7 @@ export class GridMain {
     }
   }
 
-  drawDottedRect() {
-    this.ctx.setLineDash([5,5]);
-    this.ctx.lineDashOffset = -this.dashOffset;
-    this.ctx.strokeStyle = "rgba(0, 128, 0, 0.9)";
-    this.ctx.lineWidth = 2;
-    this.ctx.strokeRect(
-      this.xStart,
-      this.yStart,
-      this.xEnd - this.xStart,
-      this.yEnd - this.yStart
-    );
-  }
+  
 
   fillUpdatedCells(start, end) {
     this.selectedCells = [];
