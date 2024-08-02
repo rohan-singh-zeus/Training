@@ -63,9 +63,21 @@ export class GridMain {
       this.handleMarchingAnt(e);
     });
     document.addEventListener("DOMContentLoaded", () => {
+      this.fetchData()
       this.drawMainGrid();
       // this.handleDevicePixelRatio()
     });
+  }
+
+  fetchData() {
+    fetch("test.json")
+      .then((res) => res.json())
+      .then((data) => {
+        // console.log(data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
   drawMainGrid() {
@@ -237,7 +249,7 @@ export class GridMain {
   }
 
   drawDottedRect() {
-    this.ctx.setLineDash([5,5]);
+    this.ctx.setLineDash([5, 5]);
     this.ctx.lineDashOffset = -this.dashOffset;
     this.ctx.strokeStyle = "rgba(0, 128, 0, 0.9)";
     this.ctx.lineWidth = 2;
@@ -298,8 +310,6 @@ export class GridMain {
       }
     }
   }
-
-  
 
   fillUpdatedCells(start, end) {
     this.selectedCells = [];

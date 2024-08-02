@@ -19,10 +19,11 @@ let startX = 0;
 let resizeColIndex = -1;
 let posX = Array(numCols).fill(0);
 let rowSelected = Array(numRows).fill(false)
+let totalContainerHeight = 2000
 
 // new GridCol("gridCol")
 const gMain = new GridMain("gridMain", posX, numRows, numCols, defCellHeight, defCellWidth, colWidth, rowHeight, selectedCells, startCell, currentCell, isSelected, isDragging, isResizing, startX, resizeColIndex);
 new GridRow("gridRow", gMain, posX, numRows, numCols, defCellHeight, defCellWidth, colWidth, rowHeight, selectedCells, startCell, currentCell, isSelected, isDragging, isResizing, startX, resizeColIndex, rowSelected);
 
-new VerticalScroll("verticalScroll")
-new HorizontalScroll("horizontalScroll")
+new VerticalScroll("verticalScroll", gMain, totalContainerHeight)
+new HorizontalScroll("horizontalScroll", gMain)
