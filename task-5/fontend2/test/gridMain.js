@@ -1,11 +1,9 @@
+import { GridConstants } from "../constant/index.js";
+
 export class GridMain {
   constructor(
     canvasId,
     posX,
-    numRows,
-    numCols,
-    defCellHeight,
-    defCellWidth,
     colWidth,
     rowHeight,
     selectedCells,
@@ -17,36 +15,125 @@ export class GridMain {
     startX,
     resizeColIndex
   ) {
+    /**
+     * Main Canvas Element
+     * @type {HTMLCanvasElement}
+     */
     this.canvas = document.getElementById(canvasId);
     this.ctx = this.canvas.getContext("2d");
+    /**
+     * Keeps track if any column is resized or not
+     * @type {number[]}
+     */
+    this.posX = posX;
+    
     this.selectedX = 0;
     this.selectedY = 0;
-    this.posX = posX;
-    this.numRows = numRows;
-    this.numCols = numCols;
-    this.defCellHeight = defCellHeight;
-    this.defCellWidth = defCellWidth;
+    /**
+     * Total number of Rows
+     * @type {number} 
+     */
+    this.numRows = GridConstants.numRows;
+    /**
+     * Total number of Columns
+     * @type {number} 
+     */
+    this.numCols = GridConstants.numCols;
+    /**
+     * Default height of individual cell
+     * @type {number} 
+     */
+    this.defCellHeight = GridConstants.defCellHeight;
+    /**
+     * Default width of individual cell
+     * @type {number}
+     */
+    this.defCellWidth = GridConstants.defCellWidth;
+    /**
+     * Array of widths of each column
+     * @type {number[]} 
+     */
     this.colWidth = colWidth;
+    /**
+     * Array of heights of row
+     * @type {number[]} 
+     */
     this.rowHeight = rowHeight;
+    /**
+     * Array of selected cells for selection
+     * @type {number[]}  
+     */
     this.selectedCells = selectedCells;
+    /**
+     * Start row, col values for the cells to be selected in the format (row, col)
+     * @type {number[]}  
+     */
     this.startCell = startCell;
+    /**
+     * Current row, col values for the cells which are selected in the format (row, col)
+     * @type {number[]}  
+     */
     this.currentCell = currentCell;
     this.isSelected = isSelected;
+    /**
+     * Flag for if dragging for multiple selection or not
+     * @type {boolean}  
+     */
     this.isDragging = isDragging;
+    /**
+     * Flag for if resizing a column or not
+     * @type {boolean}  
+     */
     this.isResizing = isResizing;
-    this.startX = startX;
+    /**
+     * Current col selected for resizing
+     * @type {number} 
+     */
     this.resizeColIndex = resizeColIndex;
+    /**
+     * Starting position of the column where we want to resize from
+     * @type {number} 
+     */
+    this.startX = startX;
+    /**
+     * Flag for starting the marching ants animation
+     * @type {boolean}  
+     */
     this.isAnimated = false;
+    /**
+     * Offset value for marching ants animation
+     * @type {number} 
+     */
     this.dashOffset = 0;
+    /**
+     * Request animation frame id
+     * @type {number} 
+     */
     this.wafId = 0;
+    /**
+     * @type {number} 
+     */
     this.xStart = 0;
+    /**
+     * @type {number} 
+     */
     this.xEnd = 0;
+    /**
+     * @type {number} 
+     */
     this.yStart = 0;
+    /**
+     * @type {number} 
+     */
     this.yEnd = 0;
 
     this.init();
   }
 
+  /**
+   * Initializing Row Grid Canvas
+   * @returns {void}
+   */
   init() {
     this.canvas.addEventListener(
       "pointerdown",
@@ -69,6 +156,7 @@ export class GridMain {
     });
   }
 
+
   fetchData() {
     fetch("test.json")
       .then((res) => res.json())
@@ -80,6 +168,10 @@ export class GridMain {
       });
   }
 
+  /**
+   * Draw Main Grid Canvas
+   * @returns {void}
+   */
   drawMainGrid() {
     this.ctx.reset();
     let cellPositionX = 0;
@@ -111,6 +203,7 @@ export class GridMain {
     this.highlightSelection();
   }
 
+
   handleDevicePixelRatio() {
     const dpx = window.devicePixelRatio;
 
@@ -120,6 +213,11 @@ export class GridMain {
     this.ctx.scale(dpx, dpx);
   }
 
+  /**
+   * Handle Mouse Down Operation
+   * @param {PointerEvent} e 
+   * @return {void}
+   */
   handleMouseDown(e) {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     window.cancelAnimationFrame(this.wafId);
@@ -161,6 +259,11 @@ export class GridMain {
     this.drawMainGrid();
   }
 
+  /**
+   * Handle Mouse move operation
+   * @param {PointerEvent} e 
+   * @returns {void}
+   */
   handleMouseMove(e) {
     const { offsetX, offsetY } = e;
 
@@ -183,11 +286,21 @@ export class GridMain {
     }
   }
 
+  /**
+   * Handle Pointer up event
+   * @param {PointerEvent} event  -
+   * @returns {void} 
+   */
   handleMouseUp(e) {
     this.isDragging = false;
     // console.log(this.selectedCells);
   }
 
+  /**
+   * Handle Double click Operation
+   * @param {PointerEvent} e 
+   * @returns {void}
+   */
   handleDoubleClick(e) {
     const { offsetX, offsetY } = e;
     const inpText = document.querySelector(".inpText");
@@ -218,6 +331,11 @@ export class GridMain {
     // console.log(x, y);
   }
 
+  /**
+   * Get x position based on column value
+   * @param {number} col 
+   * @returns {number}
+   */
   getColumnLeftPosition(col) {
     let x = 0;
     for (let i = 0; i < col; i++) {
@@ -226,6 +344,10 @@ export class GridMain {
     return x;
   }
 
+  /**
+   * This enables marching animation through recursion
+   * @returns {void}
+   */
   march() {
     this.dashOffset++;
     if (this.dashOffset > 16) {
@@ -238,6 +360,11 @@ export class GridMain {
     });
   }
 
+  /**
+   * Handles Marching Ant Animation logic
+   * @param {KeyboardEvent} e 
+   * @returns {void}
+   */
   handleMarchingAnt(e) {
     if (e.key === "Control" && this.selectedCells.length > 1) {
       this.isAnimated = true;
@@ -248,6 +375,10 @@ export class GridMain {
     }
   }
 
+  /**
+   * Draw Rectangle with dotted stroke
+   * @returns {void}
+   */
   drawDottedRect() {
     this.ctx.setLineDash([5, 5]);
     this.ctx.lineDashOffset = -this.dashOffset;
@@ -261,6 +392,10 @@ export class GridMain {
     );
   }
 
+  /**
+   * Highlight the selected cells
+   * @return {void}
+   */
   highlightSelection() {
     if (this.selectedCells.length == 1) {
       // console.log("Highlight of len 1 called section called");
@@ -311,6 +446,13 @@ export class GridMain {
     }
   }
 
+  /**
+   * 
+   * Fill selected row, column array for multiple selection
+   * @param {number} start
+   * @param {number} end
+   * @returns {void}
+   */
   fillUpdatedCells(start, end) {
     this.selectedCells = [];
     const [startRow, startCol] = start;

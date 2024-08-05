@@ -1,27 +1,30 @@
 export class Graph {
   constructor(canvasId, cellsData, cellsCol) {
+    /**
+     * Canvas Id
+     * @type {string}  
+     */
     this.canvasId = canvasId;
+    /**
+     * Array of selected data for Graph construction
+     * @type {number[]}  
+     */
     this.cellsData = cellsData;
+    /**
+     * Array of selected data columns for Graph construction
+     * @type {number[]}  
+     */
     this.cellsCol = cellsCol;
+    /**
+     * @type {HTMLCanvasElement}
+     */
     this.ctx = document.getElementById(this.canvasId);
-
-    this.init();
   }
 
-  init() {
-    this.ctx.addEventListener("mouseup", this.test.bind(this));
-  }
-
-  test() {
-    // console.log(this.cellsCol);
-    // console.log(this.cellsData);
-    // if(Array.from(this.cellsCol).length === Array.from(this.cellsData).length){
-    //     console.log("Equal");
-    // }else{
-    //     console.log("Not Equal");
-    // }
-  }
-
+  /**
+   * Drawing Bar Graph
+   * @returns {void}
+   */
   drawBarGraph() {
     new Chart(this.ctx, {
       type: "bar",
@@ -46,6 +49,10 @@ export class Graph {
     });
   }
 
+  /**
+   * Drawing Line Graph
+   * @returns {void}
+   */
   drawLineGraph() {
     new Chart(this.ctx, {
       type : 'line',
@@ -68,6 +75,10 @@ export class Graph {
     });
   }
 
+  /**
+   * Drawing Pie Chart
+   * @returns {void}
+   */
   drawPieGraph(){
     new Chart(this.ctx, {
       type : 'pie',

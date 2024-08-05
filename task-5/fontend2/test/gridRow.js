@@ -1,14 +1,11 @@
-// import { Grid } from "./grid.js";
+import { GridConstants } from '../constant/index.js';
+import {GridMain} from './gridMain.js'
 
 export class GridRow {
   constructor(
     canvasId,
     gMain,
     posX,
-    numRows,
-    numCols,
-    defCellHeight,
-    defCellWidth,
     colWidth,
     rowHeight,
     selectedCells,
@@ -21,36 +18,109 @@ export class GridRow {
     resizeColIndex,
     rowSelected
   ) {
+    /**
+     * Canvas Id
+     * @type {string}
+     */
     this.canvasId = canvasId;
+    /**
+     * Row Canvas Element
+     * @type {HTMLCanvasElement}
+     */
     this.canvas = document.getElementById(this.canvasId);
     this.ctx = this.canvas.getContext("2d");
+    /**
+     * Main Canvas Element
+     * @type {GridMain}
+     */
     this.gMain = gMain;
+    /**
+     * Keeps track if any column is resized or not
+     * @type {number[]}
+     */
     this.posX = posX;
+    
     this.selectedX = 0;
     this.selectedY = 0;
-    this.numRows = numRows;
-    this.numCols = numCols;
-    this.defCellHeight = defCellHeight;
-    this.defCellWidth = defCellWidth;
+    /**
+     * Total number of Rows
+     * @type {number} 
+     */
+    this.numRows = GridConstants.numRows;
+    /**
+     * Total number of Columns
+     * @type {number} 
+     */
+    this.numCols = GridConstants.numCols;
+    /**
+     * Default height of individual cell
+     * @type {number} 
+     */
+    this.defCellHeight = GridConstants.defCellHeight;
+    /**
+     * Default width of individual cell
+     * @type {number}
+     */
+    this.defCellWidth = GridConstants.defCellWidth;
+    /**
+     * Array of widths of each column
+     * @type {number[]} 
+     */
     this.colWidth = colWidth;
+    /**
+     * Array of heights of row
+     * @type {number[]} 
+     */
     this.rowHeight = rowHeight;
+    /**
+     * Array of selected cells for selection
+     * @type {number[]}  
+     */
     this.selectedCells = selectedCells;
+    /**
+     * Start row, col values for the cells to be selected in the format (row, col)
+     * @type {number[]}  
+     */
     this.startCell = startCell;
+    /**
+     * Current row, col values for the cells which are selected in the format (row, col)
+     * @type {number[]}  
+     */
     this.currentCell = currentCell;
     this.isSelected = isSelected;
+    /**
+     * Flag for if dragging for multiple selection or not
+     * @type {boolean}  
+     */
     this.isDragging = isDragging;
+    /**
+     * Flag for if resizing a column or not
+     * @type {boolean}  
+     */
     this.isResizing = isResizing;
-    this.startX = startX;
+    /**
+     * Current col selected for resizing
+     * @type {number} 
+     */
     this.resizeColIndex = resizeColIndex;
+    /**
+     * Starting position of the column where we want to resize from
+     * @type {number} 
+     */
+    this.startX = startX;
     this.rowSelected = rowSelected
 
     this.init();
   }
 
+  /**
+   * Initializing Row Grid Canvas
+   * @returns {void}
+   */
   init() {
-    this.canvas.addEventListener("mousedown", this.handleMouseDown.bind(this));
-    this.canvas.addEventListener("mousemove", this.handleMouseMove.bind(this));
-    this.canvas.addEventListener("mouseup", this.handleMouseUp.bind(this));
+    this.canvas.addEventListener("pointerdown", this.handleMouseDown.bind(this));
+    this.canvas.addEventListener("pointermove", this.handleMouseMove.bind(this));
+    this.canvas.addEventListener("pointerup", this.handleMouseUp.bind(this));
     this.canvas.addEventListener("dblclick", this.handleDblClick.bind(this));
     // this.canvas.addEventListener("click", this.fixedColCanvasClick.bind(this))
     document.addEventListener("DOMContentLoaded", () => {
@@ -58,6 +128,10 @@ export class GridRow {
     });
   }
 
+  /**
+   * Draw Row Grid Canvas
+   * @returns {void}
+   */
   drawRowGrid() {
     // console.log("drawGridCol called");
     this.ctx.reset();
@@ -101,6 +175,11 @@ export class GridRow {
     // console.log(this.posX);
   }
 
+  /**
+   * Handle Double click Operation
+   * @param {PointerEvent} e 
+   * @returns {void}
+   */
   handleDblClick(e) {
     const { offsetX, offsetY } = e;
     // this.isSelected = true;
@@ -131,6 +210,11 @@ export class GridRow {
     this.rowSelected[col] = true
   }
 
+  /**
+   * Handle Mouse Down Operation
+   * @param {PointerEvent} e 
+   * @return {void}
+   */
   handleMouseDown(e) {
     const { offsetX, offsetY } = e;
     this.isSelected = true;
@@ -166,6 +250,11 @@ export class GridRow {
     }
   }
 
+  /**
+   * Handle Mouse move operation
+   * @param {PointerEvent} e 
+   * @returns {void}
+   */
   handleMouseMove(e) {
     const { offsetX, offsetY } = e;
 
@@ -189,6 +278,12 @@ export class GridRow {
     }
   }
 
+  /**
+   * 
+   * Handle Pointer up event
+   * @param {PointerEvent} event  -
+   * @returns {void} 
+   */
   handleMouseUp(e) {
     this.gMain.drawMainGrid();
     this.isResizing = false;
@@ -232,6 +327,12 @@ export class GridRow {
     // console.log(this.posX);
   }
 
+  /**
+   * 
+   * Updated selected column array for multiple selection
+   * @param {number} col 
+   * @returns {void}
+   */
   updateSelectedCol(col) {
     this.selectedCells = [];
     for (let row = 0; row < this.numRows; row++) {
@@ -239,6 +340,11 @@ export class GridRow {
     }
   }
 
+  /**
+   * Get Column value based on x
+   * @param {number} x 
+   * @returns {number}
+   */
   getColumnAtX(x) {
     let accumulatedWidth = 0;
     for (let i = 0; i < this.numCols; i++) {
@@ -248,6 +354,10 @@ export class GridRow {
     return -1;
   }
 
+  /**
+   * Highlight the selected cells
+   * @return {void}
+   */
   highlightSelection() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     // this.drawGrid(this.data.map(() => true));
@@ -291,6 +401,11 @@ export class GridRow {
     // this.drawCellContents(this.data.map(() => true));
   }
 
+  /**
+   * Get x position based on column value
+   * @param {number} col 
+   * @returns {number}
+   */
   getColumnLeftPosition(col) {
     let x = 0;
     for (let i = 0; i < col; i++) {
@@ -299,6 +414,11 @@ export class GridRow {
     return x;
   }
 
+  /**
+   * Get random column names
+   * @param {number} n 
+   * @returns {string}
+   */
   getColName(n) {
     let columnName = "";
     while (n > 0) {

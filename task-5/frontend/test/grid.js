@@ -1,3 +1,4 @@
+import { GridConstants } from "../constant/index.js";
 import { Graph } from "./graph.js";
 
 export class Grid {
@@ -11,49 +12,150 @@ export class Grid {
     startX,
     startCell,
     currentCell,
-    numRows,
-    numCols,
     cellsData,
     cellsCol
   ) {
+    /**
+     * Canvas of the main Grid
+     * @type {HTMLCanvasElement}
+     */
     this.canvas = document.getElementById(canvasId);
     this.ctx = this.canvas.getContext("2d");
-    this.defaultCellWidth = 100;
-    this.cellHeight = 30;
-    this.numRows = numRows;
-    this.numCols = numCols;
+    /**
+     * Default width of individual cell
+     * @type {number}
+     */
+    this.defaultCellWidth = GridConstants.defaultCellWidth;
+    /**
+     * Default height of individual cell
+     * @type {number} 
+     */
+    this.cellHeight = GridConstants.cellHeight;
+    /**
+     * Total number of Rows
+     * @type {number} 
+     */
+    this.numRows = GridConstants.numRows;
+    /**
+     * Total number of Columns
+     * @type {number} 
+     */
+    this.numCols = GridConstants.numCols;
+    /**
+     * Array of widths of each column
+     * @type {number[]} 
+     */
     this.columnWidths = columnWidths;
+    /**
+     * Array of heights of row
+     * @type {number[]} 
+     */
     this.rowHeights = Array(this.numRows).fill(this.cellHeight);
+    /**
+     * Stores the data in 2-D Array
+     * @type {string[][]}  
+     */
     this.gridData = Array.from({ length: this.numRows }, () =>
       Array(this.numCols).fill("")
     );
+    /**
+     * Number of Columns for the first column
+     * @type {number[]}  
+     */
     this.gridCols = [];
+    /**
+     * Number of Rows for the first Row
+     * @type {number[]}  
+     */
     this.gridRows = [];
+    /**
+     * Array of selected cells for selection
+     * @type {number[]}  
+     */
     this.selectedCells = selectedCells;
+    /**
+     * Array of selected data for Graph construction
+     * @type {number[]}  
+     */
     this.cellsData = cellsData;
-    this.cellsCol = cellsCol
+    /**
+     * Array of selected data columns for Graph construction
+     * @type {number[]}  
+     */
+    this.cellsCol = cellsCol;
+    /**
+     * Flag for if dragging for multiple selection or not
+     * @type {boolean}  
+     */
     this.isDragging = isDragging;
+    /**
+     * Flag for if resizing a column or not
+     * @type {boolean}  
+     */
     this.isResizing = isResizing;
+    /**
+     * Current col selected for resizing
+     * @type {number} 
+     */
     this.resizeColIndex = resizeColIndex;
+    /**
+     * Starting position of the column where we want to resize from
+     * @type {number} 
+     */
     this.startX = startX;
+    /**
+     * Start row, col values for the cells to be selected in the format (row, col)
+     * @type {number[]}  
+     */
     this.startCell = startCell;
+    /**
+     * Current row, col values for the cells which are selected in the format (row, col)
+     * @type {number[]}  
+     */
     this.currentCell = currentCell;
     this.copiedCells = [];
+    /**
+     * Value of sum of selected values
+     * @type {number}  
+     */
     this.sum = 0;
+    /**
+     * Value of min of selected values
+     * @type {number}  
+     */
     this.min = 0;
+    /**
+     * Value of max of selected values
+     * @type {number}  
+     */
     this.max = 0;
+    /**
+     * Value of average of selected values
+     * @type {number}  
+     */
     this.avg = 0;
+    /**
+     * Value of count of selected values
+     * @type {number}  
+     */
     this.count = 0;
-
+    /**
+     * Array of filtered rows when using Find function
+     * @type {number[]}  
+     */
     this.filteredRows = null;
 
     this.init();
   }
 
+  /**
+   * Initializing the whole Excel and all the mouse events related to it
+   * @returns {void}
+   */
   init() {
-    this.canvas.addEventListener("mousedown", this.handleMouseDown.bind(this));
-    this.canvas.addEventListener("mousemove", this.handleMouseMove.bind(this));
-    this.canvas.addEventListener("mouseup", this.handleMouseUp.bind(this));
+    this.canvas.addEventListener("pointerdown", this.handleMouseDown.bind(this));
+    this.canvas.addEventListener("pointermove", this.handleMouseMove.bind(this));
+    this.canvas.addEventListener("pointerup", this.handleMouseUp.bind(this));
     this.canvas.addEventListener("dblclick", this.handleDoubleClick.bind(this));
     // document.addEventListener("keydown", this.handleKeyDown.bind(this));
     document.addEventListener(
@@ -66,6 +168,10 @@ export class Grid {
       .addEventListener("scroll", this.resizeCanvas.bind(this));
   }
 
+  /**
+   * Resizing Canvas based on Scroll
+   * @returns {void}
+   */
   resizeCanvas() {
     const excel = document.querySelector(".grid");
     const scrollHeight = excel.scrollHeight;
@@ -85,7 +191,11 @@ export class Grid {
       this.drawGrid();
     }
   }
-
+  
+  /**
+   * Getting data from backend the populating the Grid
+   * @returns {void}
+   */
   fetchDataAndPopulateGrid() {
     fetch("test.json")
       .then((response) => response.json())
@@ -103,6 +213,10 @@ export class Grid {
       .catch((error) => console.error("Error fetching data:", error));
   }
 
+  /**
+   * Drawing the First Col
+   * @returns {void}
+   */
   drawFirstCol() {
     for (let row = 0; row < this.numRows; row++) {
       const width = this.columnWidths[0];
@@ -121,6 +235,10 @@ export class Grid {
     }
   }
 
+  /**
+   * Drawing the First Row
+   * @returns {void}
+   */
   drawFirstRow() {
     for (let row = 0; row < 1; row++) {
       let x = this.columnWidths[0];
@@ -143,6 +261,10 @@ export class Grid {
     }
   }
 
+  /**
+   * Drawing the Main Grid
+   * @returns {void}
+   */
   drawGrid() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.drawFirstCol();
@@ -196,7 +318,12 @@ export class Grid {
       this.ctx.strokeStyle = "rgba(231,241,236,0.25)";
     }
   }
-
+  /**
+   * 
+   * Handle Double click event
+   * @param {PointerEvent} event  -
+   * @returns {void}
+   */
   handleDoubleClick(event) {
     // console.log(event);
     const { offsetX, offsetY } = event;
@@ -219,6 +346,12 @@ export class Grid {
     }
   }
 
+  /**
+   * 
+   * Handle Pointer Down event 
+   * @param {PointerEvent} event  
+   * @returns {void}
+   */
   handleMouseDown(event) {
     const { offsetX, offsetY } = event;
     let col = 0;
@@ -247,9 +380,14 @@ export class Grid {
     }
   }
 
+  /**
+   * 
+   * Handle Pointer Move event 
+   * @param {PointerEvent} event  
+   * @returns {void}
+   */
   handleMouseMove(event) {
     const { offsetX, offsetY } = event;
-
     if (this.isResizing) {
       const delta = offsetX - this.startX;
       this.columnWidths[this.resizeColIndex] += delta;
@@ -282,6 +420,12 @@ export class Grid {
     }
   }
 
+  /**
+   * 
+   * Handle Pointer up event
+   * @param {PointerEvent} event  
+   * @returns {void} 
+   */
   handleMouseUp(event) {
     const { offsetX, offsetY } = event;
     let col = 0;
@@ -333,8 +477,7 @@ export class Grid {
       )}</span>`;
       for (let i = 0; i < this.selectedCells.length; i++) {
         this.cellsData.push(this.selectedCells[i][2]);
-        this.cellsCol.push(i)
-        
+        this.cellsCol.push(i);
       }
     }
     if (row === 0) {
@@ -347,6 +490,12 @@ export class Grid {
     }
   }
 
+  /**
+   * 
+   * Updated selected column array for multiple selection
+   * @param {number} col  
+   * @returns {void}
+   */
   updateSelectedCol(col) {
     this.selectedCells = [];
     for (let row = 0; row < this.numRows; row++) {
@@ -354,6 +503,12 @@ export class Grid {
     }
   }
 
+  /**
+   * 
+   * Updated selected row array for multiple selection
+   * @param {number} row
+   * @returns {void}
+   */
   updateSelectedRow(row) {
     this.selectedCells = [];
     for (let col = 0; col < this.numCols; col++) {
@@ -361,6 +516,13 @@ export class Grid {
     }
   }
 
+  /**
+   * 
+   * Updated selected row, column array for multiple selection
+   * @param {number} start
+   * @param {number} end
+   * @returns {void}
+   */
   updateSelectedCells(start, end) {
     this.selectedCells = [];
     const [startRow, startCol] = start;
@@ -371,11 +533,16 @@ export class Grid {
     for (let row = rowRange[0]; row <= rowRange[1]; row++) {
       for (let col = colRange[0]; col <= colRange[1]; col++) {
         this.selectedCells.push([row, col, this.gridData[row - 1][col - 1]]);
-        
       }
     }
   }
 
+  /**
+   * 
+   * Filter rows based on a value for Find function
+   * @param {*} findValue  
+   * @returns {void}
+   */
   filterRows(findValue) {
     this.filteredRows = [];
     for (let row = 0; row < this.numRows; row++) {
@@ -388,22 +555,39 @@ export class Grid {
     }
   }
 
+  /**
+   * Clearing the filtered Rows
+   * @returns {void}
+   */
   clearFilter() {
     this.filteredRows = null;
   }
 
-  constructBar(){
-    const graph = new Graph("myChart", this.cellsData, this.cellsCol)
+  /**
+   * Constructing Bar Graph based on the selected values
+   * @returns {void}
+   * @returns {void}
+   */
+  constructBar() {
+    const graph = new Graph("myChart", this.cellsData, this.cellsCol);
     graph.drawBarGraph();
   }
 
-  constructLine(){
-    const graph = new Graph("myChart", this.cellsData, this.cellsCol)
+  /**
+   * Constructing Line Graph based on the selected values
+   * @returns {void}
+   */
+  constructLine() {
+    const graph = new Graph("myChart", this.cellsData, this.cellsCol);
     graph.drawLineGraph();
   }
 
-  constructPie(){
-    const graph = new Graph("myChart", this.cellsData, this.cellsCol)
-    graph.drawPieGraph()
+  /**
+   * Constructing Pie Chart based on the selected values
+   * @returns {void}
+   */
+  constructPie() {
+    const graph = new Graph("myChart", this.cellsData, this.cellsCol);
+    graph.drawPieGraph();
   }
 }

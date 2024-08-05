@@ -1,24 +1,64 @@
+import { GridConstants } from "../constant/index.js";
+import { Grid } from "./grid.js";
+
 export class RowGrid {
-  constructor(canvasId, columnWidths, selectedCells, isDragging, isResizing, resizeColIndex, startX, startCell, currentCell, numRows, numCols, grid) {
+  constructor(canvasId, columnWidths, grid) {
+    /**
+     * Canvas of the row Grid
+     * @type {HTMLCanvasElement} 
+     */
     this.canvas = document.getElementById(canvasId);
     this.ctx = this.canvas.getContext("2d");
-    this.defaultCellWidth = 100;
-    this.cellHeight = 32;
-    this.numRows = numRows;
-    this.numCols = numCols;
+
+    /**
+     * Default width of individual cell
+     * @type {number} 
+     */
+    this.defaultCellWidth = GridConstants.defaultCellWidth;
+    /**
+     * Default height of individual cell
+     * @type {number} 
+     */
+    this.cellHeight = GridConstants.cellHeight;
+    /**
+     * Total number of Rows
+     * @type {number} 
+     */
+    this.numRows = GridConstants.numRows;
+    /**
+     * Total number of Columns
+     * @type {number} 
+     */
+    this.numCols = GridConstants.numCols;
+    /**
+     * Array of widths of each column
+     * @type {number[]} 
+     */
     this.columnWidths = columnWidths;
+    /**
+     * Instance of the Grid class
+     * @type {Grid}  
+     */
     this.grid = grid
 
     this.init();
   }
 
+  /**
+   * Initializing the First Row and all the mouse events related to it
+   * @returns {void}
+   */
   init() {
-    this.canvas.addEventListener("mousedown", this.handleMouseDown.bind(this));
-    this.canvas.addEventListener("mousemove", this.handleMouseMove.bind(this));
-    this.canvas.addEventListener("mouseup", this.handleMouseUp.bind(this));
+    this.canvas.addEventListener("pointerdown", this.handleMouseDown.bind(this));
+    this.canvas.addEventListener("pointermove", this.handleMouseMove.bind(this));
+    this.canvas.addEventListener("pointerup", this.handleMouseUp.bind(this));
     document.addEventListener("DOMContentLoaded", this.drawRow.bind(this));
   }
 
+   /**
+   * Drawing the First Row
+   * @returns {void}
+   */
   drawRow() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
@@ -41,6 +81,12 @@ export class RowGrid {
     }
   }
 
+  /**
+   * 
+   * Handle Pointer Down event 
+   * @param {PointerEvent} event 
+   * @returns {void}
+   */
   handleMouseDown(event) {
     const { offsetX, offsetY } = event;
     let col = 0;
@@ -70,6 +116,12 @@ export class RowGrid {
     }
   }
 
+  /**
+   * 
+   * Handle Pointer Move event 
+   * @param {PointerEvent} event  
+   * @returns {void}
+   */
   handleMouseMove(event) {
     const { offsetX, offsetY } = event;
 
@@ -107,6 +159,12 @@ export class RowGrid {
     }
   }
 
+  /**
+   * 
+   * Handle Pointer up event 
+   * @param {PointerEvent} event  
+   * @returns {void}
+   */
   handleMouseUp(event) {
 
     const { offsetX, offsetY } = event;
@@ -168,6 +226,13 @@ export class RowGrid {
     // }
   }
 
+  /**
+   * 
+   * Updated selected row, column array for multiple selection
+   * @param {number} start  
+   * @param {number} end
+   * @returns {void}
+   */
   updateSelectedCells(start, end) {
     this.selectedCells = [];
     const [startRow, startCol] = start;
@@ -182,6 +247,12 @@ export class RowGrid {
     }
   }
 
+  /**
+   * 
+   * Generates different column names for each column
+   * @param {number} n  
+   * @returns {string}
+   */
   getColName(n) {
     let columnName = "";
     while (n > 0) {
