@@ -4,7 +4,7 @@ body {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow-x: hidden;
   position: relative;
 
   .ribbon {
@@ -219,7 +219,7 @@ body {
   }
 
   .grid {
-    // overflow: auto;
+    overflow: auto;
 
     .rowExcel {
       width: 100vw;
@@ -241,7 +241,7 @@ body {
       // width: 100vw;
       height: 78vh;
       width: 100vw;
-      overflow: auto;
+    //   overflow: auto;
       // border: 1px solid blue;
       position: relative;
       display: flex;

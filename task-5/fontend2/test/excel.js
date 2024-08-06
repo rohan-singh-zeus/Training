@@ -1,8 +1,7 @@
 import { GridConstants } from "../constant/index.js";
+import { GridCol } from "./gridCol.js";
 import { GridMain } from "./gridMain.js";
 import { GridRow } from "./gridRow.js";
-import { HorizontalScroll } from "./horizontalScroll.js";
-import { VerticalScroll } from "./verticalScroll.js";
 
 export class Excel {
   constructor() {
@@ -62,6 +61,7 @@ export class Excel {
      */
     this.posX = Array(GridConstants.numCols).fill(0);
     this.rowSelected = Array(GridConstants.numRows).fill(false);
+    this.varY = 0
 
     this.init();
   }
@@ -83,8 +83,9 @@ export class Excel {
       this.isDragging,
       this.isResizing,
       this.startX,
-      this.resizeColIndex
+      this.resizeColIndex, this.varY
     );
+    
     new GridRow(
       "gridRow",
       gMain,
@@ -102,7 +103,9 @@ export class Excel {
       this.rowSelected
     );
 
-    new VerticalScroll("verticalScroll", gMain);
-    new HorizontalScroll("horizontalScroll", gMain);
+    new GridCol("gridCol")
+
+    // new VerticalScroll("verticalScroll", gMain, this.varY);
+    // new HorizontalScroll("horizontalScroll", gMain);
   }
 }

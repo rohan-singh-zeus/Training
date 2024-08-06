@@ -1,7 +1,7 @@
 import { GridMain } from "./gridMain.js";
 
 export class VerticalScroll {
-  constructor(classId, gMain) {
+  constructor(classId, gMain, varY) {
     /**
      * Main scroll div
      * @type {HTMLElement}
@@ -18,13 +18,17 @@ export class VerticalScroll {
      */
     this.isMoving = false;
 
+    /**
+     * This is top value
+     * @type {number}
+     */
     this.topVal = 0;
     this.topY = 0;
     /**
      * Starting x position of mouse
      * @type {number}
      */
-    this.startmouseX = 0;
+    this.startmouseY = 0;
     /**
      * Main Grid Canvas
      * @type {GridMain}
@@ -35,12 +39,15 @@ export class VerticalScroll {
      * @type {number}
      */
     this.totalContainerHeight = this.gMain.canvas.height * 2;
+    this.startTop = 0;
+    this.var1 = 0;
+    this.varY = varY
 
     this.init();
   }
 
   /**
-   * Initialize Custom scroll function
+   * Initialize Custom vertical scroll function
    * @returns {void}
    */
   init() {
@@ -55,6 +62,8 @@ export class VerticalScroll {
     window.addEventListener("pointerup", (e) => {
       this.handleMouseUp(e);
     });
+
+    this.destroy()
   }
 
   /**
@@ -63,7 +72,7 @@ export class VerticalScroll {
    * @return {void}
    */
   handleMouseDown(e) {
-    this.startmouseX = e.pageY;
+    this.startmouseY = e.pageY;
     this.isMoving = true;
   }
 
@@ -74,7 +83,8 @@ export class VerticalScroll {
    */
   handleMouseMove(e) {
     if (this.isMoving) {
-      let diff = e.pageY - this.startmouseX;
+      // this.startTop
+      let diff = e.pageY - this.startmouseY;
       this.bar.style.top = `${Math.max(
         0,
         Math.min(
@@ -82,6 +92,9 @@ export class VerticalScroll {
           this.scrollBar.clientHeight - this.bar.clientHeight
         )
       )}px`;
+      this.startTop = diff;
+      // console.log(diff);
+
       if (parseInt(getComputedStyle(this.bar).top.valueOf()) === 0) {
         this.bar.style.height = this.scrollBar.clientHeight / 2 + "px";
         this.totalContainerHeight = this.gMain.canvas.height * 2;
@@ -98,8 +111,11 @@ export class VerticalScroll {
         )}px`;
         this.bar.style.top = "20px";
         this.totalContainerHeight += this.gMain.canvas.height;
-        this.startmouseX = e.pageY;
+        this.varY += this.startTop;
+        // this.startTop += this.startTop
+        this.startmouseY = e.pageY;
       }
+      this.gMain.drawMainGrid()
     }
   }
 
@@ -110,5 +126,26 @@ export class VerticalScroll {
    */
   handleMouseUp(e) {
     this.isMoving = false;
+    // console.log(this.startTop );
+    this.varY += this.startTop
+    // this.varY = this.var1
+    // console.log(this.var1);
+    
+  }
+
+  getScrollTopX(){
+    return this.var1
+  }
+
+  destroy(){
+    this.bar.removeEventListener("pointerdown", (e)=>{
+        this.handleMouseDown(e)
+    })
+    window.removeEventListener("pointermove", (e)=>{
+      this.handleMouseMove(e)
+    })
+    window.removeEventListener("pointerup", (e)=>{
+      this.handleMouseUp(e)
+    })
   }
 }

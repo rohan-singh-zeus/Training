@@ -19,6 +19,24 @@ export class Graph {
      * @type {HTMLCanvasElement}
      */
     this.ctx = document.getElementById(this.canvasId);
+
+    // /**
+    //  * Flag for destroying the graph
+    //  * @type {any}
+    //  */
+    this.draw = null
+  }
+
+  destroyGraph(){
+    if(this.draw){
+        this.draw.destroy()
+        this.draw = null
+    }
+  }
+
+  setReqData(cellsData, cellsCol){
+    this.cellsData = cellsData
+    this.cellsCol = cellsCol
   }
 
   /**
@@ -26,7 +44,8 @@ export class Graph {
    * @returns {void}
    */
   drawBarGraph() {
-    new Chart(this.ctx, {
+    this.destroyGraph()
+    this.draw = new Chart(this.ctx, {
       type: "bar",
       data: {
         // labels: [0,1,3,4],
@@ -54,7 +73,8 @@ export class Graph {
    * @returns {void}
    */
   drawLineGraph() {
-    new Chart(this.ctx, {
+    this.destroyGraph()
+    this.draw = new Chart(this.ctx, {
       type : 'line',
       data : {
         labels : this.cellsCol,
@@ -80,7 +100,8 @@ export class Graph {
    * @returns {void}
    */
   drawPieGraph(){
-    new Chart(this.ctx, {
+    this.destroyGraph()
+    this.draw=new Chart(this.ctx, {
       type : 'pie',
       data : {
         labels : this.cellsCol,

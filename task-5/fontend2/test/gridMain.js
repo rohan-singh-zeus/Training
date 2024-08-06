@@ -1,4 +1,6 @@
 import { GridConstants } from "../constant/index.js";
+import { GridDS } from "./dStructure.js";
+import { VerticalScroll } from "./verticalScroll.js";
 
 export class GridMain {
   constructor(
@@ -13,7 +15,8 @@ export class GridMain {
     isDragging,
     isResizing,
     startX,
-    resizeColIndex
+    resizeColIndex,
+    varY
   ) {
     /**
      * Main Canvas Element
@@ -26,22 +29,22 @@ export class GridMain {
      * @type {number[]}
      */
     this.posX = posX;
-    
+
     this.selectedX = 0;
     this.selectedY = 0;
     /**
      * Total number of Rows
-     * @type {number} 
+     * @type {number}
      */
     this.numRows = GridConstants.numRows;
     /**
      * Total number of Columns
-     * @type {number} 
+     * @type {number}
      */
     this.numCols = GridConstants.numCols;
     /**
      * Default height of individual cell
-     * @type {number} 
+     * @type {number}
      */
     this.defCellHeight = GridConstants.defCellHeight;
     /**
@@ -51,82 +54,87 @@ export class GridMain {
     this.defCellWidth = GridConstants.defCellWidth;
     /**
      * Array of widths of each column
-     * @type {number[]} 
+     * @type {number[]}
      */
     this.colWidth = colWidth;
     /**
      * Array of heights of row
-     * @type {number[]} 
+     * @type {number[]}
      */
     this.rowHeight = rowHeight;
     /**
      * Array of selected cells for selection
-     * @type {number[]}  
+     * @type {number[]}
      */
     this.selectedCells = selectedCells;
     /**
      * Start row, col values for the cells to be selected in the format (row, col)
-     * @type {number[]}  
+     * @type {number[]}
      */
     this.startCell = startCell;
     /**
      * Current row, col values for the cells which are selected in the format (row, col)
-     * @type {number[]}  
+     * @type {number[]}
      */
     this.currentCell = currentCell;
     this.isSelected = isSelected;
     /**
      * Flag for if dragging for multiple selection or not
-     * @type {boolean}  
+     * @type {boolean}
      */
     this.isDragging = isDragging;
     /**
      * Flag for if resizing a column or not
-     * @type {boolean}  
+     * @type {boolean}
      */
     this.isResizing = isResizing;
     /**
      * Current col selected for resizing
-     * @type {number} 
+     * @type {number}
      */
     this.resizeColIndex = resizeColIndex;
     /**
      * Starting position of the column where we want to resize from
-     * @type {number} 
+     * @type {number}
      */
     this.startX = startX;
     /**
      * Flag for starting the marching ants animation
-     * @type {boolean}  
+     * @type {boolean}
      */
     this.isAnimated = false;
     /**
      * Offset value for marching ants animation
-     * @type {number} 
+     * @type {number}
      */
     this.dashOffset = 0;
     /**
      * Request animation frame id
-     * @type {number} 
+     * @type {number}
      */
     this.wafId = 0;
     /**
-     * @type {number} 
+     * @type {number}
      */
     this.xStart = 0;
     /**
-     * @type {number} 
+     * @type {number}
      */
     this.xEnd = 0;
     /**
-     * @type {number} 
+     * @type {number}
      */
     this.yStart = 0;
     /**
-     * @type {number} 
+     * @type {number}
      */
     this.yEnd = 0;
+    // this.vScroll = new VerticalScroll('verticalScroll', )
+    this.varY = varY;
 
+    this.gridData = Array.from({ length: GridConstants.numRows }, () =>
+      Array(GridConstants.numCols).fill("")
+    );
     this.init();
   }
 
@@ -139,10 +147,7 @@ export class GridMain {
       "pointerdown",
       this.handleMouseDown.bind(this)
     );
-    this.canvas.addEventListener(
-      "pointermove",
-      this.handleMouseMove.bind(this)
-    );
+    window.addEventListener("pointermove", this.handleMouseMove.bind(this));
     this.canvas.addEventListener("pointerup", this.handleMouseUp.bind(this));
     this.canvas.addEventListener("dblclick", this.handleDoubleClick.bind(this));
     document.addEventListener("keydown", (e) => {
@@ -150,18 +155,25 @@ export class GridMain {
       this.handleMarchingAnt(e);
     });
     document.addEventListener("DOMContentLoaded", () => {
-      this.fetchData()
-      this.drawMainGrid();
+      this.fetchData();
+      //   this.drawMainGrid();
+    //   this.fillCellContents();
+      //   this.highlightSelection()
       // this.handleDevicePixelRatio()
     });
   }
-
 
   fetchData() {
     fetch("test.json")
       .then((res) => res.json())
       .then((data) => {
         // console.log(data);
+        data.forEach((row, i) => {
+          // console.log(Object.values(row));
+          // this.gridData
+          this.gridData[i] = Object.values(row);
+        });
+        this.fillCellContents()
       })
       .catch((err) => {
         console.log(err);
@@ -188,8 +200,8 @@ export class GridMain {
       this.ctx.restore();
     }
 
-    for (let y = 0; cellPositionY <= this.canvas.width; ++y) {
-      cellPositionY += this.defCellHeight;
+    for (let y = 0; cellPositionY <= this.canvas.height; ++y) {
+      cellPositionY += this.defCellHeight - this.varY;
       this.ctx.save();
       this.ctx.beginPath();
       this.ctx.moveTo(0, cellPositionY + 0.5);
@@ -199,10 +211,38 @@ export class GridMain {
       this.ctx.stroke();
       this.ctx.restore();
     }
-
     this.highlightSelection();
   }
 
+  fillCellContents() {
+    console.log("Cell contents called");
+    this.drawMainGrid();
+    // this.ctx.reset()
+    this.ctx.font = "14px Arial";
+    this.ctx.textAlign = "left";
+    this.ctx.textBaseline = "middle";
+    this.ctx.fillStyle = "#000";
+
+    let y = 0;
+    for (let i = 0; i < GridConstants.numRows; i++) {
+      // if (filteredData[i]) {
+      let x = 0;
+      for (let j = 0; j < GridConstants.numCols; j++) {
+        if (this.gridData[i] && this.gridData[i][j] !== undefined) {
+          this.ctx.fillText(
+            this.gridData[i][j],
+            x + 5,
+            y + this.defCellHeight / 2
+          );
+        } else {
+          this.ctx.fillText("", x + 5, y + this.defCellHeight / 2);
+        }
+        x += this.colWidth[j];
+      }
+      // y += this.rowHeights[i];
+      // }
+    }
+  }
 
   handleDevicePixelRatio() {
     const dpx = window.devicePixelRatio;
@@ -215,7 +255,7 @@ export class GridMain {
 
   /**
    * Handle Mouse Down Operation
-   * @param {PointerEvent} e 
+   * @param {PointerEvent} e
    * @return {void}
    */
   handleMouseDown(e) {
@@ -261,7 +301,7 @@ export class GridMain {
 
   /**
    * Handle Mouse move operation
-   * @param {PointerEvent} e 
+   * @param {PointerEvent} e
    * @returns {void}
    */
   handleMouseMove(e) {
@@ -289,7 +329,7 @@ export class GridMain {
   /**
    * Handle Pointer up event
    * @param {PointerEvent} event  -
-   * @returns {void} 
+   * @returns {void}
    */
   handleMouseUp(e) {
     this.isDragging = false;
@@ -298,7 +338,7 @@ export class GridMain {
 
   /**
    * Handle Double click Operation
-   * @param {PointerEvent} e 
+   * @param {PointerEvent} e
    * @returns {void}
    */
   handleDoubleClick(e) {
@@ -328,12 +368,16 @@ export class GridMain {
     inpText.style.position = "absolute";
     inpText.style.top = `${y}px`;
     inpText.style.left = `${x - this.defCellWidth}px`;
+
+    console.log(this.gridData[x][y]);
+
+    // this.gridData[x][y]
     // console.log(x, y);
   }
 
   /**
    * Get x position based on column value
-   * @param {number} col 
+   * @param {number} col
    * @returns {number}
    */
   getColumnLeftPosition(col) {
@@ -362,7 +406,7 @@ export class GridMain {
 
   /**
    * Handles Marching Ant Animation logic
-   * @param {KeyboardEvent} e 
+   * @param {KeyboardEvent} e
    * @returns {void}
    */
   handleMarchingAnt(e) {
@@ -397,6 +441,9 @@ export class GridMain {
    * @return {void}
    */
   highlightSelection() {
+    // this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    // this.drawMainGrid();
+    // this.fillCellContents();
     if (this.selectedCells.length == 1) {
       // console.log("Highlight of len 1 called section called");
 
@@ -447,7 +494,7 @@ export class GridMain {
   }
 
   /**
-   * 
+   *
    * Fill selected row, column array for multiple selection
    * @param {number} start
    * @param {number} end

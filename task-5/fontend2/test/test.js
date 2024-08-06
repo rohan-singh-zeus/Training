@@ -111,3 +111,82 @@ function init() {
 // }
 
 window.addEventListener("load", init);
+
+
+/**
+   * @returns {void} --> drawing of grid
+   */
+drawGrid() {
+  this.ctx.strokeStyle = "black";
+  this.ctx.lineWidth = 0.2;
+
+  let x = 0;
+  for (let j = 0; j <= this.COLS; j++) {
+    this.ctx.beginPath();
+    this.ctx.moveTo(x, 0);
+    this.ctx.lineTo(x, this.canvas.height);
+    this.ctx.stroke();
+
+    if (j < this.COLS) x += this.columnWidths[j];
+  }
+
+  let y = 0;
+  for (let i = 0; i <= this.ROWS; i++) {
+    this.ctx.beginPath();
+    this.ctx.moveTo(0, y);
+    this.ctx.lineTo(this.COLS * 100, y);
+    this.ctx.stroke();
+    if (i < this.ROWS) y += this.rowHeights[i];
+  }
+}
+/**
+ * @param {boolean[]} filteredData
+ * @returns {void}
+ */
+drawCellContents(filteredData) {
+  this.ctx.font = "14px Arial";
+  this.ctx.textAlign = "left";
+  this.ctx.textBaseline = "middle";
+  this.ctx.fillStyle = "#000";
+
+  let y = 0;
+  for (let i = 0; i < this.ROWS; i++) {
+    if (filteredData[i]) {
+      let x = 0;
+      for (let j = 0; j < this.COLS; j++) {
+        if (this.data[i] && this.data[i][j] !== undefined) {
+          this.ctx.fillText(this.data[i][j], x + 5, y + this.CELL_HEIGHT / 2);
+        }
+        x += this.columnWidths[j];
+      }
+      y += this.rowHeights[i];
+    }
+  }
+}
+/**
+ * @param {boolean[]} filteredData
+ * @returns {void}
+ */
+render(filteredData = this.data.map(() => true)) {
+  this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  this.fixedRow();
+  this.drawFixedCol();
+  this.drawGrid();
+}
+handleFileUplaod(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  console.log(reader);
+  reader.onload = (e) => {
+    const contents = e.target.result;
+    const rows = contents.split("\n").map((row) => row.split(","));
+    this.ROWS = rows.length;
+    this.COLS = rows[0].length;
+    this.data = rows;
+    this.columnWidths = Array(this.COLS).fill(100);
+    this.render();
+  };
+  reader.readAsText(file);
+}

@@ -163,34 +163,34 @@ export class Grid {
       this.fetchDataAndPopulateGrid.bind(this)
     );
 
-    document
-      .querySelector(".excel")
-      .addEventListener("scroll", this.resizeCanvas.bind(this));
+    // document
+    //   .querySelector(".excel")
+    //   .addEventListener("scroll", this.resizeCanvas.bind(this));
   }
 
   /**
    * Resizing Canvas based on Scroll
    * @returns {void}
    */
-  resizeCanvas() {
-    const excel = document.querySelector(".grid");
-    const scrollHeight = excel.scrollHeight;
-    const clientHeight = excel.clientHeight;
-    const scrollTop = excel.scrollTop;
+//   resizeCanvas() {
+//     const excel = document.querySelector(".grid");
+//     const scrollHeight = excel.scrollHeight;
+//     const clientHeight = excel.clientHeight;
+//     const scrollTop = excel.scrollTop;
 
-    const scrollWidth = excel.scrollWidth;
-    const clientWidth = excel.clientWidth;
-    const scrollLeft = excel.scrollLeft;
+//     const scrollWidth = excel.scrollWidth;
+//     const clientWidth = excel.clientWidth;
+//     const scrollLeft = excel.scrollLeft;
 
-    if (scrollTop + clientHeight >= scrollHeight - 50) {
-      this.canvas.height += 100;
-      this.drawGrid();
-    }
-    if (scrollLeft + clientWidth >= scrollWidth - 50) {
-      this.canvas.width += 100;
-      this.drawGrid();
-    }
-  }
+//     if (scrollTop + clientHeight >= scrollHeight - 50) {
+//       this.canvas.height += 100;
+//       this.drawGrid();
+//     }
+//     if (scrollLeft + clientWidth >= scrollWidth - 50) {
+//       this.canvas.width += 100;
+//       this.drawGrid();
+//     }
+//   }
   
   /**
    * Getting data from backend the populating the Grid

@@ -4,7 +4,7 @@ body {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow-x: hidden;
   position: relative;
 }
 body .ribbon {
@@ -149,6 +149,9 @@ body .ribbon > .rOptions > .rRight {
   align-items: center;
   justify-content: space-evenly;
 }
+body .grid {
+  overflow: auto;
+}
 body .grid .rowExcel {
   width: 100vw;
 }
@@ -158,7 +161,6 @@ body .grid .rowExcel > #gridCanvas2 {
 body .grid .excel {
   height: 78vh;
   width: 100vw;
-  overflow: auto;
   position: relative;
   display: flex;
 }

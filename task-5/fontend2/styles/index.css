@@ -13,7 +13,7 @@ body {
 }
 body .container {
   height: 70vh;
-  overflow: hidden;
+  overflow: scroll;
   width: 60vw;
   background-color: whitesmoke;
   display: flex;
