@@ -133,10 +133,8 @@ export class GridRow {
    * @returns {void}
    */
   drawRowGrid() {
-    // console.log("drawGridCol called");
     this.ctx.reset();
     let cellPositionX = 0;
-    // let cellPositionY = 0;
     for (let x = 0; cellPositionX <= this.canvas.width; ++x) {
       this.ctx.save();
       this.ctx.beginPath();
@@ -147,9 +145,8 @@ export class GridRow {
       this.ctx.stroke();
       this.ctx.restore();
       if(this.rowSelected[x]){
-        
-        // this.ctx.fillStyle = "lightgray";
-        // this.ctx.fillRect(0, cellPositionX, this.colWidth[x], this.defCellHeight);
+        this.ctx.fillStyle = "green";
+        this.ctx.fillRect(0, cellPositionX, this.colWidth[x], this.defCellHeight);
         console.log("Row selected");
       }
       this.ctx.fillStyle = "black";

@@ -1,5 +1,6 @@
 import { GridConstants } from "../constant/index.js";
 import { GridDS } from "./dStructure.js";
+import { GridRow } from "./gridRow.js";
 import { VerticalScroll } from "./verticalScroll.js";
 
 export class GridMain {
@@ -16,7 +17,8 @@ export class GridMain {
     isResizing,
     startX,
     resizeColIndex,
-    varY
+    varY,
+    rowSelected
   ) {
     /**
      * Main Canvas Element
@@ -135,6 +137,22 @@ export class GridMain {
     this.gridData = Array.from({ length: GridConstants.numRows }, () =>
       Array(GridConstants.numCols).fill("")
     );
+
+    /**
+     * Instance of gridRow class
+     * @type {GridRow}
+     */
+    // this.gRow = new GridRow('')
+
+    /**
+     * Highlighting main row
+     * @type {boolean[]}
+     */
+    this.rowSelected = rowSelected
+
+    this.thisCell = [0, 0]; // Add this to keep track of the current cell
+    this.handleInputSubmitBound = null; // Store the bound function for event removal
+    this.init();
     this.init();
   }
 
@@ -157,10 +175,13 @@ export class GridMain {
     document.addEventListener("DOMContentLoaded", () => {
       this.fetchData();
       //   this.drawMainGrid();
-    //   this.fillCellContents();
+      //   this.fillCellContents();
       //   this.highlightSelection()
       // this.handleDevicePixelRatio()
     });
+
+    this.lastDrawTime = 0;
+    this.mouseMoveTimeout = null;
   }
 
   fetchData() {
@@ -168,12 +189,13 @@ export class GridMain {
       .then((res) => res.json())
       .then((data) => {
         // console.log(data);
-        data.forEach((row, i) => {
-          // console.log(Object.values(row));
-          // this.gridData
-          this.gridData[i] = Object.values(row);
-        });
-        this.fillCellContents()
+        // data.forEach((row, i) => {
+        //   // console.log(Object.values(row));
+        //   // this.gridData
+        //   this.gridData[i] = Object.values(row);
+        // });
+        this.drawMainGrid();
+        // this.fillCellContents();
       })
       .catch((err) => {
         console.log(err);
@@ -188,7 +210,7 @@ export class GridMain {
     this.ctx.reset();
     let cellPositionX = 0;
     let cellPositionY = 0;
-    for (let x = 0; cellPositionX <= this.canvas.width; ++x) {
+    for (let x = 0; x <= this.canvas.width; ++x) {
       cellPositionX += this.defCellWidth + this.posX[x];
       this.ctx.save();
       this.ctx.beginPath();
@@ -200,7 +222,7 @@ export class GridMain {
       this.ctx.restore();
     }
 
-    for (let y = 0; cellPositionY <= this.canvas.height; ++y) {
+    for (let y = 0; y <= this.canvas.height; ++y) {
       cellPositionY += this.defCellHeight - this.varY;
       this.ctx.save();
       this.ctx.beginPath();
@@ -211,38 +233,23 @@ export class GridMain {
       this.ctx.stroke();
       this.ctx.restore();
     }
+    // this.fillCellContents();
     this.highlightSelection();
   }
 
-  fillCellContents() {
-    console.log("Cell contents called");
-    this.drawMainGrid();
-    // this.ctx.reset()
-    this.ctx.font = "14px Arial";
-    this.ctx.textAlign = "left";
-    this.ctx.textBaseline = "middle";
-    this.ctx.fillStyle = "#000";
-
-    let y = 0;
-    for (let i = 0; i < GridConstants.numRows; i++) {
-      // if (filteredData[i]) {
-      let x = 0;
-      for (let j = 0; j < GridConstants.numCols; j++) {
-        if (this.gridData[i] && this.gridData[i][j] !== undefined) {
-          this.ctx.fillText(
-            this.gridData[i][j],
-            x + 5,
-            y + this.defCellHeight / 2
-          );
-        } else {
-          this.ctx.fillText("", x + 5, y + this.defCellHeight / 2);
-        }
-        x += this.colWidth[j];
-      }
-      // y += this.rowHeights[i];
-      // }
-    }
-  }
+  // fillCellContents() {
+  //   this.ctx.font = "10px Arial";
+  //   this.ctx.textAlign = "left";
+  //   this.ctx.textBaseline = "middle";
+  //   this.ctx.fillStyle = "black";
+  //   this.gridData.forEach((row, rowIndex) => {
+  //     row.forEach((cell, colIndex) => {
+  //       const x = this.getColumnLeftPosition(colIndex);
+  //       const y = rowIndex * this.defCellHeight;
+  //       this.ctx.fillText(cell, x + 5, y + this.defCellHeight / 2);
+  //     });
+  //   });
+  // }
 
   handleDevicePixelRatio() {
     const dpx = window.devicePixelRatio;
@@ -294,9 +301,11 @@ export class GridMain {
     this.selectedY = y - this.defCellHeight;
     this.startCell = [row, col];
     this.currentCell = [row, col];
+    this.rowSelected[row] = true
     this.fillUpdatedCells(this.startCell, this.currentCell);
     this.highlightSelection();
     this.drawMainGrid();
+    // this.fillCellContents();
   }
 
   /**
@@ -305,24 +314,27 @@ export class GridMain {
    * @returns {void}
    */
   handleMouseMove(e) {
-    const { offsetX, offsetY } = e;
-
     if (this.isDragging) {
-      let col = 0;
-      let x = 0;
-      for (let i = 0; i < this.numCols; i++) {
-        x += this.colWidth[i];
-        if (offsetX < x) {
-          col = i;
-          break;
-        }
+      if (this.mouseMoveTimeout) {
+        clearTimeout(this.mouseMoveTimeout);
       }
-      const row = Math.floor(offsetY / this.defCellHeight);
-      this.currentCell = [row, col];
-      this.fillUpdatedCells(this.startCell, this.currentCell);
-      // console.log(this.selectedCells);
-      this.highlightSelection();
-      this.drawMainGrid();
+      this.mouseMoveTimeout = setTimeout(() => {
+        const { offsetX, offsetY } = e;
+        let col = 0;
+        let x = 0;
+        for (let i = 0; i < this.numCols; i++) {
+          x += this.colWidth[i];
+          if (offsetX < x) {
+            col = i;
+            break;
+          }
+        }
+        const row = Math.floor(offsetY / this.defCellHeight);
+        this.currentCell = [row, col];
+        this.fillUpdatedCells(this.startCell, this.currentCell);
+        this.drawMainGrid();
+        // this.fillCellContents();
+      }, 10);
     }
   }
 
@@ -333,6 +345,8 @@ export class GridMain {
    */
   handleMouseUp(e) {
     this.isDragging = false;
+    this.drawMainGrid();
+    // this.fillCellContents();
     // console.log(this.selectedCells);
   }
 
@@ -344,20 +358,31 @@ export class GridMain {
   handleDoubleClick(e) {
     const { offsetX, offsetY } = e;
     const inpText = document.querySelector(".inpText");
+
+    let col = 0;
+    let row = 0;
     let x = 0;
     let y = 0;
+
     for (let i = 0; i < this.numCols; i++) {
       x += this.colWidth[i];
       if (x > offsetX) {
+        col = i;
         break;
       }
     }
+
     for (let j = 0; j < this.numRows; j++) {
       y += this.rowHeight[j];
       if (y > offsetY) {
+        row = j;
         break;
       }
     }
+
+    this.thisCell = [row, col];
+
+    inpText.value = this.gridData[row][col]; // Populate input with existing data
     inpText.style.display = "inline-block";
     inpText.style.border = "none";
     inpText.style.outline = "none";
@@ -369,10 +394,55 @@ export class GridMain {
     inpText.style.top = `${y}px`;
     inpText.style.left = `${x - this.defCellWidth}px`;
 
-    console.log(this.gridData[x][y]);
+    inpText.focus();
+
+    // Remove existing event listeners
+    inpText.removeEventListener("keydown", this.handleInputSubmitBound);
+    inpText.removeEventListener("blur", this.handleInputSubmitBound);
+
+    // Bind the new input submission handler with the current context and store the bound function for later removal
+    this.handleInputSubmitBound = this.handleInputSubmit.bind(this);
+    inpText.addEventListener("keydown", this.handleInputSubmitBound);
+    inpText.addEventListener("blur", this.handleInputSubmitBound);
+
+    // console.log(this.gridData[x][y]);
 
     // this.gridData[x][y]
     // console.log(x, y);
+  }
+
+  /**
+   * Handling of adding values
+   * @param {KeyboardEvent | PointerEvent} e
+   * @returns {void}
+   */
+  handleInputSubmit(e) {
+    if (e.key === "Enter" || e.type === "blur") {
+      const inpText = document.querySelector(".inpText");
+      const [row, col] = this.thisCell;
+
+      // Save input value to grid data
+      this.gridData[row][col] = inpText.value;
+      this.ctx.font = "10px Arial";
+      this.ctx.textAlign = "left";
+      this.ctx.textBaseline = "middle";
+      this.ctx.fillStyle = "black";
+      this.ctx.fillText(
+        this.gridData[row][col],
+        this.colWidth[row] + 5,
+        y + this.defCellHeight / 2
+      );
+
+      // Hide input box
+      inpText.style.display = "none";
+
+      // Remove event listeners to avoid duplicating them
+      inpText.removeEventListener("keydown", this.handleInputSubmitBound);
+      inpText.removeEventListener("blur", this.handleInputSubmitBound);
+
+      // Redraw the grid to reflect the changes
+      this.drawMainGrid();
+    }
   }
 
   /**
@@ -393,6 +463,10 @@ export class GridMain {
    * @returns {void}
    */
   march() {
+    // const now = performance.now();
+    // if (now - this.lastDrawTime < 1000 / 60) {
+    //   return; // Skip this frame to maintain 60fps
+    // }
     this.dashOffset++;
     if (this.dashOffset > 16) {
       this.dashOffset = 0;
@@ -400,8 +474,10 @@ export class GridMain {
     this.drawDottedRect();
     this.wafId = window.requestAnimationFrame(() => {
       this.drawMainGrid();
+      // this.fillCellContents();
       this.march();
     });
+    // this.lastDrawTime = now;
   }
 
   /**
@@ -434,6 +510,7 @@ export class GridMain {
       this.xEnd - this.xStart,
       this.yEnd - this.yStart
     );
+    this.ctx.setLineDash([]);
   }
 
   /**
@@ -447,7 +524,7 @@ export class GridMain {
     if (this.selectedCells.length == 1) {
       // console.log("Highlight of len 1 called section called");
 
-      this.ctx.fillStyle = "white";
+      this.ctx.fillStyle = "transparent";
       this.selectedCells.forEach((cell) => {
         // console.log(cell);
         const x = this.getColumnLeftPosition(cell[1]);

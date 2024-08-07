@@ -151,6 +151,7 @@ body .ribbon > .rOptions > .rRight {
 }
 body .grid {
   overflow: auto;
+  height: 80vh;
 }
 body .grid .rowExcel {
   width: 100vw;

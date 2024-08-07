@@ -28,123 +28,129 @@ export class Grid {
     this.defaultCellWidth = GridConstants.defaultCellWidth;
     /**
      * Default height of individual cell
-     * @type {number} 
+     * @type {number}
      */
     this.cellHeight = GridConstants.cellHeight;
     /**
      * Total number of Rows
-     * @type {number} 
+     * @type {number}
      */
     this.numRows = GridConstants.numRows;
     /**
      * Total number of Columns
-     * @type {number} 
+     * @type {number}
      */
     this.numCols = GridConstants.numCols;
     /**
      * Array of widths of each column
-     * @type {number[]} 
+     * @type {number[]}
      */
     this.columnWidths = columnWidths;
     /**
      * Array of heights of row
-     * @type {number[]} 
+     * @type {number[]}
      */
     this.rowHeights = Array(this.numRows).fill(this.cellHeight);
     /**
      * Stores the data in 2-D Array
-     * @type {string[][]}  
+     * @type {string[][]}
      */
     this.gridData = Array.from({ length: this.numRows }, () =>
       Array(this.numCols).fill("")
     );
     /**
      * Number of Columns for the first column
-     * @type {number[]}  
+     * @type {number[]}
      */
     this.gridCols = [];
     /**
      * Number of Rows for the first Row
-     * @type {number[]}  
+     * @type {number[]}
      */
     this.gridRows = [];
     /**
      * Array of selected cells for selection
-     * @type {number[]}  
+     * @type {number[]}
      */
     this.selectedCells = selectedCells;
     /**
      * Array of selected data for Graph construction
-     * @type {number[]}  
+     * @type {number[]}
      */
     this.cellsData = cellsData;
     /**
      * Array of selected data columns for Graph construction
-     * @type {number[]}  
+     * @type {number[]}
      */
     this.cellsCol = cellsCol;
     /**
      * Flag for if dragging for multiple selection or not
-     * @type {boolean}  
+     * @type {boolean}
      */
     this.isDragging = isDragging;
     /**
      * Flag for if resizing a column or not
-     * @type {boolean}  
+     * @type {boolean}
      */
     this.isResizing = isResizing;
     /**
      * Current col selected for resizing
-     * @type {number} 
+     * @type {number}
      */
     this.resizeColIndex = resizeColIndex;
     /**
      * Starting position of the column where we want to resize from
-     * @type {number} 
+     * @type {number}
      */
     this.startX = startX;
     /**
      * Start row, col values for the cells to be selected in the format (row, col)
-     * @type {number[]}  
+     * @type {number[]}
      */
     this.startCell = startCell;
     /**
      * Current row, col values for the cells which are selected in the format (row, col)
-     * @type {number[]}  
+     * @type {number[]}
      */
     this.currentCell = currentCell;
     this.copiedCells = [];
     /**
      * Value of sum of selected values
-     * @type {number}  
+     * @type {number}
      */
     this.sum = 0;
     /**
      * Value of min of selected values
-     * @type {number}  
+     * @type {number}
      */
     this.min = 0;
     /**
      * Value of max of selected values
-     * @type {number}  
+     * @type {number}
      */
     this.max = 0;
     /**
      * Value of average of selected values
-     * @type {number}  
+     * @type {number}
      */
     this.avg = 0;
     /**
      * Value of count of selected values
-     * @type {number}  
+     * @type {number}
      */
     this.count = 0;
     /**
      * Array of filtered rows when using Find function
-     * @type {number[]}  
+     * @type {number[]}
      */
     this.filteredRows = null;
 
+    /**
+     * @type {HTMLElement}
+     */
+    this.graph = document.querySelector(".graph");
+
+    
     this.init();
   }
 
@@ -153,11 +159,17 @@ export class Grid {
    * @returns {void}
    */
   init() {
-    this.canvas.addEventListener("pointerdown", this.handleMouseDown.bind(this));
-    this.canvas.addEventListener("pointermove", this.handleMouseMove.bind(this));
+    this.canvas.addEventListener(
+      "pointerdown",
+      this.handleMouseDown.bind(this)
+    );
+    this.canvas.addEventListener(
+      "pointermove",
+      this.handleMouseMove.bind(this)
+    );
     this.canvas.addEventListener("pointerup", this.handleMouseUp.bind(this));
     this.canvas.addEventListener("dblclick", this.handleDoubleClick.bind(this));
-    // document.addEventListener("keydown", this.handleKeyDown.bind(this));
+    document.addEventListener("keydown", this.handleKeyPress.bind(this));
     document.addEventListener(
       "DOMContentLoaded",
       this.fetchDataAndPopulateGrid.bind(this)
@@ -172,26 +184,26 @@ export class Grid {
    * Resizing Canvas based on Scroll
    * @returns {void}
    */
-//   resizeCanvas() {
-//     const excel = document.querySelector(".grid");
-//     const scrollHeight = excel.scrollHeight;
-//     const clientHeight = excel.clientHeight;
-//     const scrollTop = excel.scrollTop;
+  //   resizeCanvas() {
+  //     const excel = document.querySelector(".grid");
+  //     const scrollHeight = excel.scrollHeight;
+  //     const clientHeight = excel.clientHeight;
+  //     const scrollTop = excel.scrollTop;
 
-//     const scrollWidth = excel.scrollWidth;
-//     const clientWidth = excel.clientWidth;
-//     const scrollLeft = excel.scrollLeft;
+  //     const scrollWidth = excel.scrollWidth;
+  //     const clientWidth = excel.clientWidth;
+  //     const scrollLeft = excel.scrollLeft;
 
-//     if (scrollTop + clientHeight >= scrollHeight - 50) {
-//       this.canvas.height += 100;
-//       this.drawGrid();
-//     }
-//     if (scrollLeft + clientWidth >= scrollWidth - 50) {
-//       this.canvas.width += 100;
-//       this.drawGrid();
-//     }
-//   }
-  
+  //     if (scrollTop + clientHeight >= scrollHeight - 50) {
+  //       this.canvas.height += 100;
+  //       this.drawGrid();
+  //     }
+  //     if (scrollLeft + clientWidth >= scrollWidth - 50) {
+  //       this.canvas.width += 100;
+  //       this.drawGrid();
+  //     }
+  //   }
+
   /**
    * Getting data from backend the populating the Grid
    * @returns {void}
@@ -319,7 +331,7 @@ export class Grid {
     }
   }
   /**
-   * 
+   *
    * Handle Double click event
    * @param {PointerEvent} event  -
    * @returns {void}
@@ -347,13 +359,14 @@ export class Grid {
   }
 
   /**
-   * 
-   * Handle Pointer Down event 
-   * @param {PointerEvent} event  
+   *
+   * Handle Pointer Down event
+   * @param {PointerEvent} event
    * @returns {void}
    */
   handleMouseDown(event) {
     const { offsetX, offsetY } = event;
+    this.graph.style.display = "none";
     let col = 0;
     let x = 0;
     let y = 0;
@@ -381,9 +394,9 @@ export class Grid {
   }
 
   /**
-   * 
-   * Handle Pointer Move event 
-   * @param {PointerEvent} event  
+   *
+   * Handle Pointer Move event
+   * @param {PointerEvent} event
    * @returns {void}
    */
   handleMouseMove(event) {
@@ -421,10 +434,10 @@ export class Grid {
   }
 
   /**
-   * 
+   *
    * Handle Pointer up event
-   * @param {PointerEvent} event  
-   * @returns {void} 
+   * @param {PointerEvent} event
+   * @returns {void}
    */
   handleMouseUp(event) {
     const { offsetX, offsetY } = event;
@@ -488,12 +501,28 @@ export class Grid {
       this.updateSelectedRow(row);
       this.drawGrid();
     }
+    // for (let i = 0; i < this.selectedCells.length; i++) {
+    //     console.log(this.selectedCells[i][2]);
+    // }
   }
 
   /**
-   * 
+   * Handle any key press event
+   * @param {KeyboardEvent} ev
+   */
+  handleKeyPress(ev) {
+    if (ev.shiftKey) {
+      const selectedData = this.getSelectedData();
+      this.copyToClipBoard(selectedData);
+      console.log(selectedData);
+      
+    }
+  }
+
+  /**
+   *
    * Updated selected column array for multiple selection
-   * @param {number} col  
+   * @param {number} col
    * @returns {void}
    */
   updateSelectedCol(col) {
@@ -504,7 +533,7 @@ export class Grid {
   }
 
   /**
-   * 
+   *
    * Updated selected row array for multiple selection
    * @param {number} row
    * @returns {void}
@@ -517,7 +546,7 @@ export class Grid {
   }
 
   /**
-   * 
+   *
    * Updated selected row, column array for multiple selection
    * @param {number} start
    * @param {number} end
@@ -538,9 +567,9 @@ export class Grid {
   }
 
   /**
-   * 
+   *
    * Filter rows based on a value for Find function
-   * @param {*} findValue  
+   * @param {*} findValue
    * @returns {void}
    */
   filterRows(findValue) {
@@ -569,8 +598,12 @@ export class Grid {
    * @returns {void}
    */
   constructBar() {
-    const graph = new Graph("myChart", this.cellsData, this.cellsCol);
-    graph.drawBarGraph();
+    if (!this.graphInst) {
+      this.graphInst = new Graph("myChart", this.cellsData, this.cellsCol);
+    } else {
+      this.graphInst.setReqData(this.cellsData, this.cellsCol);
+    }
+    this.graphInst.drawBarGraph();
   }
 
   /**
@@ -578,8 +611,12 @@ export class Grid {
    * @returns {void}
    */
   constructLine() {
-    const graph = new Graph("myChart", this.cellsData, this.cellsCol);
-    graph.drawLineGraph();
+    if (!this.graphInst) {
+      this.graphInst = new Graph("myChart", this.cellsData, this.cellsCol);
+    } else {
+      this.graphInst.setReqData(this.cellsData, this.cellsCol);
+    }
+    this.graphInst.drawLineGraph();
   }
 
   /**
@@ -587,7 +624,35 @@ export class Grid {
    * @returns {void}
    */
   constructPie() {
-    const graph = new Graph("myChart", this.cellsData, this.cellsCol);
-    graph.drawPieGraph();
+    if (!this.graphInst) {
+      this.graphInst = new Graph("myChart", this.cellsData, this.cellsCol);
+    } else {
+      this.graphInst.setReqData(this.cellsData, this.cellsCol);
+    }
+    this.graphInst.drawPieGraph();
+  }
+
+  /**
+   * Copy to clipboard using ClipBoard API
+   * @param {string} data 
+   */
+  copyToClipBoard(data) {
+    navigator.clipboard
+      .writeText(data)
+      .then(() => console.log("Added to clipboard"))
+      .catch((err) => console.log("Failed to copy: ", err));
+  }
+
+  /**
+   * Get selected cells data in a selectedData array
+   * @returns {number[]}
+   */
+  getSelectedData() {
+    let selectedData = [];
+    for (let i = 0; i < this.selectedCells.length; i++) {
+      selectedData.push(this.selectedCells[i][2]);
+    }
+
+    return selectedData;
   }
 }
