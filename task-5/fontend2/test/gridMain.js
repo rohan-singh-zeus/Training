@@ -1,7 +1,6 @@
 import { GridConstants } from "../constant/index.js";
-import { GridDS } from "./dStructure.js";
+import { Excel } from "./excel.js";
 import { GridRow } from "./gridRow.js";
-import { VerticalScroll } from "./verticalScroll.js";
 
 export class GridMain {
   constructor(
@@ -17,8 +16,8 @@ export class GridMain {
     isResizing,
     startX,
     resizeColIndex,
-    varY,
-    rowSelected
+    rowSelected,
+
   ) {
     /**
      * Main Canvas Element
@@ -132,7 +131,7 @@ export class GridMain {
      */
     this.yEnd = 0;
     // this.vScroll = new VerticalScroll('verticalScroll', )
-    this.varY = varY;
+    // this.varY = varY;
 
     this.gridData = Array.from({ length: GridConstants.numRows }, () =>
       Array(GridConstants.numCols).fill("")
@@ -152,8 +151,13 @@ export class GridMain {
 
     this.thisCell = [0, 0]; // Add this to keep track of the current cell
     this.handleInputSubmitBound = null; // Store the bound function for event removal
+
+    /**
+     * @type {Excel}
+     */
+    this.excel = Excel.getInstance()
     this.init();
-    this.init();
+    // this.init();
   }
 
   /**
@@ -210,6 +214,8 @@ export class GridMain {
     this.ctx.reset();
     let cellPositionX = 0;
     let cellPositionY = 0;
+    // console.log(this.excel.varY);
+    
     for (let x = 0; x <= this.canvas.width; ++x) {
       cellPositionX += this.defCellWidth + this.posX[x];
       this.ctx.save();
@@ -223,7 +229,8 @@ export class GridMain {
     }
 
     for (let y = 0; y <= this.canvas.height; ++y) {
-      cellPositionY += this.defCellHeight - this.varY;
+      cellPositionY += this.defCellHeight - this.excel.varY
+    //   cellPositionY += this.defCellHeight
       this.ctx.save();
       this.ctx.beginPath();
       this.ctx.moveTo(0, cellPositionY + 0.5);

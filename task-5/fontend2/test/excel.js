@@ -65,6 +65,11 @@ export class Excel {
     this.rowSelected = Array(GridConstants.numCols).fill(false);
     this.varY = 0
 
+    /**
+     * Creating an excel instance for making it a singleton class
+     */
+    Excel.instance = this
+
     this.init();
   }
 
@@ -85,7 +90,7 @@ export class Excel {
       this.isDragging,
       this.isResizing,
       this.startX,
-      this.resizeColIndex, this.varY, this.rowSelected
+      this.resizeColIndex, this.rowSelected,
     );
     
     new GridRow(
@@ -105,9 +110,16 @@ export class Excel {
       this.rowSelected
     );
 
-    new GridCol("gridCol")
+    const gCol = new GridCol("gridCol")
 
-    new VerticalScroll("verticalScroll", gMain, this.varY);
+    new VerticalScroll("verticalScroll", gMain, gCol);
     new HorizontalScroll("horizontalScroll", gMain);
+  }
+
+  static getInstance(){
+    if(!Excel.instance){
+        Excel.instance = new Excel()
+    }
+    return Excel.instance
   }
 }

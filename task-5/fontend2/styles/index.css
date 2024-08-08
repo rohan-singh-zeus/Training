@@ -13,7 +13,7 @@ body {
 }
 body .container {
   height: 70vh;
-  overflow: scroll;
+  overflow: hidden;
   width: 60vw;
   background-color: whitesmoke;
   display: flex;
@@ -22,8 +22,8 @@ body .container {
 body .container > #gridCol {
   position: sticky;
   margin-top: 33px;
+  height: 100%;
   left: 0;
-  background-color: rgba(0, 0, 128, 0.03);
 }
 body .container > .main {
   position: relative;

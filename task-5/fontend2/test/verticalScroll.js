@@ -1,7 +1,9 @@
+import { Excel } from "./excel.js";
+import { GridCol } from "./gridCol.js";
 import { GridMain } from "./gridMain.js";
 
 export class VerticalScroll {
-  constructor(classId, gMain, varY) {
+  constructor(classId, gMain, gCol) {
     /**
      * Main scroll div
      * @type {HTMLElement}
@@ -41,7 +43,16 @@ export class VerticalScroll {
     this.totalContainerHeight = this.gMain.canvas.height * 2;
     this.startTop = 0;
     this.var1 = 0;
-    this.varY = varY
+    // this.varY = varY
+    /**
+     * @type {Excel}
+     */
+    this.excel = Excel.getInstance();
+
+    /**
+     * @type {GridCol}
+     */
+    this.gCol = gCol;
 
     this.init();
   }
@@ -63,7 +74,7 @@ export class VerticalScroll {
       this.handleMouseUp(e);
     });
 
-    this.destroy()
+    this.destroy();
   }
 
   /**
@@ -111,11 +122,17 @@ export class VerticalScroll {
         )}px`;
         this.bar.style.top = "20px";
         this.totalContainerHeight += this.gMain.canvas.height;
-        this.varY += this.startTop;
+        this.excel.varY += this.startTop;
         // this.startTop += this.startTop
+
         this.startmouseY = e.pageY;
       }
-      this.gMain.drawMainGrid()
+      console.log(this.excel.varY);
+      //   this.handleMouseUp()
+      this.excel.varY += this.startTop;
+
+      this.gMain.drawMainGrid();
+      this.gCol.drawFixedCol();
     }
   }
 
@@ -127,25 +144,23 @@ export class VerticalScroll {
   handleMouseUp(e) {
     this.isMoving = false;
     // console.log(this.startTop );
-    this.varY += this.startTop
-    // this.varY = this.var1
-    // console.log(this.var1);
-    
+    this.excel.varY += this.startTop;
+    // console.log(this.excel.varY);
   }
 
-  getScrollTopX(){
-    return this.var1
+  getScrollTopX() {
+    return this.var1;
   }
 
-  destroy(){
-    this.bar.removeEventListener("pointerdown", (e)=>{
-        this.handleMouseDown(e)
-    })
-    window.removeEventListener("pointermove", (e)=>{
-      this.handleMouseMove(e)
-    })
-    window.removeEventListener("pointerup", (e)=>{
-      this.handleMouseUp(e)
-    })
+  destroy() {
+    this.bar.removeEventListener("pointerdown", (e) => {
+      this.handleMouseDown(e);
+    });
+    window.removeEventListener("pointermove", (e) => {
+      this.handleMouseMove(e);
+    });
+    window.removeEventListener("pointerup", (e) => {
+      this.handleMouseUp(e);
+    });
   }
 }

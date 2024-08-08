@@ -150,7 +150,28 @@ export class Grid {
      */
     this.graph = document.querySelector(".graph");
 
-    
+    /**
+     * @type {number[][]}
+     */
+    this.pasteData = null;
+
+    /**
+     * Initial row, col for copy paste
+     * @type {number[]}
+     */
+    this.initialCell = [0, 0];
+
+    /**
+     * Final row, col for copy paste
+     * @type {number[]}
+     */
+    this.finalCell = [0, 0];
+
+    // /**
+    //  * @type {number[][]}
+    //  */
+    this.copyCutData = []
+
     this.init();
   }
 
@@ -388,6 +409,8 @@ export class Grid {
       this.isDragging = true;
       this.startCell = [row, col];
       this.currentCell = [row, col];
+      this.initialCell = [row, col];
+      this.finalCell = [row, col];
       this.updateSelectedCells(this.startCell, this.currentCell);
       this.drawGrid();
     }
@@ -418,6 +441,7 @@ export class Grid {
       }
       const row = Math.floor(offsetY / this.cellHeight);
       this.currentCell = [row, col];
+      this.finalCell = [row, col];
       this.updateSelectedCells(this.startCell, this.currentCell);
       this.drawGrid();
     } else {
@@ -504,6 +528,12 @@ export class Grid {
     // for (let i = 0; i < this.selectedCells.length; i++) {
     //     console.log(this.selectedCells[i][2]);
     // }
+    // console.log(this.initialCell, this.finalCell);
+    // console.log(this.gridData[this.initialCell[0]][this.initialCell[1]], this.gridData[this.finalCell[0]][this.finalCell[1]]);
+    // console.log(this.handleCopyToClipBoard());
+    // this.handleCopyToClipBoard()
+    // this.handleClipBoardPaste();
+    // console.log(this.gridData[row-1][col-1]);
   }
 
   /**
@@ -512,11 +542,57 @@ export class Grid {
    */
   handleKeyPress(ev) {
     if (ev.shiftKey) {
-      const selectedData = this.getSelectedData();
-      this.copyToClipBoard(selectedData);
-      console.log(selectedData);
+      const selectedString = this.handleCopyToClipBoard();
+      console.log(selectedString.split("-}"));
+      const [startRow, startCol] = this.initialCell;
+      const [endRow, endCol] = this.finalCell;
+      const rowRange = [Math.min(startRow, endRow), Math.max(startRow, endRow)];
+      const colRange = [Math.min(startCol, endCol), Math.max(startCol, endCol)];
+      let transfromToMatrixHelper = selectedString.split('-}')
+    //   let copyCutData = [];
+      for(let rowIndex = 0; rowIndex + 1 < transfromToMatrixHelper.length ; ++rowIndex){
+          let temp = transfromToMatrixHelper[rowIndex].split("-->");
+          this.copyCutData.push(temp);
+      }
+    //   console.log(this.copyCutData);
       
+
+      this.copyToClipBoard(selectedString);
     }
+    if (ev.altKey) {
+      this.readClipBoardData();
+    }
+  }
+
+  handleCopyToClipBoard() {
+    let copyToClipboardString = "";
+    const [startRow, startCol] = this.initialCell;
+    const [endRow, endCol] = this.finalCell;
+    const rowRange = [Math.min(startRow, endRow), Math.max(startRow, endRow)];
+    const colRange = [Math.min(startCol, endCol), Math.max(startCol, endCol)];
+    for (let row = rowRange[0]; row <= rowRange[1]; row++) {
+      for (let col = colRange[0]; col <= colRange[1]; col++) {
+        copyToClipboardString +=
+          (this.gridData[row - 1][col - 1] || "") +
+          (col === colRange[1] ? "-}" : "-->");
+      }
+    }
+    return copyToClipboardString;
+  }
+
+  handleClipBoardPaste() {
+    // const [startRow, startCol] = this.initialCell;
+    // const [endRow, endCol] = this.finalCell;
+    // const rowRange = [Math.min(startRow, endRow), Math.max(startRow, endRow)];
+    // const colRange = [Math.min(startCol, endCol), Math.max(startCol, endCol)];
+    // let lx = colRange[0];
+    // let ly = rowRange[0];
+    // /**
+    //  * @type {string}
+    //  */
+    let copyCutString = this.handleClipBoardPaste();
+    // console.log(this.copyCutData);
+    console.log(copyCutString.split("-}"));
   }
 
   /**
@@ -634,13 +710,20 @@ export class Grid {
 
   /**
    * Copy to clipboard using ClipBoard API
-   * @param {string} data 
+   * @param {string} data
    */
   copyToClipBoard(data) {
     navigator.clipboard
       .writeText(data)
       .then(() => console.log("Added to clipboard"))
       .catch((err) => console.log("Failed to copy: ", err));
+  }
+
+  readClipBoardData() {
+    navigator.clipboard
+      .readText()
+      .then((text) => "")
+      .catch((err) => console.log(err));
   }
 
   /**
