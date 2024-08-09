@@ -78,6 +78,7 @@ export class Excel {
    * @returns {void}
    */
   init() {
+
     const gMain = new GridMain(
       "gridMain",
       this.posX,
@@ -122,4 +123,6 @@ export class Excel {
     }
     return Excel.instance
   }
+
+  
 }

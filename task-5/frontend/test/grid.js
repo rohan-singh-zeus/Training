@@ -170,7 +170,10 @@ export class Grid {
     // /**
     //  * @type {number[][]}
     //  */
-    this.copyCutData = []
+    this.copyCutData = [];
+
+    this.currentRow = 0
+    this.currentCol = 0
 
     this.init();
   }
@@ -414,6 +417,8 @@ export class Grid {
       this.updateSelectedCells(this.startCell, this.currentCell);
       this.drawGrid();
     }
+    // console.log(row, col);
+    // console.log(this.gridData[row - 1][col - 1]);
   }
 
   /**
@@ -543,24 +548,48 @@ export class Grid {
   handleKeyPress(ev) {
     if (ev.shiftKey) {
       const selectedString = this.handleCopyToClipBoard();
-      console.log(selectedString.split("-}"));
+      //   console.log(selectedString.split("-}"));
       const [startRow, startCol] = this.initialCell;
       const [endRow, endCol] = this.finalCell;
       const rowRange = [Math.min(startRow, endRow), Math.max(startRow, endRow)];
       const colRange = [Math.min(startCol, endCol), Math.max(startCol, endCol)];
-      let transfromToMatrixHelper = selectedString.split('-}')
-    //   let copyCutData = [];
-      for(let rowIndex = 0; rowIndex + 1 < transfromToMatrixHelper.length ; ++rowIndex){
-          let temp = transfromToMatrixHelper[rowIndex].split("-->");
-          this.copyCutData.push(temp);
+      let transfromToMatrixHelper = selectedString.split("-}");
+      //   let copyCutData = [];
+      for (
+        let rowIndex = 0;
+        rowIndex + 1 < transfromToMatrixHelper.length;
+        ++rowIndex
+      ) {
+        let temp = transfromToMatrixHelper[rowIndex].split("-->");
+        this.copyCutData.push(temp);
       }
-    //   console.log(this.copyCutData);
-      
+      console.log(this.copyCutData.length);
 
+      for (let i = 0; i < this.copyCutData.length; i++) {
+        for (let j = 0; j < this.copyCutData[0].length; j++) {
+            console.log(i, j, this.copyCutData[i][j]);
+            
+          //   console.log(this.copyCutData[i][j]);
+        }
+      }
       this.copyToClipBoard(selectedString);
     }
     if (ev.altKey) {
-      this.readClipBoardData();
+      //   this.readClipBoardData();
+      //   const { offsetX, offsetY } = ev;
+      //   this.graph.style.display = "none";
+      //   let col = 0;
+      //   let x = 0;
+      //   let y = 0;
+      //   for (let i = 0; i < this.numCols; i++) {
+      //     x += this.columnWidths[i];
+      //     if (offsetX < x) {
+      //       col = i;
+      //       break;
+      //     }
+      //   }
+      //   const row = Math.floor(offsetY / this.cellHeight);
+      //   console.log(row, col);
     }
   }
 
@@ -592,7 +621,7 @@ export class Grid {
     //  */
     let copyCutString = this.handleClipBoardPaste();
     // console.log(this.copyCutData);
-    console.log(copyCutString.split("-}"));
+    // console.log(copyCutString.split("-}"));
   }
 
   /**

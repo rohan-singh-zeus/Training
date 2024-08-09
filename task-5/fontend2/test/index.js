@@ -1,3 +1,3 @@
-import { Excel } from "./excel.js";
+import { Sheet } from "./sheet.js";
 
-new Excel()
+new Sheet();
