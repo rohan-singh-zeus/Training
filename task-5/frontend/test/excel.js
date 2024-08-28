@@ -2,6 +2,7 @@ import { GridConstants } from "../constant/index.js";
 import { GraphUtils } from "./graphUtils.js";
 import { Grid } from "./grid.js";
 import { RowGrid } from "./rowCanvas.js";
+import { UploadFunctionality } from "./upload.js";
 
 // Global Variables
 
@@ -81,6 +82,8 @@ export class Excel{
     new RowGrid("gridCanvas2", this.columnWidths, grid)
     
     new GraphUtils(grid)
+
+    new UploadFunctionality()
 
   }
 }

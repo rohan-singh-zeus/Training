@@ -55,9 +55,18 @@ export class Grid {
      * Stores the data in 2-D Array
      * @type {string[][]}
      */
+    // this.gridData = [];
     this.gridData = Array.from({ length: this.numRows }, () =>
       Array(this.numCols).fill("")
     );
+
+    // for (let i = 0; i < this.numRows; i++) {
+    //     const row = [];
+    //     for (let j = 0; j < this.numCols; j++) {
+    //         row.push("abc");
+    //     }
+    //     this.gridData.push(row);
+    // }
     /**
      * Number of Columns for the first column
      * @type {number[]}
@@ -172,10 +181,11 @@ export class Grid {
     //  */
     this.copyCutData = [];
 
-    this.currentRow = 0
-    this.currentCol = 0
+    this.currentRow = 0;
+    this.currentCol = 0;
 
     this.init();
+    // this.fetchActualData(0, 30);
   }
 
   /**
@@ -194,39 +204,12 @@ export class Grid {
     this.canvas.addEventListener("pointerup", this.handleMouseUp.bind(this));
     this.canvas.addEventListener("dblclick", this.handleDoubleClick.bind(this));
     document.addEventListener("keydown", this.handleKeyPress.bind(this));
-    document.addEventListener(
-      "DOMContentLoaded",
-      this.fetchDataAndPopulateGrid.bind(this)
-    );
-
-    // document
-    //   .querySelector(".excel")
-    //   .addEventListener("scroll", this.resizeCanvas.bind(this));
+    document.addEventListener("DOMContentLoaded", (ev) => {
+        // this.fetchDataAndPopulateGrid();
+        this.fetchActualData(0, 30);
+        // this.drawGrid()
+    });
   }
-
-  /**
-   * Resizing Canvas based on Scroll
-   * @returns {void}
-   */
-  //   resizeCanvas() {
-  //     const excel = document.querySelector(".grid");
-  //     const scrollHeight = excel.scrollHeight;
-  //     const clientHeight = excel.clientHeight;
-  //     const scrollTop = excel.scrollTop;
-
-  //     const scrollWidth = excel.scrollWidth;
-  //     const clientWidth = excel.clientWidth;
-  //     const scrollLeft = excel.scrollLeft;
-
-  //     if (scrollTop + clientHeight >= scrollHeight - 50) {
-  //       this.canvas.height += 100;
-  //       this.drawGrid();
-  //     }
-  //     if (scrollLeft + clientWidth >= scrollWidth - 50) {
-  //       this.canvas.width += 100;
-  //       this.drawGrid();
-  //     }
-  //   }
 
   /**
    * Getting data from backend the populating the Grid
@@ -236,7 +219,32 @@ export class Grid {
     fetch("test.json")
       .then((response) => response.json())
       .then((data) => {
-        this.gridData.length = 0;
+        console.log(data);
+        
+        // this.gridData.length = 0;
+        // Object.keys(data[0]).forEach((d, i) => {
+        //   this.gridCols.push(d);
+        // });
+        // data.forEach((row, rowIndex) => {
+        //   this.gridData[rowIndex] = Object.values(row);
+        //   this.gridRows.push(rowIndex);
+        // });
+        // this.drawGrid();
+      })
+      .catch((error) => console.error("Error fetching data:", error));
+  }
+
+  /**
+   * Fetch data from backend through lazy loading
+   * @param {number} from
+   * @param {number} to
+   * @returns {void}
+   */
+  fetchActualData(from, to) {
+    fetch(`https://localhost:7210/lazy/${from}/${to}`)
+      .then((response) => response.json())
+      .then((data) => {
+        // this.gridData.length = 0;
         Object.keys(data[0]).forEach((d, i) => {
           this.gridCols.push(d);
         });
@@ -244,7 +252,7 @@ export class Grid {
           this.gridData[rowIndex] = Object.values(row);
           this.gridRows.push(rowIndex);
         });
-        this.drawGrid();
+       this.drawGrid();
       })
       .catch((error) => console.error("Error fetching data:", error));
   }
@@ -307,7 +315,8 @@ export class Grid {
     this.drawFirstRow();
 
     let rowCount = this.filteredRows ? this.filteredRows.length : this.numRows;
-
+    console.log(this.gridData.length, this.gridData[0].length);
+    
     for (let row = 0; row < rowCount; row++) {
       let x = this.columnWidths[0];
       let actualRow = this.filteredRows ? this.filteredRows[row] : row;
@@ -320,7 +329,9 @@ export class Grid {
         this.ctx.strokeRect(x, y, width, this.cellHeight);
         this.ctx.fillStyle = "#000000";
         this.ctx.font = "11px Arial";
-        if (this.gridData[row][col]) {
+        // console.log(this.gridData[row][col]);
+        
+        if (row < this.gridData.length && col < this.gridData[0].length) {
           this.ctx.fillText(this.gridData[actualRow][col], x + 5, y + 20);
         } else {
           this.ctx.fillText("", x + 5, y + 20);
@@ -567,8 +578,8 @@ export class Grid {
 
       for (let i = 0; i < this.copyCutData.length; i++) {
         for (let j = 0; j < this.copyCutData[0].length; j++) {
-            console.log(i, j, this.copyCutData[i][j]);
-            
+          console.log(i, j, this.copyCutData[i][j]);
+
           //   console.log(this.copyCutData[i][j]);
         }
       }

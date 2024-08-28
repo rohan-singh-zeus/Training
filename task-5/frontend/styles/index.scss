@@ -7,6 +7,26 @@ body {
   overflow-x: hidden;
   position: relative;
 
+  #progressContainer {
+    position: absolute;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    height: 100px;
+    width: 200px;
+    padding: 20px;
+    background-color: azure;
+    border: 1px solid black;
+    top: 340px;
+    left: 35%;
+    border-radius: 10px;
+    z-index: 999;
+
+    #progressPercentage {
+      margin-left: 10px;
+    }
+  }
+
   .ribbon {
     height: 20vh;
     width: 100vw;
@@ -85,31 +105,41 @@ body {
           // border-top-left-radius: 50%;
 
           > div {
-            > label {
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-              justify-content: center;
+            > form {
+                display: flex;
+                align-items: center;
+              > div {
+                > label {
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  justify-content: center;
 
-              > p {
-                margin-top: 30px;
+                  > p {
+                    margin-top: 30px;
+                  }
+                }
+
+                > input[type="file"] {
+                  display: none;
+                }
+
+                > .custom-file-upload {
+                  // border: 1px solid #ccc;
+                  display: inline-flex;
+                  padding: 6px 12px;
+                  cursor: pointer;
+
+                  > img {
+                    border-radius: 50%;
+                    height: 40px;
+                    width: 40px;
+                  }
+                }
               }
-            }
 
-            > input[type="file"] {
-              display: none;
-            }
-
-            > .custom-file-upload {
-              // border: 1px solid #ccc;
-              display: inline-flex;
-              padding: 6px 12px;
-              cursor: pointer;
-
-              > img {
-                border-radius: 50%;
-                height: 40px;
-                width: 40px;
+              > button{
+                
               }
             }
           }
@@ -165,7 +195,7 @@ body {
           }
         }
 
-        > .r-33{
+        > .r-33 {
           display: none;
           flex: 0.9;
           // background-color: #b9d9eb;
@@ -229,7 +259,7 @@ body {
       // position: relative;
       // display: flex;
 
-      > #gridCanvas2{
+      > #gridCanvas2 {
         cursor: default;
         // position: absolute;
         // top: 0;
@@ -242,7 +272,7 @@ body {
       // width: 100vw;
       height: 78vh;
       width: 100vw;
-    //   overflow: auto;
+      //   overflow: auto;
       // border: 1px solid blue;
       position: relative;
       display: flex;

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Text;
@@ -7,7 +8,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using MySql.Data.MySqlClient;
+using Mysqlx.Crud;
 using Newtonsoft.Json;
 using NuGet.Protocol.Plugins;
 using RabbitMQ.Client;
@@ -33,48 +36,81 @@ namespace server.Controllers
             _rabbitmqService = rabbitmqService;
         }
 
-        // GET: api/TodoItems
+
         [HttpGet]
-        public async Task<IActionResult> GetTodoItems()
+        public async Task<IActionResult> GetCsvRecords()
         {
 
-            var todoItems = new List<TodoItem>();
+            var csvRecord = new List<Employee>();
 
             await connection.OpenAsync();
 
-            using var command = new MySqlCommand("select * from todo;", connection);
+            using var command = new MySqlCommand("select * from employee4;", connection);
             using var reader = await command.ExecuteReaderAsync();
             while (await reader.ReadAsync())
             {
-                TodoItem item = new()
+                Employee item = new()
                 {
-                    Id = reader.GetInt32(0),
-                    FirstName = reader.GetString(1),
-                    LastName = reader.GetString(2),
-                    Age = reader.GetInt32(3),
-                    Height = reader.GetInt32(4),
-                    Gender = reader.GetString(5),
-
+                    Email = reader.GetString(0),
+                    Name = reader.GetString(1),
+                    Country = reader.GetString(2),
+                    State = reader.GetString(3),
+                    City = reader.GetString(4),
+                    Telephone_Number = reader.GetInt64(5),
+                    Address_Line_1 = reader.GetString(6),
+                    Address_Line_2 = reader.GetString(7),
+                    Date_Of_Birth = reader.GetString(8),
+                    Gross_Salary_FY2019_20 = reader.GetInt64(9),
+                    Gross_Salary_FY2020_21 = reader.GetInt64(10),
+                    Gross_Salary_FY2021_22 = reader.GetInt64(11),
+                    Gross_Salary_FY2022_23 = reader.GetInt64(12),
+                    Gross_Salary_FY2023_24 = reader.GetInt64(13),
                 };
-                todoItems.Add(item);
+                csvRecord.Add(item);
             }
-            return Ok(todoItems);
+            return Ok(csvRecord);
             // return await _context.TodoItems.ToListAsync();
+        }
+
+        [HttpGet]
+        [Route("/lazy/{from}/{to}")]
+        public async Task<IActionResult> GetCsvRecordInChunks(long from, long to){
+            var csvRecord = new List<Employee>();
+
+            await connection.OpenAsync();
+
+            using var command = new MySqlCommand("select * from employee4 limit @from, @to;", connection);
+            command.Parameters.AddWithValue("@from", from);
+            command.Parameters.AddWithValue("@to", to);
+            using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                Employee item = new()
+                {
+                    Email = reader.GetString(0),
+                    Name = reader.GetString(1),
+                    Country = reader.GetString(2),
+                    State = reader.GetString(3),
+                    City = reader.GetString(4),
+                    Telephone_Number = reader.GetInt64(5),
+                    Address_Line_1 = reader.GetString(6),
+                    Address_Line_2 = reader.GetString(7),
+                    Date_Of_Birth = reader.GetString(8),
+                    Gross_Salary_FY2019_20 = reader.GetInt64(9),
+                    Gross_Salary_FY2020_21 = reader.GetInt64(10),
+                    Gross_Salary_FY2021_22 = reader.GetInt64(11),
+                    Gross_Salary_FY2022_23 = reader.GetInt64(12),
+                    Gross_Salary_FY2023_24 = reader.GetInt64(13),
+                };
+                csvRecord.Add(item);
+            }
+            return Ok(csvRecord);
         }
 
         // GET: api/TodoItems/5
         [HttpGet("{id}")]
         public async Task<ActionResult<TodoItem>> GetTodoItem(long id)
         {
-            // var todoItems = new List<TodoItem>();
-
-            // await connection.OpenAsync();
-
-            // using var command = new MySqlCommand("select * from todo where id = @id;", connection);
-            // command.Parameters.AddWithValue("@id", id);
-            // using var reader = await command.ExecuteReaderAsync();
-            // var result = await reader.ReadAsync();
-
             var todoItem = await _context.TodoItems.FindAsync(id);
 
             if (todoItem == null)
@@ -121,8 +157,6 @@ namespace server.Controllers
         [HttpPost]
         public async Task<ActionResult<TodoItem>> PostTodoItem(TodoItem todoItem)
         {
-            // _context.TodoItems.Add(todoItem);
-            // await _context.SaveChangesAsync();
             await connection.OpenAsync();
             using var command = new MySqlCommand("insert into todo (id, firstname, lastname, age, height, gender) values(@id, @firstname, @lastname, @age, @height, @gender);", connection);
             command.Parameters.AddWithValue("@id", todoItem.Id);
@@ -135,10 +169,13 @@ namespace server.Controllers
             return CreatedAtAction(nameof(PostTodoItem), new { id = todoItem.Id }, todoItem);
         }
 
+        // POST: api/TodoItems/handleCsv
         [HttpPost]
         [Route("handleCsv")]
         public async Task<IActionResult> HandleCsv(IFormFile file)
         {
+            Stopwatch stopwatch = new();
+            stopwatch.Start();
             if (file == null || file.Length == 0)
             {
                 return BadRequest("File not found!!");
@@ -148,9 +185,12 @@ namespace server.Controllers
             var csvContent = Encoding.UTF8.GetString(stream.ToArray());
             List<Employee> jsonContent = ConverStringToJson(csvContent);
             await MultipleInsert(jsonContent);
+            stopwatch.Stop();
+            Console.WriteLine("Time elapsed: {0} ms", stopwatch.ElapsedMilliseconds);
             return Ok("Csv data added to MySQL");
         }
 
+        // POST: api/TodoItems/sendToMQ
         [HttpPost]
         [Route("sendToMQ")]
         public async Task<IActionResult> SendToMQ(IFormFile file)
@@ -166,10 +206,14 @@ namespace server.Controllers
             return Ok("Csv data added to RabbitMQ");
         }
 
+        // POST: api/TodoItems/sendToMQInChunks
         [HttpPost]
         [Route("sendToMQInChunks")]
         public async Task<IActionResult> SendToMQInChunks(IFormFile file)
         {
+            Stopwatch stopwatch = new();
+            stopwatch.Start();
+            var chunkSize = 10000;
             if (file == null || file.Length == 0)
             {
                 return BadRequest("File not found!!");
@@ -185,9 +229,11 @@ namespace server.Controllers
             }
             // Chunking the CSV data
             var chunks = csvData.Skip(1).Select((value, index) => new { value, index }) // Skip the header
-                                .GroupBy(x => x.index / 10)
+                                .GroupBy(x => x.index / chunkSize)
                                 .Select(g => g.Select(x => x.value).ToArray());
-            _rabbitmqService.SendMessageInChunks(chunks, "chunksQueue12");
+            await _rabbitmqService.SendMessageInChunksAsync(chunks, "chunksQueue12");
+            stopwatch.Stop();
+            Console.WriteLine("Time elapsed for sending chunks from aspnet to rabbitmq: {0} ms", stopwatch.ElapsedMilliseconds);
             return Ok("Added To RabbitMQ in chunks");
         }
 
@@ -230,12 +276,37 @@ namespace server.Controllers
             sql.Append("INSERT INTO employee4 (email, name, country, state, city, telephone, `address_line_1`, `address_line_2`, dob, `fy2019-20`, `fy2020-21`, `fy2021-22`, `fy2022-23`, `fy2023-24`) VALUES");
             foreach (var record in csvRecords)
             {
-                sql.Append($"('{record.Email}', '{record.Name}', '{record.Country}', '{record.State}', '{record.City}', {record.Telephone_Number}, '{record.Address_Line_1}', '{record.Address_Line_2}', '{record.Date_Of_Birth}', {record.Gross_Salary_FY2019_20}, {record.Gross_Salary_FY2020_21}, {record.Gross_Salary_FY2021_22}, {record.Gross_Salary_FY2022_23}, {record.Gross_Salary_FY2023_24}),");
+                sql.Append($"('{MySqlHelper.EscapeString(record.Email)}', '{MySqlHelper.EscapeString(record.Name)}', '{MySqlHelper.EscapeString(record.Country)}', '{MySqlHelper.EscapeString(record.State)}', '{MySqlHelper.EscapeString(record.City)}', {record.Telephone_Number}, '{MySqlHelper.EscapeString(record.Address_Line_1)}', '{MySqlHelper.EscapeString(record.Address_Line_2)}', '{MySqlHelper.EscapeString(record.Date_Of_Birth)}', {record.Gross_Salary_FY2019_20}, {record.Gross_Salary_FY2020_21}, {record.Gross_Salary_FY2021_22}, {record.Gross_Salary_FY2022_23}, {record.Gross_Salary_FY2023_24}),");
             }
             sql.Length--;
             Console.WriteLine(sql.ToString());
             using var command = new MySqlCommand(sql.ToString(), connection);
             await command.ExecuteNonQueryAsync();
+        }
+
+        // PUT: api/TodoItems/updateCells
+        [HttpPut]
+        [Route("updateCells")]
+        public async Task<IActionResult> UpdateCells(Dictionary<String, List<Dictionary<String, String>>> UpdateItems){
+            await connection.OpenAsync();
+            var sql = new StringBuilder();
+            foreach (var item in UpdateItems)
+            {
+                var columnName = item.Key;
+                foreach (var i in item.Value)
+                {
+                    foreach (var j in i)
+                    {
+                        // Console.WriteLine("Email: {0}, column: {1}, value: {2}", columnName, j.Key, j.Value);
+                        sql.Append($"UPDATE employee4 SET {j.Key} = '{j.Value}' WHERE email = '{columnName}'");
+                        using var command = new MySqlCommand(sql.ToString(), connection);
+                        await command.ExecuteNonQueryAsync();
+                        // Console.WriteLine(sql.ToString());
+                        sql.Clear();
+                    }
+                }
+            }
+            return Ok("All Updates performed succcessfully");
         }
 
         // DELETE: api/TodoItems/5
