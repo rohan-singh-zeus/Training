@@ -1,4 +1,5 @@
 import { GridConstants } from "../constant/index.js";
+import { CustomDictionary } from "./ds.js";
 import { Graph } from "./graph.js";
 
 export class Grid {
@@ -184,6 +185,13 @@ export class Grid {
     this.currentRow = 0;
     this.currentCol = 0;
 
+    /**
+     * @type {CustomDictionary}
+     */
+    this.customDict = CustomDictionary.getInstance();
+
+    // Grid.instance = this;
+
     this.init();
     // this.fetchActualData(0, 30);
   }
@@ -205,9 +213,8 @@ export class Grid {
     this.canvas.addEventListener("dblclick", this.handleDoubleClick.bind(this));
     document.addEventListener("keydown", this.handleKeyPress.bind(this));
     document.addEventListener("DOMContentLoaded", (ev) => {
-        // this.fetchDataAndPopulateGrid();
-        this.fetchActualData(0, 30);
-        // this.drawGrid()
+      this.fetchActualData(0, 30);
+      this.drawGrid();
     });
   }
 
@@ -220,16 +227,16 @@ export class Grid {
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
-        
-        // this.gridData.length = 0;
-        // Object.keys(data[0]).forEach((d, i) => {
-        //   this.gridCols.push(d);
-        // });
-        // data.forEach((row, rowIndex) => {
-        //   this.gridData[rowIndex] = Object.values(row);
-        //   this.gridRows.push(rowIndex);
-        // });
-        // this.drawGrid();
+
+        this.gridData.length = 0;
+        Object.keys(data[0]).forEach((d, i) => {
+          this.gridCols.push(d);
+        });
+        data.forEach((row, rowIndex) => {
+          this.gridData[rowIndex] = Object.values(row);
+          this.gridRows.push(rowIndex);
+        });
+        this.drawGrid();
       })
       .catch((error) => console.error("Error fetching data:", error));
   }
@@ -252,7 +259,7 @@ export class Grid {
           this.gridData[rowIndex] = Object.values(row);
           this.gridRows.push(rowIndex);
         });
-       this.drawGrid();
+        this.drawGrid();
       })
       .catch((error) => console.error("Error fetching data:", error));
   }
@@ -315,8 +322,8 @@ export class Grid {
     this.drawFirstRow();
 
     let rowCount = this.filteredRows ? this.filteredRows.length : this.numRows;
-    console.log(this.gridData.length, this.gridData[0].length);
-    
+    // console.log(this.gridData.length, this.gridData[0].length);
+
     for (let row = 0; row < rowCount; row++) {
       let x = this.columnWidths[0];
       let actualRow = this.filteredRows ? this.filteredRows[row] : row;
@@ -330,7 +337,7 @@ export class Grid {
         this.ctx.fillStyle = "#000000";
         this.ctx.font = "11px Arial";
         // console.log(this.gridData[row][col]);
-        
+
         if (row < this.gridData.length && col < this.gridData[0].length) {
           this.ctx.fillText(this.gridData[actualRow][col], x + 5, y + 20);
         } else {
@@ -387,10 +394,47 @@ export class Grid {
 
     const row = Math.floor(offsetY / this.cellHeight);
     const value = prompt("Enter new value:", this.gridData[row - 1][col - 1]);
+    // console.log(value, this.gridCols[col-1], this.gridData[row-1][0]);
+    let existingEntry = this.customDict.get(this.gridData[row - 1][0]);
+    if (!existingEntry) {
+      existingEntry = [];
+    }
+    existingEntry.push({ [this.gridCols[col - 1]]: value });
+    this.customDict.add(this.gridData[row - 1][0], existingEntry);
     if (value !== null) {
       this.gridData[row - 1][col - 1] = value;
       this.drawGrid();
     }
+  }
+
+  updateCellsCall() {
+    console.log(this.customDict.getAll());
+    
+    fetch("https://localhost:7210/api/TodoItems/updateCells", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(this.customDict.getAll()),
+    })
+      .then((res) => res.json())
+      .then((data) => console.log(data))
+      .catch((err) => console.log(err));
+    // try {
+    //   const res = await fetch(
+    //     "https://localhost:7210/api/TodoItems/updateCells",
+    //     {
+    //       method: "PUT",
+    //       headers: {
+    //         "Content-Type": "application/json",
+    //       },
+    //       body: JSON.stringify(this.customDict.getAll()),
+    //     }
+    //   );
+    //   console.log(res);
+    // } catch (error) {
+    //   console.log(error);
+    // }
   }
 
   /**
@@ -430,6 +474,8 @@ export class Grid {
     }
     // console.log(row, col);
     // console.log(this.gridData[row - 1][col - 1]);
+    this.cellsData = []
+    this.cellsCol = []
   }
 
   /**
@@ -585,22 +631,9 @@ export class Grid {
       }
       this.copyToClipBoard(selectedString);
     }
-    if (ev.altKey) {
-      //   this.readClipBoardData();
-      //   const { offsetX, offsetY } = ev;
-      //   this.graph.style.display = "none";
-      //   let col = 0;
-      //   let x = 0;
-      //   let y = 0;
-      //   for (let i = 0; i < this.numCols; i++) {
-      //     x += this.columnWidths[i];
-      //     if (offsetX < x) {
-      //       col = i;
-      //       break;
-      //     }
-      //   }
-      //   const row = Math.floor(offsetY / this.cellHeight);
-      //   console.log(row, col);
+    if (ev.ctrlKey) {
+      this.updateCellsCall();
+      //   console.log("altkey called");
     }
   }
 
@@ -778,4 +811,10 @@ export class Grid {
 
     return selectedData;
   }
+
+  //   static getInstance(){
+  //     if(!Grid.instance){
+  //         Grid.instance = new Grid()
+  //     }
+  //   }
 }

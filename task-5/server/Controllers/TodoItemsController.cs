@@ -74,7 +74,8 @@ namespace server.Controllers
 
         [HttpGet]
         [Route("/lazy/{from}/{to}")]
-        public async Task<IActionResult> GetCsvRecordInChunks(long from, long to){
+        public async Task<IActionResult> GetCsvRecordInChunks(long from, long to)
+        {
             var csvRecord = new List<Employee>();
 
             await connection.OpenAsync();
@@ -108,66 +109,66 @@ namespace server.Controllers
         }
 
         // GET: api/TodoItems/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<TodoItem>> GetTodoItem(long id)
-        {
-            var todoItem = await _context.TodoItems.FindAsync(id);
+        // [HttpGet("{id}")]
+        // public async Task<ActionResult<TodoItem>> GetTodoItem(long id)
+        // {
+        //     var todoItem = await _context.TodoItems.FindAsync(id);
 
-            if (todoItem == null)
-            {
-                return NotFound();
-            }
+        //     if (todoItem == null)
+        //     {
+        //         return NotFound();
+        //     }
 
-            return todoItem;
-        }
+        //     return todoItem;
+        // }
 
         // PUT: api/TodoItems/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutTodoItem(long id, TodoItem todoItem)
-        {
-            if (id != todoItem.Id)
-            {
-                return BadRequest();
-            }
+        // [HttpPut("{id}")]
+        // public async Task<IActionResult> PutTodoItem(long id, TodoItem todoItem)
+        // {
+        //     if (id != todoItem.Id)
+        //     {
+        //         return BadRequest();
+        //     }
 
-            _context.Entry(todoItem).State = EntityState.Modified;
+        //     _context.Entry(todoItem).State = EntityState.Modified;
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!TodoItemExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+        //     try
+        //     {
+        //         await _context.SaveChangesAsync();
+        //     }
+        //     catch (DbUpdateConcurrencyException)
+        //     {
+        //         if (!TodoItemExists(id))
+        //         {
+        //             return NotFound();
+        //         }
+        //         else
+        //         {
+        //             throw;
+        //         }
+        //     }
 
-            return NoContent();
-        }
+        //     return NoContent();
+        // }
 
         // POST: api/TodoItems
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<TodoItem>> PostTodoItem(TodoItem todoItem)
-        {
-            await connection.OpenAsync();
-            using var command = new MySqlCommand("insert into todo (id, firstname, lastname, age, height, gender) values(@id, @firstname, @lastname, @age, @height, @gender);", connection);
-            command.Parameters.AddWithValue("@id", todoItem.Id);
-            command.Parameters.AddWithValue("@firstname", todoItem.FirstName);
-            command.Parameters.AddWithValue("@lastname", todoItem.LastName);
-            command.Parameters.AddWithValue("@age", todoItem.Age);
-            command.Parameters.AddWithValue("@height", todoItem.Height);
-            command.Parameters.AddWithValue("@gender", todoItem.Gender);
-            await command.ExecuteNonQueryAsync();
-            return CreatedAtAction(nameof(PostTodoItem), new { id = todoItem.Id }, todoItem);
-        }
+        // [HttpPost]
+        // public async Task<ActionResult<TodoItem>> PostTodoItem(TodoItem todoItem)
+        // {
+        //     await connection.OpenAsync();
+        //     using var command = new MySqlCommand("insert into todo (id, firstname, lastname, age, height, gender) values(@id, @firstname, @lastname, @age, @height, @gender);", connection);
+        //     command.Parameters.AddWithValue("@id", todoItem.Id);
+        //     command.Parameters.AddWithValue("@firstname", todoItem.FirstName);
+        //     command.Parameters.AddWithValue("@lastname", todoItem.LastName);
+        //     command.Parameters.AddWithValue("@age", todoItem.Age);
+        //     command.Parameters.AddWithValue("@height", todoItem.Height);
+        //     command.Parameters.AddWithValue("@gender", todoItem.Gender);
+        //     await command.ExecuteNonQueryAsync();
+        //     return CreatedAtAction(nameof(PostTodoItem), new { id = todoItem.Id }, todoItem);
+        // }
 
         // POST: api/TodoItems/handleCsv
         [HttpPost]
@@ -285,28 +286,34 @@ namespace server.Controllers
         }
 
         // PUT: api/TodoItems/updateCells
-        [HttpPut]
+        [HttpPost]
         [Route("updateCells")]
-        public async Task<IActionResult> UpdateCells(Dictionary<String, List<Dictionary<String, String>>> UpdateItems){
+        public async Task<IActionResult> UpdateCells(Dictionary<string, List<Dictionary<string, string>>> UpdateItems)
+        {
             await connection.OpenAsync();
             var sql = new StringBuilder();
             foreach (var item in UpdateItems)
             {
+                Console.WriteLine(item);
+                Console.WriteLine(item.Key);
+
                 var columnName = item.Key;
                 foreach (var i in item.Value)
                 {
                     foreach (var j in i)
                     {
+                        Console.WriteLine($"{0}, {1}", i, j);
                         // Console.WriteLine("Email: {0}, column: {1}, value: {2}", columnName, j.Key, j.Value);
-                        sql.Append($"UPDATE employee4 SET {j.Key} = '{j.Value}' WHERE email = '{columnName}'");
-                        using var command = new MySqlCommand(sql.ToString(), connection);
-                        await command.ExecuteNonQueryAsync();
-                        // Console.WriteLine(sql.ToString());
-                        sql.Clear();
+                        // sql.Append($"UPDATE employee4 SET {j.Key} = '{j.Value}' WHERE email = '{columnName}'");
+                        // using var command = new MySqlCommand(sql.ToString(), connection);
+                        // await command.ExecuteNonQueryAsync();
+                        // // Console.WriteLine(sql.ToString());
+                        // sql.Clear();
                     }
                 }
             }
-            return Ok("All Updates performed succcessfully");
+            // Console.WriteLine(UpdateItems);
+            return Ok(UpdateItems);
         }
 
         // DELETE: api/TodoItems/5

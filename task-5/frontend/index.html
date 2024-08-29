@@ -17,7 +17,7 @@
   </head>
   <body>
     <div id="progressContainer">
-      <progress id="uploadProgress" value="0" max="200"></progress>
+      <progress id="uploadProgress" value="0" max="200" draggable="true"></progress>
       <span id="progressPercentage">0%</span>
     </div>
     <div class="ribbon">
@@ -33,7 +33,7 @@
             <div class="upload">
               <form id="uploadForm">
                 <div>
-                  <label for="file-upload" class="custom-file-upload">
+                  <label for="file-upload" class="custom-file">
                     <i class="fa-solid fa-circle-chevron-up fa-2xl"></i>
                     <p>Upload</p>
                   </label>
@@ -42,13 +42,13 @@
                 <button type="submit">Custom Upload</button>
               </form>
             </div>
-            <!-- <div class="open">
-              <label for="file-upload" class="custom-file-upload">
+            <div class="open">
+              <button for="file-upload" class="custom-file-upload">
                 <i class="fa-solid fa-folder-open fa-2xl"></i>
                 <p>Open</p>
-              </label>
-              <input id="file-upload" type="file" />
-            </div> -->
+              </button>
+              <!-- <input id="file-upload" type="file" /> -->
+            </div>
           </div>
           <div class="r-32">
             <div>
