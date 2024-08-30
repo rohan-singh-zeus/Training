@@ -36,6 +36,13 @@ namespace server.Controllers
             _rabbitmqService = rabbitmqService;
         }
 
+        private async Task EnsureConnectionOpenAsync()
+        {
+            if (connection.State != System.Data.ConnectionState.Open)
+            {
+                await connection.OpenAsync();
+            }
+        }
 
         [HttpGet]
         public async Task<IActionResult> GetCsvRecords()
@@ -43,9 +50,9 @@ namespace server.Controllers
 
             var csvRecord = new List<Employee>();
 
-            await connection.OpenAsync();
+            await EnsureConnectionOpenAsync();
 
-            using var command = new MySqlCommand("select * from employee4;", connection);
+            using var command = new MySqlCommand("select * from employee4 limit 0, 50;", connection);
             using var reader = await command.ExecuteReaderAsync();
             while (await reader.ReadAsync())
             {
@@ -78,7 +85,7 @@ namespace server.Controllers
         {
             var csvRecord = new List<Employee>();
 
-            await connection.OpenAsync();
+            await EnsureConnectionOpenAsync();
 
             using var command = new MySqlCommand("select * from employee4 limit @from, @to;", connection);
             command.Parameters.AddWithValue("@from", from);
@@ -108,67 +115,13 @@ namespace server.Controllers
             return Ok(csvRecord);
         }
 
-        // GET: api/TodoItems/5
-        // [HttpGet("{id}")]
-        // public async Task<ActionResult<TodoItem>> GetTodoItem(long id)
-        // {
-        //     var todoItem = await _context.TodoItems.FindAsync(id);
-
-        //     if (todoItem == null)
-        //     {
-        //         return NotFound();
-        //     }
-
-        //     return todoItem;
-        // }
-
-        // PUT: api/TodoItems/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        // [HttpPut("{id}")]
-        // public async Task<IActionResult> PutTodoItem(long id, TodoItem todoItem)
-        // {
-        //     if (id != todoItem.Id)
-        //     {
-        //         return BadRequest();
-        //     }
-
-        //     _context.Entry(todoItem).State = EntityState.Modified;
-
-        //     try
-        //     {
-        //         await _context.SaveChangesAsync();
-        //     }
-        //     catch (DbUpdateConcurrencyException)
-        //     {
-        //         if (!TodoItemExists(id))
-        //         {
-        //             return NotFound();
-        //         }
-        //         else
-        //         {
-        //             throw;
-        //         }
-        //     }
-
-        //     return NoContent();
-        // }
-
-        // POST: api/TodoItems
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        // [HttpPost]
-        // public async Task<ActionResult<TodoItem>> PostTodoItem(TodoItem todoItem)
-        // {
-        //     await connection.OpenAsync();
-        //     using var command = new MySqlCommand("insert into todo (id, firstname, lastname, age, height, gender) values(@id, @firstname, @lastname, @age, @height, @gender);", connection);
-        //     command.Parameters.AddWithValue("@id", todoItem.Id);
-        //     command.Parameters.AddWithValue("@firstname", todoItem.FirstName);
-        //     command.Parameters.AddWithValue("@lastname", todoItem.LastName);
-        //     command.Parameters.AddWithValue("@age", todoItem.Age);
-        //     command.Parameters.AddWithValue("@height", todoItem.Height);
-        //     command.Parameters.AddWithValue("@gender", todoItem.Gender);
-        //     await command.ExecuteNonQueryAsync();
-        //     return CreatedAtAction(nameof(PostTodoItem), new { id = todoItem.Id }, todoItem);
-        // }
+        // Helper method to read file content
+        private async Task<string> ReadFileContentAsync(IFormFile file)
+        {
+            using var stream = new MemoryStream();
+            await file.CopyToAsync(stream);
+            return Encoding.UTF8.GetString(stream.ToArray());
+        }
 
         // POST: api/TodoItems/handleCsv
         [HttpPost]
@@ -181,14 +134,22 @@ namespace server.Controllers
             {
                 return BadRequest("File not found!!");
             }
-            using var stream = new MemoryStream();
-            await file.CopyToAsync(stream);
-            var csvContent = Encoding.UTF8.GetString(stream.ToArray());
-            List<Employee> jsonContent = ConverStringToJson(csvContent);
-            await MultipleInsert(jsonContent);
-            stopwatch.Stop();
-            Console.WriteLine("Time elapsed: {0} ms", stopwatch.ElapsedMilliseconds);
-            return Ok("Csv data added to MySQL");
+            try
+            {
+                var csvContent = await ReadFileContentAsync(file);
+                List<Employee> jsonContent = ConverStringToJson(csvContent);
+                await MultipleInsert(jsonContent);
+                stopwatch.Stop();
+                Console.WriteLine("Time elapsed: {0} ms", stopwatch.ElapsedMilliseconds);
+                return Ok("Csv data added to MySQL");
+            }
+            catch (Exception ex)
+            {
+                stopwatch.Stop();
+                Console.WriteLine("Time elapsed: {0} ms", stopwatch.ElapsedMilliseconds);
+                Console.WriteLine($"Error processing CSV: {ex.Message}");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         // POST: api/TodoItems/sendToMQ
@@ -207,6 +168,27 @@ namespace server.Controllers
             return Ok("Csv data added to RabbitMQ");
         }
 
+        // Helper method to read CSV file
+        private async Task<List<string[]>> ReadCsvFileAsync(IFormFile file)
+        {
+            var csvData = new List<string[]>();
+            using var reader = new StreamReader(file.OpenReadStream());
+            while (!reader.EndOfStream)
+            {
+                var line = await reader.ReadLineAsync();
+                csvData.Add(line!.Split(','));
+            }
+            return csvData;
+        }
+
+        // Helper method to chunk data
+        private IEnumerable<string[][]> ChunkCsvData(List<string[]> csvData, int chunkSize)
+        {
+            return csvData.Skip(1).Select((value, index) => new { value, index })
+                          .GroupBy(x => x.index / chunkSize)
+                          .Select(g => g.Select(x => x.value).ToArray());
+        }
+
         // POST: api/TodoItems/sendToMQInChunks
         [HttpPost]
         [Route("sendToMQInChunks")]
@@ -219,23 +201,23 @@ namespace server.Controllers
             {
                 return BadRequest("File not found!!");
             }
-            var csvData = new List<string[]>();
-            using (var reader = new StreamReader(file.OpenReadStream()))
+
+            try
             {
-                while (!reader.EndOfStream)
-                {
-                    var line = await reader.ReadLineAsync();
-                    csvData.Add(line!.Split(','));
-                }
+                var csvData = await ReadCsvFileAsync(file);
+                var chunks = ChunkCsvData(csvData, chunkSize);
+                await _rabbitmqService.SendMessageInChunksAsync(chunks, "chunksQueue12");
+                stopwatch.Stop();
+                Console.WriteLine("Time elapsed for sending chunks from aspnet to rabbitmq: {0} ms", stopwatch.ElapsedMilliseconds);
+                return Ok("Added To RabbitMQ in chunks");
             }
-            // Chunking the CSV data
-            var chunks = csvData.Skip(1).Select((value, index) => new { value, index }) // Skip the header
-                                .GroupBy(x => x.index / chunkSize)
-                                .Select(g => g.Select(x => x.value).ToArray());
-            await _rabbitmqService.SendMessageInChunksAsync(chunks, "chunksQueue12");
-            stopwatch.Stop();
-            Console.WriteLine("Time elapsed for sending chunks from aspnet to rabbitmq: {0} ms", stopwatch.ElapsedMilliseconds);
-            return Ok("Added To RabbitMQ in chunks");
+            catch (Exception ex)
+            {
+                stopwatch.Stop();
+                Console.WriteLine("Time elapsed for sending chunks from aspnet to rabbitmq: {0} ms", stopwatch.ElapsedMilliseconds);
+                Console.WriteLine($"Error sending to MQ: {ex.Message}");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
 
@@ -285,34 +267,43 @@ namespace server.Controllers
             await command.ExecuteNonQueryAsync();
         }
 
-        // PUT: api/TodoItems/updateCells
+        // POST: api/TodoItems/updateCells
         [HttpPost]
         [Route("updateCells")]
         public async Task<IActionResult> UpdateCells(Dictionary<string, List<Dictionary<string, string>>> UpdateItems)
         {
+            if (UpdateItems == null || UpdateItems.Count == 0)
+            {
+                return BadRequest("No Data received");
+            }
             await connection.OpenAsync();
             var sql = new StringBuilder();
             foreach (var item in UpdateItems)
             {
-                Console.WriteLine(item);
-                Console.WriteLine(item.Key);
-
-                var columnName = item.Key;
-                foreach (var i in item.Value)
+                var email = item.Key; // Email is the key
+                foreach (var dict in item.Value) // Each dict contains column-value pairs
                 {
-                    foreach (var j in i)
+                    foreach (var pair in dict)
                     {
-                        Console.WriteLine($"{0}, {1}", i, j);
-                        // Console.WriteLine("Email: {0}, column: {1}, value: {2}", columnName, j.Key, j.Value);
-                        // sql.Append($"UPDATE employee4 SET {j.Key} = '{j.Value}' WHERE email = '{columnName}'");
-                        // using var command = new MySqlCommand(sql.ToString(), connection);
-                        // await command.ExecuteNonQueryAsync();
-                        // // Console.WriteLine(sql.ToString());
-                        // sql.Clear();
+                        var columnName = pair.Key;
+                        var value = pair.Value;
+                        sql.Append($"UPDATE employee4 SET `{columnName}` = @value WHERE `email` = @Email;");
+                        using var command = new MySqlCommand(sql.ToString(), connection);
+                        command.Parameters.AddWithValue("@value", value);
+                        command.Parameters.AddWithValue("@Email", email);
+                        try
+                        {
+                            await command.ExecuteNonQueryAsync();
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error updating record: {ex.Message}");
+                            return StatusCode(500, $"Internal server error: {ex.Message}");
+                        }
+                        sql.Clear();
                     }
                 }
             }
-            // Console.WriteLine(UpdateItems);
             return Ok(UpdateItems);
         }
 

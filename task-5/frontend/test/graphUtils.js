@@ -60,9 +60,7 @@ export class GraphUtils {
      */
     this.r33 = document.querySelector(".r-33");
 
-    
-
-    this.init()
+    this.init();
   }
 
   /**
@@ -70,44 +68,71 @@ export class GraphUtils {
    * @returns {void}
    */
   init() {
-    this.findReplace.addEventListener("click", () => {
-      this.handleFindReplace();
-    });
-    this.find.addEventListener("click", () => {
-      this.handleFind();
-    });
-    this.file.addEventListener("click", () => {
-      this.r31.style.display = "inline-flex";
-      this.r32.style.display = "none";
-      this.r33.style.display = "none";
+    this.addClickListener(this.findReplace, () => this.handleFindReplace());
+    this.addClickListener(this.find, () => this.handleFind());
+
+    this.addClickListener(this.file, () => {
+      this.setDisplay(this.r31, "inline-flex");
+      this.setDisplay(this.r32, "none");
+      this.setDisplay(this.r33, "none");
     });
 
-    this.opeartions.addEventListener("click", () => {
-      this.r31.style.display = "none";
-      this.r32.style.display = "inline-flex";
-      this.r33.style.display = "none";
+    this.addClickListener(this.opeartions, () => {
+      this.setDisplay(this.r31, "none");
+      this.setDisplay(this.r32, "inline-flex");
+      this.setDisplay(this.r33, "none");
     });
 
-    this.oGraph.addEventListener("click", () => {
-      this.r31.style.display = "none";
-      this.r32.style.display = "none";
-      this.r33.style.display = "inline-flex";
+    this.addClickListener(this.oGraph, () => {
+      this.setDisplay(this.r31, "none");
+      this.setDisplay(this.r32, "none");
+      this.setDisplay(this.r33, "inline-flex");
     });
 
-    this.barGraph.addEventListener("click", () => {
-      this.graph.style.display = "inline-block";
+    this.addClickListener(this.barGraph, () => {
+      this.setDisplay(this.graph, "inline-block");
       this.grid.constructBar();
     });
 
-    this.lineGraph.addEventListener("click", () => {
-      this.graph.style.display = "inline-block";
+    this.addClickListener(this.lineGraph, () => {
+      this.setDisplay(this.graph, "inline-block");
       this.grid.constructLine();
     });
 
-    this.pieGraph.addEventListener("click", () => {
-      this.graph.style.display = "inline-block";
+    this.addClickListener(this.pieGraph, () => {
+      this.setDisplay(this.graph, "inline-block");
       this.grid.constructPie();
     });
+  }
+
+  /**
+   * Utility function to set display style for elements
+   * @param {HTMLElement} element
+   * @param {string} displayStyle
+   * @returns {void}
+   */
+  setDisplay(element, displayStyle) {
+    element.style.display = displayStyle;
+  }
+
+  /**
+   * Utility function to get user input with validation
+   * @param {string} promptMessage
+   * @returns {string | null}
+   */
+  getUserInput(promptMessage) {
+    const input = prompt(promptMessage);
+    return input ? input.trim() : null;
+  }
+
+  /**
+   * Initialize event listeners with a helper function
+   * @param {HTMLElement} element
+   * @param {Function} handler
+   * @returns {void}
+   */
+  addClickListener(element, handler) {
+    element.addEventListener("click", handler);
   }
 
   /**
@@ -115,11 +140,13 @@ export class GraphUtils {
    * @returns {void}
    */
   handleFindReplace() {
-    const findValue = prompt("Enter the value to find:");
-    if (findValue === null) return; // Cancelled
+    const findValue = this.getUserInput("Enter the value to find:");
+    if (!findValue) return; // Cancelled or empty input
 
-    const replaceValue = prompt("Enter the value to replace it with:");
-    if (replaceValue === null) return; // Cancelled
+    const replaceValue = this.getUserInput(
+      "Enter the value to replace it with:"
+    );
+    if (replaceValue === null) return; // Cancelled or empty input
 
     // Iterate through gridData and replace values
     for (let row = 0; row < this.grid.numRows; row++) {

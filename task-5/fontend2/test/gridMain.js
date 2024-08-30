@@ -173,7 +173,6 @@ export class GridMain {
     this.canvas.addEventListener("pointerup", this.handleMouseUp.bind(this));
     this.canvas.addEventListener("dblclick", this.handleDoubleClick.bind(this));
     document.addEventListener("keydown", (e) => {
-      // console.log(this.dashOffset);
       this.handleMarchingAnt(e);
     });
     document.addEventListener("DOMContentLoaded", () => {
@@ -470,10 +469,6 @@ export class GridMain {
    * @returns {void}
    */
   march() {
-    // const now = performance.now();
-    // if (now - this.lastDrawTime < 1000 / 60) {
-    //   return; // Skip this frame to maintain 60fps
-    // }
     this.dashOffset++;
     if (this.dashOffset > 16) {
       this.dashOffset = 0;
@@ -481,10 +476,8 @@ export class GridMain {
     this.drawDottedRect();
     this.wafId = window.requestAnimationFrame(() => {
       this.drawMainGrid();
-      // this.fillCellContents();
       this.march();
     });
-    // this.lastDrawTime = now;
   }
 
   /**

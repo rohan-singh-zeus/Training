@@ -83,32 +83,3 @@ export class CustomDictionary {
     return CustomDictionary.instance;
   }
 }
-
-// Example usage:
-
-// Create an instance of the class
-// const customDict = new CustomDictionary();
-
-// // Add some entries
-// customDict.add("key1", [
-//     { "subKey1": "value1" },
-//     { "subKey2": "value2" }
-// ]);
-
-// customDict.add("key2", [
-//     { "subKeyA": "valueA" },
-//     { "subKeyB": "valueB" }
-// ]);
-
-// // Get an entry by key
-// console.log(customDict.get("key1"));
-
-// // Remove an entry by key
-// customDict.remove("key2");
-
-// // Get all keys
-// console.log(customDict.keys());
-
-// // Get all entries
-// console.log(customDict.entries());
-// // has context menu

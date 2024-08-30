@@ -1,6 +1,7 @@
 import { GridConstants } from "../constant/index.js";
 import { CustomDictionary } from "./ds.js";
 import { Graph } from "./graph.js";
+import { GridFunctionalities } from "./gridFunctionalities.js";
 
 export class Grid {
   constructor(
@@ -190,6 +191,11 @@ export class Grid {
      */
     this.customDict = CustomDictionary.getInstance();
 
+    /**
+     * @type {GridFunctionalities}
+     */
+    this.gridFunctionalities = GridFunctionalities.getInstance();
+
     // Grid.instance = this;
 
     this.init();
@@ -201,21 +207,41 @@ export class Grid {
    * @returns {void}
    */
   init() {
-    this.canvas.addEventListener(
-      "pointerdown",
-      this.handleMouseDown.bind(this)
-    );
-    this.canvas.addEventListener(
-      "pointermove",
-      this.handleMouseMove.bind(this)
-    );
-    this.canvas.addEventListener("pointerup", this.handleMouseUp.bind(this));
-    this.canvas.addEventListener("dblclick", this.handleDoubleClick.bind(this));
-    document.addEventListener("keydown", this.handleKeyPress.bind(this));
-    document.addEventListener("DOMContentLoaded", (ev) => {
-      this.fetchActualData(0, 30);
-      this.drawGrid();
+    ["pointerdown", "pointermove", "pointerup", "dblclick"].forEach((type) => {
+      this.canvas.addEventListener(type, this.handleEvent.bind(this));
     });
+    document.addEventListener("keydown", this.handleEvent.bind(this));
+    document.addEventListener("DOMContentLoaded", this.handleEvent.bind(this));
+  }
+
+  /**
+   *
+   * @param {Event} event
+   */
+  handleEvent(event) {
+    switch (event.type) {
+      case "pointerdown":
+        this.handleMouseDown(event);
+        break;
+      case "pointermove":
+        this.handleMouseMove(event);
+        break;
+      case "pointerup":
+        this.handleMouseUp(event);
+        break;
+      case "dblclick":
+        this.handleDoubleClick(event);
+        break;
+      case "keydown":
+        this.handleKeyPress(event);
+        break;
+      case "DOMContentLoaded":
+        this.fetchActualData(0, 30);
+        this.drawGrid();
+        break;
+      default:
+        break;
+    }
   }
 
   /**
@@ -242,12 +268,27 @@ export class Grid {
   }
 
   /**
+   * Debounce function to prevent excessive calls
+   * @param {Function} func
+   * @param {number} wait
+   * @returns {Function}
+   */
+  debounce(func, wait) {
+    let timeout;
+    return function (...args) {
+      const context = this;
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func.apply(context, args), wait);
+    };
+  }
+
+  /**
    * Fetch data from backend through lazy loading
    * @param {number} from
    * @param {number} to
    * @returns {void}
    */
-  fetchActualData(from, to) {
+  fetchData(from, to) {
     fetch(`https://localhost:7210/lazy/${from}/${to}`)
       .then((response) => response.json())
       .then((data) => {
@@ -264,6 +305,27 @@ export class Grid {
       .catch((error) => console.error("Error fetching data:", error));
   }
 
+  fetchActualData = this.debounce(this.fetchData, 300);
+
+  /**
+   * Helper function for drawing cells
+   * @param {number} x
+   * @param {number} y
+   * @param {number} width
+   * @param {number} height
+   * @param {string} text
+   * @returns {void}
+   */
+  drawCell(x, y, width, height, text) {
+    this.ctx.fillStyle = "white";
+    this.ctx.fillRect(x, y, width, height);
+    this.ctx.strokeStyle = "#dfdfde";
+    this.ctx.strokeRect(x, y, width, height);
+    this.ctx.fillStyle = "#000000";
+    this.ctx.font = "11px Arial";
+    this.ctx.fillText(text, x + 5, y + 20);
+  }
+
   /**
    * Drawing the First Col
    * @returns {void}
@@ -272,17 +334,8 @@ export class Grid {
     for (let row = 0; row < this.numRows; row++) {
       const width = this.columnWidths[0];
       const y = row * this.cellHeight;
-      this.ctx.fillStyle = "#F5F5F5";
-      this.ctx.fillRect(0, y, width, this.cellHeight);
-      this.ctx.strokeStyle = "#b6b6b6";
-      this.ctx.strokeRect(0, y, width, this.cellHeight);
-      this.ctx.fillStyle = "#000000";
-      this.ctx.font = "11px Arial";
-      if (this.gridRows[row]) {
-        this.ctx.fillText(this.gridRows[row], 50, y + 20);
-      } else {
-        this.ctx.fillText("", 50, y + 20);
-      }
+      const text = this.gridRows[row] || "";
+      this.drawCell(0, y, width, this.cellHeight, text);
     }
   }
 
@@ -291,24 +344,12 @@ export class Grid {
    * @returns {void}
    */
   drawFirstRow() {
-    for (let row = 0; row < 1; row++) {
-      let x = this.columnWidths[0];
-      for (let col = 0; col < this.numCols; col++) {
-        const width = this.columnWidths[col + 1];
-        this.ctx.fillStyle = "white";
-        this.ctx.fillRect(x, 0, width, this.cellHeight);
-        this.ctx.strokeStyle = "#dfdfde";
-        this.ctx.strokeRect(x, 0, width, this.cellHeight);
-        this.ctx.fillStyle = "#000000";
-        this.ctx.font = "11px Arial";
-        this.ctx.fontWeight = "bold";
-        if (this.gridCols[col]) {
-          this.ctx.fillText(this.gridCols[col], x + 5, 20);
-        } else {
-          this.ctx.fillText("", x + 5, 20);
-        }
-        x += width;
-      }
+    let x = this.columnWidths[0];
+    for (let col = 0; col < this.numCols; col++) {
+      const width = this.columnWidths[col + 1];
+      const text = this.gridCols[col] || "";
+      this.drawCell(x, 0, width, this.cellHeight, text);
+      x += width;
     }
   }
 
@@ -321,28 +362,20 @@ export class Grid {
     this.drawFirstCol();
     this.drawFirstRow();
 
-    let rowCount = this.filteredRows ? this.filteredRows.length : this.numRows;
-    // console.log(this.gridData.length, this.gridData[0].length);
-
+    const rowCount = this.filteredRows
+      ? this.filteredRows.length
+      : this.numRows;
     for (let row = 0; row < rowCount; row++) {
       let x = this.columnWidths[0];
       let actualRow = this.filteredRows ? this.filteredRows[row] : row;
       for (let col = 0; col < this.numCols; col++) {
         const width = this.columnWidths[col + 1];
         const y = (row + 1) * this.cellHeight;
-        this.ctx.fillStyle = "white";
-        this.ctx.fillRect(x, y, width, this.cellHeight);
-        this.ctx.strokeStyle = "#dfdfde";
-        this.ctx.strokeRect(x, y, width, this.cellHeight);
-        this.ctx.fillStyle = "#000000";
-        this.ctx.font = "11px Arial";
-        // console.log(this.gridData[row][col]);
-
-        if (row < this.gridData.length && col < this.gridData[0].length) {
-          this.ctx.fillText(this.gridData[actualRow][col], x + 5, y + 20);
-        } else {
-          this.ctx.fillText("", x + 5, y + 20);
-        }
+        const text =
+          row < this.gridData.length && col < this.gridData[0].length
+            ? this.gridData[actualRow][col]
+            : "";
+        this.drawCell(x, y, width, this.cellHeight, text);
         x += width;
       }
     }
@@ -408,33 +441,18 @@ export class Grid {
   }
 
   updateCellsCall() {
-    console.log(this.customDict.getAll());
-    
+    console.log(Object.fromEntries(this.customDict.getAll()));
+
     fetch("https://localhost:7210/api/TodoItems/updateCells", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(this.customDict.getAll()),
+      body: JSON.stringify(Object.fromEntries(this.customDict.getAll())),
     })
       .then((res) => res.json())
       .then((data) => console.log(data))
       .catch((err) => console.log(err));
-    // try {
-    //   const res = await fetch(
-    //     "https://localhost:7210/api/TodoItems/updateCells",
-    //     {
-    //       method: "PUT",
-    //       headers: {
-    //         "Content-Type": "application/json",
-    //       },
-    //       body: JSON.stringify(this.customDict.getAll()),
-    //     }
-    //   );
-    //   console.log(res);
-    // } catch (error) {
-    //   console.log(error);
-    // }
   }
 
   /**
@@ -474,8 +492,8 @@ export class Grid {
     }
     // console.log(row, col);
     // console.log(this.gridData[row - 1][col - 1]);
-    this.cellsData = []
-    this.cellsCol = []
+    this.cellsData = [];
+    this.cellsCol = [];
   }
 
   /**
@@ -587,15 +605,6 @@ export class Grid {
       this.updateSelectedRow(row);
       this.drawGrid();
     }
-    // for (let i = 0; i < this.selectedCells.length; i++) {
-    //     console.log(this.selectedCells[i][2]);
-    // }
-    // console.log(this.initialCell, this.finalCell);
-    // console.log(this.gridData[this.initialCell[0]][this.initialCell[1]], this.gridData[this.finalCell[0]][this.finalCell[1]]);
-    // console.log(this.handleCopyToClipBoard());
-    // this.handleCopyToClipBoard()
-    // this.handleClipBoardPaste();
-    // console.log(this.gridData[row-1][col-1]);
   }
 
   /**
@@ -604,7 +613,11 @@ export class Grid {
    */
   handleKeyPress(ev) {
     if (ev.shiftKey) {
-      const selectedString = this.handleCopyToClipBoard();
+      const selectedString = this.gridFunctionalities.handleCopyToClipBoard(
+        this.initialCell,
+        this.finalCell,
+        this.gridData
+      );
       //   console.log(selectedString.split("-}"));
       const [startRow, startCol] = this.initialCell;
       const [endRow, endCol] = this.finalCell;
@@ -629,43 +642,12 @@ export class Grid {
           //   console.log(this.copyCutData[i][j]);
         }
       }
-      this.copyToClipBoard(selectedString);
+      this.gridFunctionalities.copyToClipBoard(selectedString);
     }
     if (ev.ctrlKey) {
       this.updateCellsCall();
       //   console.log("altkey called");
     }
-  }
-
-  handleCopyToClipBoard() {
-    let copyToClipboardString = "";
-    const [startRow, startCol] = this.initialCell;
-    const [endRow, endCol] = this.finalCell;
-    const rowRange = [Math.min(startRow, endRow), Math.max(startRow, endRow)];
-    const colRange = [Math.min(startCol, endCol), Math.max(startCol, endCol)];
-    for (let row = rowRange[0]; row <= rowRange[1]; row++) {
-      for (let col = colRange[0]; col <= colRange[1]; col++) {
-        copyToClipboardString +=
-          (this.gridData[row - 1][col - 1] || "") +
-          (col === colRange[1] ? "-}" : "-->");
-      }
-    }
-    return copyToClipboardString;
-  }
-
-  handleClipBoardPaste() {
-    // const [startRow, startCol] = this.initialCell;
-    // const [endRow, endCol] = this.finalCell;
-    // const rowRange = [Math.min(startRow, endRow), Math.max(startRow, endRow)];
-    // const colRange = [Math.min(startCol, endCol), Math.max(startCol, endCol)];
-    // let lx = colRange[0];
-    // let ly = rowRange[0];
-    // /**
-    //  * @type {string}
-    //  */
-    let copyCutString = this.handleClipBoardPaste();
-    // console.log(this.copyCutData);
-    // console.log(copyCutString.split("-}"));
   }
 
   /**
@@ -701,16 +683,28 @@ export class Grid {
    * @param {number} end
    * @returns {void}
    */
-  updateSelectedCells(start, end) {
+  updateSelectedCells(startCell, endCell) {
+    const [startRow, startCol] = startCell;
+    const [endRow, endCol] = endCell;
     this.selectedCells = [];
-    const [startRow, startCol] = start;
-    const [endRow, endCol] = end;
-    const rowRange = [Math.min(startRow, endRow), Math.max(startRow, endRow)];
-    const colRange = [Math.min(startCol, endCol), Math.max(startCol, endCol)];
 
-    for (let row = rowRange[0]; row <= rowRange[1]; row++) {
-      for (let col = colRange[0]; col <= colRange[1]; col++) {
-        this.selectedCells.push([row, col, this.gridData[row - 1][col - 1]]);
+    for (
+      let row = Math.min(startRow, endRow);
+      row <= Math.max(startRow, endRow);
+      row++
+    ) {
+      for (
+        let col = Math.min(startCol, endCol);
+        col <= Math.max(startCol, endCol);
+        col++
+      ) {
+        const x = this.columnWidths
+          .slice(0, col)
+          .reduce((acc, val) => acc + val, 0);
+        const y = row * this.cellHeight;
+        this.ctx.fillStyle = "rgba(0, 0, 255, 0.2)";
+        this.ctx.fillRect(x, y, this.columnWidths[col], this.cellHeight);
+        this.selectedCells.push([row, col, this.gridData[row][col]]);
       }
     }
   }
@@ -781,17 +775,6 @@ export class Grid {
     this.graphInst.drawPieGraph();
   }
 
-  /**
-   * Copy to clipboard using ClipBoard API
-   * @param {string} data
-   */
-  copyToClipBoard(data) {
-    navigator.clipboard
-      .writeText(data)
-      .then(() => console.log("Added to clipboard"))
-      .catch((err) => console.log("Failed to copy: ", err));
-  }
-
   readClipBoardData() {
     navigator.clipboard
       .readText()
@@ -811,10 +794,4 @@ export class Grid {
 
     return selectedData;
   }
-
-  //   static getInstance(){
-  //     if(!Grid.instance){
-  //         Grid.instance = new Grid()
-  //     }
-  //   }
 }

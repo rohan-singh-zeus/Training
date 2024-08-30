@@ -48,51 +48,39 @@ export class Graph {
    * @returns {void}
    */
   init() {
-    this.graph.addEventListener("pointerdown", this.handleMouseDown.bind(this));
-    window.addEventListener("pointermove", this.handleMouseMove.bind(this));
-    window.addEventListener("pointerup", this.handleMouseUp.bind(this));
+    this.graph.addEventListener("pointerdown", (e) =>
+      this.handlePointerEvent(e, "down")
+    );
+    window.addEventListener("pointermove", (e) =>
+      this.handlePointerEvent(e, "move")
+    );
+    window.addEventListener("pointerup", (e) =>
+      this.handlePointerEvent(e, "up")
+    );
   }
 
   /**
-   * Handle mouse down event
+   * Consolidated pointer event handler
    * @param {PointerEvent} e
+   * @param {string} action
    * @returns {void}
    */
-  handleMouseDown(e) {
-    // console.log(e.offsetX, e.offsetY);
-    this.isMoving = true;
-    // console.log(e.offsetX, e.offsetY);
-    this.startMX = e.pageX;
-    this.startMY = e.pageY;
-  }
-
-  /**
-   * Handle mouse move event
-   * @param {PointerEvent} e
-   * @returns {void}
-   */
-  handleMouseMove(e) {
-    // console.log(e.offsetX);
-    if (this.isMoving) {
+  handlePointerEvent(e, action) {
+    if (action === "down") {
+      this.isMoving = true;
+      this.startMX = e.pageX;
+      this.startMY = e.pageY;
+    } else if (action === "move" && this.isMoving) {
       const diffX = e.pageX - this.startMX;
       const diffY = e.pageY - this.startMY;
-    //   console.log(diffX, diffY);
-    this.graph.style.top = `${diffY}px`
-    this.graph.style.left = `${diffX}px`
-    // console.log(e.offsetX, e.offsetY);
+      requestAnimationFrame(() =>
+        this.setElementPosition(this.graph, diffY, diffX)
+      );
+    } else if (action === "up") {
+      this.isMoving = false;
     }
-    
   }
-
-  /**
-   * Handle mouse up event
-   * @param {PointerEvent} e
-   * @returns {void}
-   */
-  handleMouseUp(e) {
-    this.isMoving = false;
-  }
-
+  
   /**
    * Destroy the current graph for switching between different graphs
    * @returns {void}
@@ -116,30 +104,48 @@ export class Graph {
   }
 
   /**
+   * Utility function to create a chart
+   * @param {string} type
+   * @param {number[]} data
+   * @param {*} options
+   * @returns
+   */
+  createChart(type, data, options) {
+    return new Chart(this.ctx, {
+      type: type,
+      data: data,
+      options: options,
+    });
+  }
+
+  /**
+   * Utility function to set element position
+   * @param {HTMLElement} element
+   * @param {number} top
+   * @param {number} left
+   * @returns {void}
+   */
+  setElementPosition(element, top, left) {
+    element.style.top = `${top}px`;
+    element.style.left = `${left}px`;
+  }
+
+  /**
    * Drawing Bar Graph
    * @returns {void}
    */
   drawBarGraph() {
     this.destroyGraph();
-    this.draw = new Chart(this.ctx, {
-      type: "bar",
-      data: {
-        // labels: [0,1,3,4],
-        labels: this.cellsCol,
-        datasets: [
-          {
-            label: "",
-            data: this.cellsData,
-            borderWidth: 1,
-          },
-        ],
-      },
-      options: {
-        scales: {
-          y: {
-            beginAtZero: true,
-          },
-        },
+    this.draw = this.createChart("bar", {
+      labels: this.cellsCol,
+      datasets: [{
+        label: "",
+        data: this.cellsData,
+        borderWidth: 1,
+      }],
+    }, {
+      scales: {
+        y: { beginAtZero: true },
       },
     });
   }
@@ -150,25 +156,16 @@ export class Graph {
    */
   drawLineGraph() {
     this.destroyGraph();
-    this.draw = new Chart(this.ctx, {
-      type: "line",
-      data: {
-        labels: this.cellsCol,
-        datasets: [
-          {
-            data: this.cellsData,
-            label: "",
-            borderColor: "#3cba9f",
-            fill: false,
-          },
-        ],
-      },
-      options: {
-        title: {
-          display: true,
-          // text : 'Chart JS Line Chart Example'
-        },
-      },
+    this.draw = this.createChart("line", {
+      labels: this.cellsCol,
+      datasets: [{
+        data: this.cellsData,
+        label: "",
+        borderColor: "#3cba9f",
+        fill: false,
+      }],
+    }, {
+      title: { display: true },
     });
   }
 
@@ -178,24 +175,13 @@ export class Graph {
    */
   drawPieGraph() {
     this.destroyGraph();
-    this.draw = new Chart(this.ctx, {
-      type: "pie",
-      data: {
-        labels: this.cellsCol,
-        datasets: [
-          {
-            // backgroundColor : [ "#51EAEA", "#FCDDB0",
-            //     "#FF9D76", "#FB3569", "#82CD47" ],
-            data: this.cellsData,
-          },
-        ],
-      },
-      options: {
-        title: {
-          display: true,
-          // text : 'Chart JS Pie Chart Example'
-        },
-      },
+    this.draw = this.createChart("pie", {
+      labels: this.cellsCol,
+      datasets: [{
+        data: this.cellsData,
+      }],
+    }, {
+      title: { display: true },
     });
   }
 }
