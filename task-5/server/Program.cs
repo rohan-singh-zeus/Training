@@ -31,10 +31,13 @@ builder.Services.AddSingleton<IConnectionFactory>(sp =>
         // Password = "guest"
     };
 });
+builder.Services.AddSingleton<LogService>();
 builder.Services.AddHostedService<RabbitMQConsumerService>();
 builder.Services.AddSignalR();
 
 builder.Services.AddControllers();
+
+builder.Services.Configure<LogDatabaseSettings>(builder.Configuration.GetSection("LogDatabase"));
 
 builder.Services.AddDbContext<TodoContext>(options => options.UseMySQL(builder.Configuration.GetConnectionString("DefaultConnection")!));
 

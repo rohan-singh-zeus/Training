@@ -60,7 +60,6 @@ namespace server.Services
             int chunkSize = message.Split('\n').Length - 1;
             int progress = chunkSize * 100 / (totalChunks * chunkSize);
             await _hubContext.Clients.All.SendAsync("ProgressUpdates", progress);
-            // await _hubContext.Clients.All.SendAsync("ProgressUpdates", message);
         }
     }
 }

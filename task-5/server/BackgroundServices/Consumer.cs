@@ -6,6 +6,7 @@ using NuGet.Protocol.Plugins;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using server.Models;
+using server.Services;
 using System;
 using System.Diagnostics;
 using System.Text;
@@ -21,14 +22,17 @@ namespace server.BackgroundServices
         private readonly IConfiguration _configuration;
 
         private readonly IHubContext<ProgressHub> _hubContext;
+
+        private readonly LogService _logService;
         public RabbitMQConsumerService(IConnectionFactory connectionFactory, 
         IConfiguration configuration,
-         ILogger<RabbitMQConsumerService> logger, IHubContext<ProgressHub> hubContext)
+         ILogger<RabbitMQConsumerService> logger, IHubContext<ProgressHub> hubContext, LogService logService)
         {
             _connectionFactory = connectionFactory;
             _configuration = configuration;
             _logger = logger;
             _hubContext = hubContext;
+            _logService = logService;
         }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -48,23 +52,30 @@ namespace server.BackgroundServices
                 var log = new Log{
                     TimeStamp = DateTime.UtcNow.ToString(),
                 };
+                var logMongo = new LogMongo{
+                    TimeStamp = DateTime.UtcNow.ToString(),
+                };
                 try
                 {
                     // Process and save the chunk to MySQL
                     await MultipleInsert(message);
                     log.IsSuccess = true;
+                    logMongo.IsSuccess = true;
                     _logger.LogInformation("Chunk successfully processed");
                     await SendProgressUpdate(message);
                 }
                 catch (Exception ex)
                 {
                     log.IsSuccess = false;
+                    logMongo.IsSuccess = false;
                     log.ErrorMessage = ex.Message;
+                    logMongo.ErrorMessage = ex.Message;
                     _logger.LogError(ex, "Error occurred while saving chunk to MySQL. Will retry.");
                 }
                 finally
                 {
                     await SaveLogsToDB(log);
+                    await _logService.CreateAsync(logMongo);
                     if(log.IsSuccess){
                         // Acknowledge the message to RabbitMQ only after successful processing
                         channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
