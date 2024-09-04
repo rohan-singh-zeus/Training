@@ -49,9 +49,9 @@ namespace server.BackgroundServices
             {
                 var body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
-                var log = new Log{
-                    TimeStamp = DateTime.UtcNow.ToString(),
-                };
+                // var log = new Log{
+                //     TimeStamp = DateTime.UtcNow.ToString(),
+                // };
                 var logMongo = new LogMongo{
                     TimeStamp = DateTime.UtcNow.ToString(),
                 };
@@ -59,24 +59,24 @@ namespace server.BackgroundServices
                 {
                     // Process and save the chunk to MySQL
                     await MultipleInsert(message);
-                    log.IsSuccess = true;
+                    // log.IsSuccess = true;
                     logMongo.IsSuccess = true;
                     _logger.LogInformation("Chunk successfully processed");
                     await SendProgressUpdate(message);
                 }
                 catch (Exception ex)
                 {
-                    log.IsSuccess = false;
+                    // log.IsSuccess = false;
                     logMongo.IsSuccess = false;
-                    log.ErrorMessage = ex.Message;
+                    // log.ErrorMessage = ex.Message;
                     logMongo.ErrorMessage = ex.Message;
                     _logger.LogError(ex, "Error occurred while saving chunk to MySQL. Will retry.");
                 }
                 finally
                 {
-                    await SaveLogsToDB(log);
+                    // await SaveLogsToDB(log);
                     await _logService.CreateAsync(logMongo);
-                    if(log.IsSuccess){
+                    if(logMongo.IsSuccess){
                         // Acknowledge the message to RabbitMQ only after successful processing
                         channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
                     }else{
@@ -109,15 +109,15 @@ namespace server.BackgroundServices
                     Country = values[2],
                     State = values[3],
                     City = values[4],
-                    Telephone_Number = Convert.ToInt64(values[5]),
+                    Telephone = Convert.ToInt64(values[5]),
                     Address_Line_1 = values[6],
                     Address_Line_2 = values[7],
-                    Date_Of_Birth = values[8],
-                    Gross_Salary_FY2019_20 = Convert.ToInt64(values[9]),
-                    Gross_Salary_FY2020_21 = Convert.ToInt64(values[10]),
-                    Gross_Salary_FY2021_22 = Convert.ToInt64(values[11]),
-                    Gross_Salary_FY2022_23 = Convert.ToInt64(values[12]),
-                    Gross_Salary_FY2023_24 = Convert.ToInt64(values[13]),
+                    DOB = values[8],
+                    FY2019_20 = Convert.ToInt64(values[9]),
+                    FY2020_21 = Convert.ToInt64(values[10]),
+                    FY2021_22 = Convert.ToInt64(values[11]),
+                    FY2022_23 = Convert.ToInt64(values[12]),
+                    FY2023_24 = Convert.ToInt64(values[13]),
                 };
                 csvData.Add(row);
             }
@@ -156,7 +156,7 @@ namespace server.BackgroundServices
                 sql.Append("INSERT INTO employee4 (email, name, country, state, city, telephone, `address_line_1`, `address_line_2`, dob, `fy2019-20`, `fy2020-21`, `fy2021-22`, `fy2022-23`, `fy2023-24`) VALUES");
                 foreach (var record in records)
                 {
-                    sql.Append($"('{record.Email}', '{record.Name}', '{record.Country}', '{record.State}', '{record.City}', {record.Telephone_Number}, '{record.Address_Line_1}', '{record.Address_Line_2}', '{record.Date_Of_Birth}', {record.Gross_Salary_FY2019_20}, {record.Gross_Salary_FY2020_21}, {record.Gross_Salary_FY2021_22}, {record.Gross_Salary_FY2022_23}, {record.Gross_Salary_FY2023_24}),");
+                    sql.Append($"('{record.Email}', '{record.Name}', '{record.Country}', '{record.State}', '{record.City}', {record.Telephone}, '{record.Address_Line_1}', '{record.Address_Line_2}', '{record.DOB}', {record.FY2019_20}, {record.FY2020_21}, {record.FY2021_22}, {record.FY2022_23}, {record.FY2023_24}),");
                 }
                 sql.Length--; // Remove the trailing comma
                 await using var command = new MySqlCommand(sql.ToString(), connection);

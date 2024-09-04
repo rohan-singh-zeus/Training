@@ -63,15 +63,15 @@ namespace server.Controllers
                     Country = reader.GetString(2),
                     State = reader.GetString(3),
                     City = reader.GetString(4),
-                    Telephone_Number = reader.GetInt64(5),
+                    Telephone = reader.GetInt64(5),
                     Address_Line_1 = reader.GetString(6),
                     Address_Line_2 = reader.GetString(7),
-                    Date_Of_Birth = reader.GetString(8),
-                    Gross_Salary_FY2019_20 = reader.GetInt64(9),
-                    Gross_Salary_FY2020_21 = reader.GetInt64(10),
-                    Gross_Salary_FY2021_22 = reader.GetInt64(11),
-                    Gross_Salary_FY2022_23 = reader.GetInt64(12),
-                    Gross_Salary_FY2023_24 = reader.GetInt64(13),
+                    DOB = reader.GetString(8),
+                    FY2019_20 = reader.GetInt64(9),
+                    FY2020_21 = reader.GetInt64(10),
+                    FY2021_22 = reader.GetInt64(11),
+                    FY2022_23 = reader.GetInt64(12),
+                    FY2023_24 = reader.GetInt64(13),
                 };
                 csvRecord.Add(item);
             }
@@ -100,15 +100,15 @@ namespace server.Controllers
                     Country = reader.GetString(2),
                     State = reader.GetString(3),
                     City = reader.GetString(4),
-                    Telephone_Number = reader.GetInt64(5),
+                    Telephone = reader.GetInt64(5),
                     Address_Line_1 = reader.GetString(6),
                     Address_Line_2 = reader.GetString(7),
-                    Date_Of_Birth = reader.GetString(8),
-                    Gross_Salary_FY2019_20 = reader.GetInt64(9),
-                    Gross_Salary_FY2020_21 = reader.GetInt64(10),
-                    Gross_Salary_FY2021_22 = reader.GetInt64(11),
-                    Gross_Salary_FY2022_23 = reader.GetInt64(12),
-                    Gross_Salary_FY2023_24 = reader.GetInt64(13),
+                    DOB = reader.GetString(8),
+                    FY2019_20 = reader.GetInt64(9),
+                    FY2020_21 = reader.GetInt64(10),
+                    FY2021_22 = reader.GetInt64(11),
+                    FY2022_23 = reader.GetInt64(12),
+                    FY2023_24 = reader.GetInt64(13),
                 };
                 csvRecord.Add(item);
             }
@@ -236,15 +236,15 @@ namespace server.Controllers
                     Country = values[2],
                     State = values[3],
                     City = values[4],
-                    Telephone_Number = Convert.ToInt64(values[5]),
+                    Telephone = Convert.ToInt64(values[5]),
                     Address_Line_1 = values[6],
                     Address_Line_2 = values[7],
-                    Date_Of_Birth = values[8],
-                    Gross_Salary_FY2019_20 = Convert.ToInt64(values[9]),
-                    Gross_Salary_FY2020_21 = Convert.ToInt64(values[10]),
-                    Gross_Salary_FY2021_22 = Convert.ToInt64(values[11]),
-                    Gross_Salary_FY2022_23 = Convert.ToInt64(values[12]),
-                    Gross_Salary_FY2023_24 = Convert.ToInt64(values[13]),
+                    DOB = values[8],
+                    FY2019_20 = Convert.ToInt64(values[9]),
+                    FY2020_21 = Convert.ToInt64(values[10]),
+                    FY2021_22 = Convert.ToInt64(values[11]),
+                    FY2022_23 = Convert.ToInt64(values[12]),
+                    FY2023_24 = Convert.ToInt64(values[13]),
 
                 };
                 csvData.Add(row);
@@ -259,7 +259,7 @@ namespace server.Controllers
             sql.Append("INSERT INTO employee4 (email, name, country, state, city, telephone, `address_line_1`, `address_line_2`, dob, `fy2019-20`, `fy2020-21`, `fy2021-22`, `fy2022-23`, `fy2023-24`) VALUES");
             foreach (var record in csvRecords)
             {
-                sql.Append($"('{MySqlHelper.EscapeString(record.Email)}', '{MySqlHelper.EscapeString(record.Name)}', '{MySqlHelper.EscapeString(record.Country)}', '{MySqlHelper.EscapeString(record.State)}', '{MySqlHelper.EscapeString(record.City)}', {record.Telephone_Number}, '{MySqlHelper.EscapeString(record.Address_Line_1)}', '{MySqlHelper.EscapeString(record.Address_Line_2)}', '{MySqlHelper.EscapeString(record.Date_Of_Birth)}', {record.Gross_Salary_FY2019_20}, {record.Gross_Salary_FY2020_21}, {record.Gross_Salary_FY2021_22}, {record.Gross_Salary_FY2022_23}, {record.Gross_Salary_FY2023_24}),");
+                sql.Append($"('{MySqlHelper.EscapeString(record.Email)}', '{MySqlHelper.EscapeString(record.Name)}', '{MySqlHelper.EscapeString(record.Country)}', '{MySqlHelper.EscapeString(record.State)}', '{MySqlHelper.EscapeString(record.City)}', {record.Telephone}, '{MySqlHelper.EscapeString(record.Address_Line_1)}', '{MySqlHelper.EscapeString(record.Address_Line_2)}', '{MySqlHelper.EscapeString(record.DOB)}', {record.FY2019_20}, {record.FY2020_21}, {record.FY2021_22}, {record.FY2022_23}, {record.FY2023_24}),");
             }
             sql.Length--;
             Console.WriteLine(sql.ToString());

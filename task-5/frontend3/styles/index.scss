@@ -1,0 +1,479 @@
+@mixin resetCss {
+  margin: 0px;
+  padding: 0px;
+  box-sizing: border-box;
+}
+
+@mixin centerFlex {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  position: relative;
+
+  #progressContainer {
+    position: absolute;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    height: 100px;
+    width: 200px;
+    padding: 20px;
+    background-color: azure;
+    border: 1px solid black;
+    top: 340px;
+    left: 35%;
+    border-radius: 10px;
+    z-index: 999;
+
+    #progressPercentage {
+      margin-left: 10px;
+    }
+  }
+
+  .ribbon {
+    height: 20vh;
+    width: 100vw;
+    // border: 1px solid red;
+    background-color: #f0f8ff;
+    position: relative;
+
+    > .rTitle {
+      display: flex;
+      align-items: center;
+      height: 30%;
+      width: 100%;
+      // margin-left: 0;
+      position: absolute;
+      top: 0;
+      left: 10px;
+
+      > p {
+        margin: 10px;
+        font-size: 30px;
+
+        &:hover {
+          border-bottom: 2px solid black;
+        }
+      }
+    }
+
+    > .rOptions {
+      height: 60%;
+      width: 95%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #b9d9eb;
+      // margin: auto;
+      position: absolute;
+      top: 55px;
+      left: 30px;
+      border-radius: 10px;
+
+      > .rLeft {
+        flex: 0.6;
+        margin-top: 20px;
+        display: flex;
+        align-items: center;
+        // justify-content: space-evenly;
+
+        // > .r-1 {
+        //   flex: 0.02;
+        //   background-color: #b9d9eb;
+        //   border-top-right-radius: 60%;
+
+        //   > .curved {
+        //     background-color: #f0f8ff;
+
+        //     border-bottom-right-radius: 80%;
+        //     height: 100%;
+        //   }
+        // }
+
+        // > .r-2 {
+        //   flex: 0.08;
+        //   background-color: #b9d9eb;
+        //   border-top-left-radius: 50%;
+        // }
+
+        > .r-31 {
+          // display: none;
+          flex: 0.9;
+          // background-color: #b9d9eb;
+          display: flex;
+          align-items: center;
+          justify-content: start;
+          margin-left: 10px;
+
+          // border-top-left-radius: 50%;
+
+          > .upload {
+            > form {
+              display: flex;
+              align-items: center;
+              > div {
+                > label {
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  justify-content: center;
+
+                  > p {
+                    margin-top: 30px;
+                  }
+                }
+
+                > input[type="file"] {
+                  display: none;
+                }
+
+                > .custom-file-upload {
+                  // border: 1px solid #ccc;
+                  display: inline-flex;
+                  padding: 6px 12px;
+                  cursor: pointer;
+
+                  > img {
+                    border-radius: 50%;
+                    height: 40px;
+                    width: 40px;
+                  }
+                }
+              }
+
+              > button {
+              }
+            }
+          }
+
+          > button {
+            margin: 10px;
+            border: none;
+            padding: 8px;
+            background-color: transparent;
+          }
+
+          > .open {
+            margin-left: 30px;
+          }
+        }
+
+        > .r-32 {
+          display: none;
+          flex: 0.9;
+          // background-color: #b9d9eb;
+          // display: flex;
+          align-items: center;
+          justify-content: start;
+          // margin-left: -60px;
+
+          > div {
+            height: 50px;
+            width: 100px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            // justify-content: center;
+            // margin: 10px 30px;
+
+            > button {
+              height: 70%;
+              width: 50%;
+              border-radius: 50%;
+              border: none;
+              background: transparent;
+
+              > img {
+                height: 100%;
+                width: 100%;
+                border-radius: 50%;
+              }
+            }
+
+            > p {
+              text-align: center;
+            }
+          }
+        }
+
+        > .r-33 {
+          display: none;
+          flex: 0.9;
+          // background-color: #b9d9eb;
+          // display: flex;
+          align-items: center;
+          justify-content: start;
+          // margin-left: -60px;
+
+          > div {
+            height: 50px;
+            width: 100px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            // justify-content: center;
+            // margin: 10px 30px;
+
+            > button {
+              height: 70%;
+              width: 50%;
+              border-radius: 50%;
+              border: none;
+              background: transparent;
+
+              > img {
+                height: 100%;
+                width: 100%;
+                border-radius: 50%;
+              }
+            }
+
+            > p {
+              text-align: center;
+            }
+          }
+        }
+      }
+
+      > .rRight {
+        flex: 0.4;
+        display: flex;
+        align-items: center;
+        justify-content: space-evenly;
+
+        p {
+          // margin:  10px;
+        }
+      }
+    }
+  }
+
+  .grid {
+    overflow: auto;
+    height: 76vh;
+    // margin-left: 10px;
+    background-color: aliceblue;
+
+    .excel {
+      height: 78vh;
+      width: 100vw;
+      position: relative;
+      display: flex;
+
+      > .rowExcel {
+        // width: 100vw;
+        // margin-left: 30px;
+
+        > #gridCanvas2 {
+          cursor: default;
+          position: absolute;
+          top: 0px;
+          left: 30px;
+        }
+      }
+      // }
+
+      > .scrollableGrid {
+        > #gridCanvas {
+          cursor: default;
+          position: absolute;
+          top: 30px;
+          left: 30px;
+          background-color: white;
+        }
+      }
+
+      > .fixedColumn {
+        > #gridCanvas3 {
+          position: absolute;
+          top: 30px;
+          left: 0;
+        }
+      }
+
+      > #cellInput {
+        position: absolute;
+        border: 1px solid #ccc;
+        box-sizing: border-box;
+        padding: 4px 8px;
+        font-size: 16px;
+        font-family: Arial, sans-serif; /* Use a clean, readable font */
+        display: none;
+        background-color: white;
+        color: #333; /* Text color */
+        border-radius: 4px; /* Rounded corners */
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+        outline: none; /* Remove default outline on focus */
+        z-index: 10; /* Ensure it's above the canvas */
+        transition: border-color 0.2s, box-shadow 0.2s; /* Smooth transition effects */
+      }
+
+      > #cellInput:focus {
+        border-color: #66afe9; /* Change border color on focus */
+        box-shadow: 0 0 5px rgba(102, 175, 233, 0.5); /* Highlight box shadow on focus */
+      }
+    }
+  }
+  // }
+
+  .graph {
+    display: none;
+    height: fit-content;
+    width: 500px;
+    position: absolute;
+    top: 340px;
+    left: 35%;
+    border: 1px dotted;
+    padding: 30px;
+    background-color: white;
+    border-radius: 10px;
+  }
+
+  > .multipleSheets {
+    min-height: 30px;
+    height: 5%;
+    width: 100%;
+    @include centerFlex();
+    justify-content: start;
+    @include resetCss();
+    margin-left: 10px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    // padding: 10px;
+
+    > .addSheet {
+      // padding: 0px 10px;
+      // height: 80%;
+      margin-left: 5px;
+
+      > button {
+        // background-color: gray;
+        border: none;
+        padding: 5px 10px;
+        // border-radius: 50%;
+
+        &:hover {
+            background-color: lightgray;
+        }
+      }
+    }
+
+    > .buttons {
+      @include resetCss();
+      height: 100%;
+      width: 100%;
+      display: flex;
+      margin-left: 15px;
+
+      button {
+        @include resetCss();
+        margin: 5px 5px;
+        padding: 5px 10px;
+        border: none;
+        border-bottom: 2px solid green;
+        @include centerFlex();
+        background-color: #f9f9f9;
+        cursor: pointer;
+        position: relative;
+        
+
+        &:hover {
+          background-color: #e9e9e9;
+        }
+
+        .close {
+          @include resetCss();
+          font-size: 10px;
+          font-weight: bold;
+          position: absolute;
+          top: -5px;
+          right: -5px;
+          width: 15px;
+          height: 15px;
+          background-color: red;
+          color: white;
+          border: none;
+          border-radius: 50%;
+          cursor: pointer;
+        }
+
+        &:hover .close {
+          display: block;
+        }
+
+        &.active {
+          background-color: #d0ebff;
+          border-color: #8ac4d0;
+        }
+      }
+
+      > .scrollableButtons {
+        @include resetCss();
+        display: flex;
+        overflow-y: hidden;
+        overflow-x: auto;
+
+        // Custom scrollbar styles for the footer
+        &::-webkit-scrollbar {
+          height: 3px;
+        }
+
+        &::-webkit-scrollbar-track {
+          background: #f1f1f1;
+        }
+
+        &::-webkit-scrollbar-thumb {
+          background: #888;
+          border-radius: 5px;
+        }
+
+        &::-webkit-scrollbar-thumb:hover {
+          background: #555;
+        }
+
+        // Custom scrollbar styles for the footer
+        &::-webkit-scrollbar {
+          height: 3px;
+        }
+
+        &::-webkit-scrollbar-track {
+          background: #f1f1f1;
+        }
+
+        &::-webkit-scrollbar-thumb {
+          background: #888;
+          border-radius: 5px;
+        }
+
+        &::-webkit-scrollbar-thumb:hover {
+          background: #555;
+        }
+      }
+    }
+
+    > .selectedCellInfo {
+      width: 50%;
+      @include resetCss();
+      height: 100%;
+      @include centerFlex();
+      flex-wrap: wrap;
+
+      > .selectedCellInfoElements {
+        @include resetCss();
+        font-size: 14px;
+        color: grey;
+      }
+    }
+  }
+}

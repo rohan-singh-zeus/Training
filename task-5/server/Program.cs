@@ -27,8 +27,6 @@ builder.Services.AddSingleton<IConnectionFactory>(sp =>
     return new ConnectionFactory()
     {
         HostName = "localhost",
-        // UserName = "guest",
-        // Password = "guest"
     };
 });
 builder.Services.AddSingleton<LogService>();
