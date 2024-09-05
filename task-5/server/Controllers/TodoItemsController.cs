@@ -48,30 +48,30 @@ namespace server.Controllers
         public async Task<IActionResult> GetCsvRecords()
         {
 
-            var csvRecord = new List<Employee>();
+            var csvRecord = new List<EmployeeStr>();
 
             await EnsureConnectionOpenAsync();
 
-            using var command = new MySqlCommand("select * from employee4 limit 0, 50;", connection);
+            using var command = new MySqlCommand("select * from employee limit 0, 50;", connection);
             using var reader = await command.ExecuteReaderAsync();
             while (await reader.ReadAsync())
             {
-                Employee item = new()
+                EmployeeStr item = new()
                 {
                     Email = reader.GetString(0),
                     Name = reader.GetString(1),
                     Country = reader.GetString(2),
                     State = reader.GetString(3),
                     City = reader.GetString(4),
-                    Telephone = reader.GetInt64(5),
+                    Telephone = reader.GetString(5),
                     Address_Line_1 = reader.GetString(6),
                     Address_Line_2 = reader.GetString(7),
                     DOB = reader.GetString(8),
-                    FY2019_20 = reader.GetInt64(9),
-                    FY2020_21 = reader.GetInt64(10),
-                    FY2021_22 = reader.GetInt64(11),
-                    FY2022_23 = reader.GetInt64(12),
-                    FY2023_24 = reader.GetInt64(13),
+                    FY2019_20 = reader.GetString(9),
+                    FY2020_21 = reader.GetString(10),
+                    FY2021_22 = reader.GetString(11),
+                    FY2022_23 = reader.GetString(12),
+                    FY2023_24 = reader.GetString(13),
                 };
                 csvRecord.Add(item);
             }
@@ -83,32 +83,32 @@ namespace server.Controllers
         [Route("/lazy/{from}/{to}")]
         public async Task<IActionResult> GetCsvRecordInChunks(long from, long to)
         {
-            var csvRecord = new List<Employee>();
+            var csvRecord = new List<EmployeeStr>();
 
             await EnsureConnectionOpenAsync();
 
-            using var command = new MySqlCommand("select * from employee4 limit @from, @to;", connection);
+            using var command = new MySqlCommand("select * from employee limit @from, @to;", connection);
             command.Parameters.AddWithValue("@from", from);
             command.Parameters.AddWithValue("@to", to);
             using var reader = await command.ExecuteReaderAsync();
             while (await reader.ReadAsync())
             {
-                Employee item = new()
+                EmployeeStr item = new()
                 {
                     Email = reader.GetString(0),
                     Name = reader.GetString(1),
                     Country = reader.GetString(2),
                     State = reader.GetString(3),
                     City = reader.GetString(4),
-                    Telephone = reader.GetInt64(5),
+                    Telephone = reader.GetString(5),
                     Address_Line_1 = reader.GetString(6),
                     Address_Line_2 = reader.GetString(7),
                     DOB = reader.GetString(8),
-                    FY2019_20 = reader.GetInt64(9),
-                    FY2020_21 = reader.GetInt64(10),
-                    FY2021_22 = reader.GetInt64(11),
-                    FY2022_23 = reader.GetInt64(12),
-                    FY2023_24 = reader.GetInt64(13),
+                    FY2019_20 = reader.GetString(9),
+                    FY2020_21 = reader.GetString(10),
+                    FY2021_22 = reader.GetString(11),
+                    FY2022_23 = reader.GetString(12),
+                    FY2023_24 = reader.GetString(13),
                 };
                 csvRecord.Add(item);
             }
@@ -137,8 +137,8 @@ namespace server.Controllers
             try
             {
                 var csvContent = await ReadFileContentAsync(file);
-                List<Employee> jsonContent = ConverStringToJson(csvContent);
-                await MultipleInsert(jsonContent);
+                List<EmployeeStr> jsonContent = ConverStringToJsonStr(csvContent);
+                await MultipleInsertStr(jsonContent);
                 stopwatch.Stop();
                 Console.WriteLine("Time elapsed: {0} ms", stopwatch.ElapsedMilliseconds);
                 return Ok("Csv data added to MySQL");
@@ -252,6 +252,37 @@ namespace server.Controllers
             return csvData;
         }
 
+        private List<EmployeeStr> ConverStringToJsonStr(string content)
+        {
+            var line = content.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            var headers = line[0].Split(',');
+            var csvData = new List<EmployeeStr>();
+            foreach (var l in line.Skip(1))
+            {
+                var values = l.Split(',');
+                var row = new EmployeeStr
+                {
+                    Email = values[0],
+                    Name = values[1],
+                    Country = values[2],
+                    State = values[3],
+                    City = values[4],
+                    Telephone = values[5],
+                    Address_Line_1 = values[6],
+                    Address_Line_2 = values[7],
+                    DOB = values[8],
+                    FY2019_20 = values[9],
+                    FY2020_21 = values[10],
+                    FY2021_22 = values[11],
+                    FY2022_23 = values[12],
+                    FY2023_24 = values[13],
+
+                };
+                csvData.Add(row);
+            }
+            return csvData;
+        }
+
         private async Task MultipleInsert(List<Employee> csvRecords)
         {
             await connection.OpenAsync();
@@ -266,6 +297,22 @@ namespace server.Controllers
             using var command = new MySqlCommand(sql.ToString(), connection);
             await command.ExecuteNonQueryAsync();
         }
+
+        private async Task MultipleInsertStr(List<EmployeeStr> csvRecords)
+        {
+            await connection.OpenAsync();
+            var sql = new StringBuilder();
+            sql.Append("INSERT INTO employee (email, name, country, state, city, telephone, `address_line_1`, `address_line_2`, dob, `fy2019-20`, `fy2020-21`, `fy2021-22`, `fy2022-23`, `fy2023-24`) VALUES");
+            foreach (var record in csvRecords)
+            {
+                sql.Append($"('{MySqlHelper.EscapeString(record.Email)}', '{MySqlHelper.EscapeString(record.Name)}', '{MySqlHelper.EscapeString(record.Country)}', '{MySqlHelper.EscapeString(record.State)}', '{MySqlHelper.EscapeString(record.City)}', '{MySqlHelper.EscapeString(record.Telephone)}', '{MySqlHelper.EscapeString(record.Address_Line_1)}', '{MySqlHelper.EscapeString(record.Address_Line_2)}', '{MySqlHelper.EscapeString(record.DOB)}', '{MySqlHelper.EscapeString(record.FY2019_20)}', '{MySqlHelper.EscapeString(record.FY2020_21)}', '{MySqlHelper.EscapeString(record.FY2021_22)}', '{MySqlHelper.EscapeString(record.FY2022_23)}', '{MySqlHelper.EscapeString(record.FY2023_24)}'),");
+            }
+            sql.Length--;
+            Console.WriteLine(sql.ToString());
+            using var command = new MySqlCommand(sql.ToString(), connection);
+            await command.ExecuteNonQueryAsync();
+        }
+
 
         // POST: api/TodoItems/updateCells
         [HttpPost]
@@ -287,7 +334,7 @@ namespace server.Controllers
                     {
                         var columnName = pair.Key;
                         var value = pair.Value;
-                        sql.Append($"UPDATE employee4 SET `{columnName}` = @value WHERE `email` = @Email;");
+                        sql.Append($"UPDATE employee SET `{columnName}` = @value WHERE `email` = @Email;");
                         using var command = new MySqlCommand(sql.ToString(), connection);
                         command.Parameters.AddWithValue("@value", value);
                         command.Parameters.AddWithValue("@Email", email);

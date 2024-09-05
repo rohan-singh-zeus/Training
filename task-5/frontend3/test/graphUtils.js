@@ -1,12 +1,11 @@
-import { GridTest } from "./grid-test.js";
-import { Grid } from "./grid.js";
+import { Excel } from "./excel.js";
 
 export class GraphUtils {
-  constructor() {
+  constructor(excel) {
     /**
-     * @type {GridTest}
+     * @type {Excel}
      */
-    this.grid = new GridTest("gridCanvas");
+    this.grid = excel.sheet.grid
 
     /**
      * @type {HTMLElement}

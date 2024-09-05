@@ -72,28 +72,28 @@ body .ribbon > .rOptions > .rLeft > .r-31 {
   justify-content: start;
   margin-left: 10px;
 }
-body .ribbon > .rOptions > .rLeft > .r-31 > div > form {
+body .ribbon > .rOptions > .rLeft > .r-31 > .upload > form {
   display: flex;
   align-items: center;
 }
-body .ribbon > .rOptions > .rLeft > .r-31 > div > form > div > label {
+body .ribbon > .rOptions > .rLeft > .r-31 > .upload > form > div > label {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 }
-body .ribbon > .rOptions > .rLeft > .r-31 > div > form > div > label > p {
+body .ribbon > .rOptions > .rLeft > .r-31 > .upload > form > div > label > p {
   margin-top: 30px;
 }
-body .ribbon > .rOptions > .rLeft > .r-31 > div > form > div > input[type=file] {
+body .ribbon > .rOptions > .rLeft > .r-31 > .upload > form > div > input[type=file] {
   display: none;
 }
-body .ribbon > .rOptions > .rLeft > .r-31 > div > form > div > .custom-file-upload {
+body .ribbon > .rOptions > .rLeft > .r-31 > .upload > form > div > .custom-file-upload {
   display: inline-flex;
   padding: 6px 12px;
   cursor: pointer;
 }
-body .ribbon > .rOptions > .rLeft > .r-31 > div > form > div > .custom-file-upload > img {
+body .ribbon > .rOptions > .rLeft > .r-31 > .upload > form > div > .custom-file-upload > img {
   border-radius: 50%;
   height: 40px;
   width: 40px;

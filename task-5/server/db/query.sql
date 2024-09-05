@@ -1,18 +1,18 @@
-CREATE TABLE `employee4` (
+CREATE TABLE `employee` (
   `email` VARCHAR(225) NOT NULL PRIMARY KEY,
   `name` VARCHAR(45),
   `country` VARCHAR(45),
   `state` VARCHAR(45),
   `city` VARCHAR(45),
-  `telephone` BIGINT,
+  `telephone` VARCHAR(255),
   `address_line_1` VARCHAR(255),
   `address_line_2` VARCHAR(255),
   `dob` VARCHAR(225),
-  `fy2019-20` BIGINT,
-  `fy2020-21` BIGINT,
-  `fy2021-22` BIGINT,
-  `fy2022-23` BIGINT,
-  `fy2023-24` BIGINT
+  `fy2019-20` VARCHAR(255),
+  `fy2020-21` VARCHAR(255),
+  `fy2021-22` VARCHAR(255),
+  `fy2022-23` VARCHAR(255),
+  `fy2023-24` VARCHAR(255)
 );
 
 CREATE TABLE `todo`(

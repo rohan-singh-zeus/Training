@@ -24,7 +24,7 @@ namespace server.BackgroundServices
         private readonly IHubContext<ProgressHub> _hubContext;
 
         private readonly LogService _logService;
-        public RabbitMQConsumerService(IConnectionFactory connectionFactory, 
+        public RabbitMQConsumerService(IConnectionFactory connectionFactory,
         IConfiguration configuration,
          ILogger<RabbitMQConsumerService> logger, IHubContext<ProgressHub> hubContext, LogService logService)
         {
@@ -52,13 +52,15 @@ namespace server.BackgroundServices
                 // var log = new Log{
                 //     TimeStamp = DateTime.UtcNow.ToString(),
                 // };
-                var logMongo = new LogMongo{
+                var logMongo = new LogMongo
+                {
                     TimeStamp = DateTime.UtcNow.ToString(),
                 };
                 try
                 {
                     // Process and save the chunk to MySQL
-                    await MultipleInsert(message);
+                    // await MultipleInsert(message);
+                    await MultipleInsertStr(message);
                     // log.IsSuccess = true;
                     logMongo.IsSuccess = true;
                     _logger.LogInformation("Chunk successfully processed");
@@ -76,10 +78,13 @@ namespace server.BackgroundServices
                 {
                     // await SaveLogsToDB(log);
                     await _logService.CreateAsync(logMongo);
-                    if(logMongo.IsSuccess){
+                    if (logMongo.IsSuccess)
+                    {
                         // Acknowledge the message to RabbitMQ only after successful processing
                         channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
-                    }else{
+                    }
+                    else
+                    {
                         // Do not acknowledge the message (it will be requeued by RabbitMQ)
                         channel.BasicNack(deliveryTag: ea.DeliveryTag, multiple: false, requeue: true);
                     }
@@ -124,7 +129,39 @@ namespace server.BackgroundServices
             return csvData;
         }
 
-        private async Task SaveLogsToDB(Log log){
+        private List<EmployeeStr> ConverStringToJsonStr(string content)
+        {
+            var line = content.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            var headers = line[0].Split(',');
+            var csvData = new List<EmployeeStr>();
+            foreach (var l in line.Skip(1))
+            {
+                var values = l.Split(',');
+                var row = new EmployeeStr
+                {
+                    Email = values[0],
+                    Name = values[1],
+                    Country = values[2],
+                    State = values[3],
+                    City = values[4],
+                    Telephone = values[5],
+                    Address_Line_1 = values[6],
+                    Address_Line_2 = values[7],
+                    DOB = values[8],
+                    FY2019_20 = values[9],
+                    FY2020_21 = values[10],
+                    FY2021_22 = values[11],
+                    FY2022_23 = values[12],
+                    FY2023_24 = values[13],
+
+                };
+                csvData.Add(row);
+            }
+            return csvData;
+        }
+
+        private async Task SaveLogsToDB(Log log)
+        {
             try
             {
                 await using var connection = new MySqlConnection(_configuration.GetConnectionString("DefaultConnection"));
@@ -143,7 +180,32 @@ namespace server.BackgroundServices
                 throw;
             }
         }
-        
+
+        private async Task MultipleInsertStr(string csvRecords)
+        {
+            List<EmployeeStr> records = ConverStringToJsonStr(csvRecords);
+            try
+            {
+                await using var connection = new MySqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+                await connection.OpenAsync();
+                var sql = new StringBuilder();
+                sql.Append("INSERT INTO employee (email, name, country, state, city, telephone, `address_line_1`, `address_line_2`, dob, `fy2019-20`, `fy2020-21`, `fy2021-22`, `fy2022-23`, `fy2023-24`) VALUES");
+                foreach (var record in records)
+                {
+                    sql.Append($"('{MySqlHelper.EscapeString(record.Email)}', '{MySqlHelper.EscapeString(record.Name)}', '{MySqlHelper.EscapeString(record.Country)}', '{MySqlHelper.EscapeString(record.State)}', '{MySqlHelper.EscapeString(record.City)}', '{MySqlHelper.EscapeString(record.Telephone)}', '{MySqlHelper.EscapeString(record.Address_Line_1)}', '{MySqlHelper.EscapeString(record.Address_Line_2)}', '{MySqlHelper.EscapeString(record.DOB)}', '{MySqlHelper.EscapeString(record.FY2019_20)}', '{MySqlHelper.EscapeString(record.FY2020_21)}', '{MySqlHelper.EscapeString(record.FY2021_22)}', '{MySqlHelper.EscapeString(record.FY2022_23)}', '{MySqlHelper.EscapeString(record.FY2023_24)}'),");
+                }
+                sql.Length--;
+                // Console.WriteLine(sql.ToString());
+                using var command = new MySqlCommand(sql.ToString(), connection);
+                await command.ExecuteNonQueryAsync();
+                _logger.LogInformation("Chunk successfully inserted into MySQL.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while saving chunk to MySQL.");
+            }
+        }
+
         private async Task MultipleInsert(string csvRecords)
         {
             List<Employee> records = ConvertStringToJson(csvRecords);
@@ -169,7 +231,8 @@ namespace server.BackgroundServices
             }
         }
 
-        private async Task SendProgressUpdate(string message){
+        private async Task SendProgressUpdate(string message)
+        {
             int totalChunks = 10;
             int chunkSize = message.Split('\n').Length - 1;
             int progress = chunkSize * 100 / (totalChunks * chunkSize);

@@ -1,6 +1,8 @@
 import { GridConstants } from "../constant/index.js";
-import { GridTest } from "./grid-test.js";
-import { RowGrid } from "./rowCanvas.js";
+import { GridTest2 } from "./grid-test-2.js";
+// import { GridTest2 } from "./grid-test-2.js";
+// import { GridTest } from "./grid-test.js";
+
 
 // Global Variables
 
@@ -68,6 +70,8 @@ export class Sheet{
     
     this.init()
 
+    Sheet.instance = this
+
   }
 
   /**
@@ -75,10 +79,17 @@ export class Sheet{
    * @returns {void}
    */
   init(){
-    const grid = new GridTest("gridCanvas");
+    this.grid = new GridTest2("gridCanvas");
     
-    new RowGrid("gridCanvas2", grid)
+    // new RowGrid("gridCanvas2", grid)
     
+  }
+
+  static getInstance() {
+    if (!Sheet.instance) {
+      Sheet.instance = new Sheet();
+    }
+    return Sheet.instance;
   }
 }
 
