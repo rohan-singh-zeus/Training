@@ -1,9 +1,8 @@
-import { GridConstants } from "../constant/index.js";
-import { GraphUtils } from "./graphUtils.js";
-import { MultipleSheets } from "./multipleSheets.js";
-import { Scroll } from "./scroll.js";
-import { Sheet } from "./sheet.js";
-import { UploadFunctionality } from "./upload.js";
+import { GridConstants } from "../../constant/index.js";
+import { GraphUtils } from "../utils/graphUtils.js";
+import { MultipleSheets } from "../utils/multipleSheets.js";
+import { Sheet } from "../excel/sheet.js";
+import { UploadFunctionality } from "../utils/upload.js";
 
 // Global Variables
 
@@ -87,14 +86,13 @@ export class Excel {
     this.shiftTopY = 0;
     this.shiftBottomY = 0;
     this.topIndex = 0;
-    this.bottomIndex = 0;
+    this.bottomIndex = 0
 
-    this.sheets = [
-      {
-        name: "Sheet1",
-        instance: new Sheet(),
-      },
-    ];
+
+    // this.sheets = [{
+    //     name: "Sheet1",
+    //     instance : new Sheet()
+    // }]
 
     this.init();
   }
@@ -104,25 +102,15 @@ export class Excel {
    * @returns {void}
    */
   init() {
-    // this.sheet = new Sheet();
+    this.sheet = new Sheet();
 
     // new Scroll()
 
+    new GraphUtils(this);
+
+    new UploadFunctionality();
+
     new MultipleSheets();
-  }
-
-  addSheet() {
-    const addSheetBtn = document.getElementById("addSheetBtn");
-    addSheetBtn.addEventListener("click", (ev) => {
-      this.sheets.push({
-        name: `Sheet${this.sheets.length + 1}`,
-        instance: new Sheet(),
-      });
-    });
-  }
-
-  replaceSheet(){
-
   }
 
   /**

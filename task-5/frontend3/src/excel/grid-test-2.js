@@ -1,10 +1,11 @@
-import { GridConstants } from "../constant/index.js";
-import { CustomDictionary } from "./ds.js";
-import { Excel } from "./excel.js";
-import { Graph } from "./graph.js";
-import { GridFunctionalities } from "./gridFunctionalities.js";
+import { GridConstants } from "../../constant/index.js";
+import { Dimension } from "../ds/dimension.js";
+import { CustomDictionary } from "../ds/ds.js";
+import { Excel } from "../excel/excel.js";
+import { Graph } from "../utils/graph.js";
+import { GridFunctionalities } from "../utils/gridFunctionalities.js";
 
-export class GridTest {
+export class GridTest2 {
   constructor(canvasId) {
     /**
      * @type {Excel}
@@ -222,10 +223,19 @@ export class GridTest {
     this.rowCountCanvas = document.getElementById("gridCanvas3");
     this.rowCountCtx = this.rowCountCanvas.getContext("2d");
 
-    GridTest.instance = this;
+    /**
+     * @type {HTMLCanvasElement}
+     */
+    this.columnCanvas = document.getElementById("gridCanvas2");
+    this.columnCtx = this.columnCanvas.getContext("2d");
+
+    /**
+     * @type {Dimension}
+     */
+    this.dimension = Dimension.getInstance();
+    this.emailSelected = null;
 
     this.init();
-    // this.fetchActualData(0, 30);
   }
 
   /**
@@ -233,7 +243,7 @@ export class GridTest {
    * @returns {void}
    */
   init() {
-    ["pointerdown", "pointermove", "pointerup", "click"].forEach((type) => {
+    ["pointerdown", "pointermove", "pointerup", "dblclick"].forEach((type) => {
       this.canvas.addEventListener(type, this.handleEvent.bind(this));
     });
     document.addEventListener("keydown", this.handleEvent.bind(this));
@@ -254,41 +264,28 @@ export class GridTest {
       this.updateSelectedRow(row);
       this.drawGrid();
       this.drawIds();
+      this.drawHeaders();
+    });
+
+    this.columnCanvas.addEventListener(
+      "pointerdown",
+      this.handleColumnMouseDown.bind(this)
+    );
+    this.columnCanvas.addEventListener(
+      "pointermove",
+      this.handleColumnMouseMove.bind(this)
+    );
+    this.columnCanvas.addEventListener(
+      "pointerup",
+      this.handleColumnMouseUp.bind(this)
+    );
+
+    this.rowCountCanvas.addEventListener("pointerdown", (ev) => {
+      let row = this.getRowFromY(ev.offsetY);
+      this.emailSelected = this.gridData[row - 1][0];
     });
 
     document.addEventListener("DOMContentLoaded", this.handleEvent.bind(this));
-  }
-
-  /**
-   *
-   * @param {Event} event
-   */
-  handleEvent(event) {
-    switch (event.type) {
-      case "pointerdown":
-        this.handleMouseDown(event);
-        break;
-      case "pointermove":
-        this.handleMouseMove(event);
-        break;
-      case "pointerup":
-        this.handleMouseUp(event);
-        break;
-      case "click":
-        this.handleDoubleClick(event);
-        break;
-      case "keydown":
-        this.handleKeyPress(event);
-        break;
-      case "DOMContentLoaded":
-        this.fetchActualData(0, 100);
-        // this.fetchDataAndPopulateGrid();
-        this.drawIds();
-        // this.drawGrid();
-        break;
-      default:
-        break;
-    }
   }
 
   /**
@@ -358,329 +355,119 @@ export class GridTest {
   fetchActualData = this.debounce(this.fetchData, 300);
 
   /**
-   * Helper function for drawing cells
-   * @param {number} x
-   * @param {number} y
-   * @param {number} width
-   * @param {number} height
-   * @param {string} text
-   * @returns {void}
+   *
+   * @param {Event} event
    */
-  drawCell(x, y, width, height, text) {
-    this.ctx.fillStyle = "white";
-    this.ctx.fillRect(x + 0.5, y + 0.5, width, height);
-    this.ctx.strokeStyle = "#dfdfde";
-    this.ctx.strokeRect(x + 0.5, y + 0.5, width, height);
-    this.ctx.fillStyle = "#000000";
-    this.ctx.font = "11px Arial";
-    this.ctx.fillText(text, x + 5, y + 20);
-  }
-
-  /**
-   * Drawing the First Col
-   * @returns {void}
-   */
-  drawFirstCol() {
-    for (let row = 0; row < this.numRows; row++) {
-      const width = this.columnWidths[0];
-      const y = row * this.cellHeight;
-      const text = this.gridRows[row] || "";
-      this.drawCell(0, y, width, this.cellHeight, text);
-    }
-  }
-
-  drawIds() {
-    this.rowCountCtx.clearRect(
-      0,
-      0,
-      this.rowCountCanvas.width,
-      this.rowCountCanvas.height
-    );
-    this.rowCountCtx.textAlign = "center";
-    this.rowCountCtx.textBaseline = "middle";
-    this.rowCountCtx.font = "10px Calibri";
-    this.rowCountCtx.fillStyle = "black";
-
-    this.rowCountCtx.lineWidth = 0.2;
-    let start = 0.5;
-    for (let i = 0; i < this.numRows; i++) {
-      this.rowCountCtx.save();
-      this.rowCountCtx.beginPath();
-      this.rowCountCtx.moveTo(0, start);
-      this.rowCountCtx.lineTo(this.cellHeight, start);
-      start += this.rowHeights[i];
-      this.rowCountCtx.fillText(
-        i,
-        this.cellHeight / 2,
-        start - this.rowHeights[i] / 2
-      );
-      this.rowCountCtx.stroke();
-      this.rowCountCtx.restore();
-    }
-    this.rowCountCtx.beginPath();
-    this.rowCountCtx.moveTo(30 + 0.5, 0);
-    this.rowCountCtx.lineTo(30 + 0.5, this.rowCountCanvas.height + 0.5);
-    this.rowCountCtx.stroke();
-  }
-
-  /**
-   * Drawing the First Row
-   * @returns {void}
-   */
-  drawFirstRow() {
-    let x = this.columnWidths[0];
-    this.ctx.lineWidth = 1;
-    for (let col = 0; col < this.numCols; col++) {
-      const width = this.columnWidths[col + 1];
-      const text = this.gridCols[col + 1] || "";
-      this.drawCell(x, 0, width, this.cellHeight, text);
-      x += width;
-    }
-  }
-
-  /**
-   * Drawing the Main Grid as a line-based grid
-   * @returns {void}
-   */
-  drawGrid() {
-    // Clear the existing grid
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.ctx.lineWidth = 1;
-    // Draw vertical lines
-    let x = this.columnWidths[0]; // Start after the first column header
-    for (let col = 1; col <= this.numCols; col++) {
-      this.ctx.beginPath();
-      this.ctx.moveTo(x + 0.5, 0);
-      this.ctx.lineTo(x + 0.5, this.canvas.height);
-      this.ctx.strokeStyle = "#dfdfde"; // Grid line color
-      this.ctx.stroke();
-      x += this.columnWidths[col] || this.defaultCellWidth;
-    }
-
-    // Draw horizontal lines
-    let y = this.cellHeight; // Start after the first row header
-    for (let row = 1; row <= this.numRows; row++) {
-      this.ctx.beginPath();
-      this.ctx.moveTo(0, y + 0.5);
-      this.ctx.lineTo(this.canvas.width, y + 0.5);
-      this.ctx.strokeStyle = "#dfdfde"; // Grid line color
-      this.ctx.stroke();
-      y += this.rowHeights[row] || this.cellHeight;
-    }
-
-    // Draw headers and content if needed
-    // this.drawFirstCol();
-    this.drawFirstRow();
-
-    // Highlight selected cells
-    this.highlightSelectedCells();
-
-    // Draw cell data
-    this.ctx.font = "12px Arial";
-    this.ctx.fillStyle = "black";
-    this.ctx.textAlign = "left";
-    this.ctx.textBaseline = "middle";
-    // this.ctx.font = "14px Calibri";
-    this.ctx.fontWeight = "600";
-    this.gridData.forEach((rowData, rowIndex) => {
-      rowData.forEach((cellData, colIndex) => {
-        if (cellData) {
-          const cellX = this.columnWidths
-            .slice(0, colIndex)
-            .reduce((acc, val) => acc + val, 0);
-          const cellY = (rowIndex + 1) * this.cellHeight + 20; // Adjust to center text vertically
-
-          this.ctx.save();
-          this.ctx.beginPath();
-          this.ctx.rect(
-            cellX,
-            cellY - this.rowHeights[rowIndex] / 2,
-            this.columnWidths[colIndex] - 10,
-            this.rowHeights[rowIndex]
-          );
-          this.ctx.clip();
-
-          this.ctx.fillText(cellData, cellX + 5, cellY); // 5px padding
-          this.ctx.restore();
-        }
-      });
-    });
-  }
-
-  /**
-   * Highlight the selected cells in the line-based grid
-   * @returns {void}
-   */
-  highlightSelectedCells() {
-    if (this.selectedCells.length == 1) {
-      this.ctx.fillStyle = "transparent";
-      this.selectedCells.forEach((cell) => {
-        const x = this.getColumnLeftPosition(cell[1]);
-        const y = cell[0] * this.cellHeight;
-        this.ctx.fillRect(x, y, this.columnWidths[cell[1]], this.cellHeight);
-
+  handleEvent(event) {
+    switch (event.type) {
+      case "pointerdown":
+        this.handleMouseDown(event);
+        break;
+      case "pointermove":
+        this.handleMouseMove(event);
+        break;
+      case "pointerup":
+        this.handleMouseUp(event);
+        break;
+      case "dblclick":
+        this.handleDoubleClick(event);
+        break;
+      case "keydown":
+        this.handleKeyPress(event);
+        break;
+      case "DOMContentLoaded":
+        this.fetchActualData(0, 100);
         this.drawIds();
-        this.rowCountCtx.fillStyle = "rgb(0, 128, 0, 0.5)";
-        this.rowCountCtx.fillRect(0, y, 30, this.cellHeight);
-      });
+        this.drawHeaders();
+        break;
+      default:
+        break;
     }
-
-    this.ctx.fillStyle = "rgb(0, 128, 0, 0.1)";
-    this.selectedCells.slice(1).forEach((cell) => {
-      const x = this.getColumnLeftPosition(cell[1]);
-      const y = cell[0] * this.cellHeight;
-      this.ctx.fillRect(x, y, this.columnWidths[cell[1]], this.cellHeight);
-    });
-
-    if (this.selectedCells.length > 0) {
-      const minRow = Math.min(...this.selectedCells.map((cell) => cell[0]));
-      const maxRow = Math.max(...this.selectedCells.map((cell) => cell[0]));
-      const minCol = Math.min(...this.selectedCells.map((cell) => cell[1]));
-      const maxCol = Math.max(...this.selectedCells.map((cell) => cell[1]));
-
-      this.xStart = this.getColumnLeftPosition(minCol);
-      this.yStart = minRow * this.cellHeight;
-      this.xEnd =
-        this.getColumnLeftPosition(maxCol) + this.columnWidths[maxCol];
-      this.yEnd = (maxRow + 1) * this.cellHeight;
-
-      this.drawIds();
-      this.rowCountCtx.fillStyle = "rgb(0, 128, 0, 0.3)";
-      this.rowCountCtx.strokeStyle = "rgba(0, 128, 0)";
-      this.rowCountCtx.lineWidth = 5;
-      this.rowCountCtx.fillRect(0, this.yStart, 30, this.yEnd - this.yStart);
-      this.rowCountCtx.beginPath();
-      this.rowCountCtx.moveTo(30 + 0.5, this.yStart);
-      this.rowCountCtx.lineTo(30 + 0.5, this.yEnd + 0.5);
-      this.rowCountCtx.stroke();
-
-      if (this.isAnimated && this.selectedCells.length > 1) {
-        this.drawDottedRect();
-      } else {
-        this.ctx.strokeStyle = "rgba(0, 128, 0, 0.8)";
-        this.ctx.lineWidth = 2;
-        this.ctx.strokeRect(
-          this.xStart,
-          this.yStart,
-          this.xEnd - this.xStart,
-          this.yEnd - this.yStart
-        );
-      }
-    }
-  }
-
-  highlightIdColumn() {}
-
-  /**
-   * Get x position based on column value
-   * @param {number} col
-   * @returns {number}
-   */
-  getColumnLeftPosition(col) {
-    let x = 0;
-    for (let i = 0; i < col; i++) {
-      x += this.columnWidths[i];
-    }
-    return x;
   }
 
   /**
    *
-   * Handle Double click event
-   * @param {PointerEvent} event  -
+   * Handle Pointer Down event
+   * @param {PointerEvent} event
    * @returns {void}
    */
-  handleDoubleClick(event) {
+  handleColumnMouseDown(event) {
     const { offsetX, offsetY } = event;
+    let col = 0;
+    let x = 0;
+    let y = 0;
 
-    const col = this.getColumnFromX(offsetX);
-    const row = this.getRowFromY(offsetY);
-
-    if (col !== -1 && row !== -1) {
-      // Calculate cell position and dimensions
-      const cellX = this.columnWidths
-        .slice(0, col)
-        .reduce((acc, val) => acc + val, 0);
-      const cellY = this.rowHeights
-        .slice(0, row)
-        .reduce((acc, val) => acc + val, 0);
-      const cellWidth = this.columnWidths[col];
-      const cellHeight = this.rowHeights[row];
-
-      // Position the input box
-      this.cellInput.style.left = `${cellX + 30}px`;
-      this.cellInput.style.top = `${cellY + 30}px`;
-      this.cellInput.style.width = `${cellWidth}px`;
-      this.cellInput.style.height = `${cellHeight}px`;
-      this.cellInput.style.display = "block";
-      this.cellInput.value =
-        this.gridData[row - 1] && this.gridData[row - 1][col]
-          ? this.gridData[row - 1][col]
-          : "";
-      this.cellInput.focus();
-
-      // Store the current cell coordinates
-      this.currentCell = { row, col };
+    for (let i = 0; i < this.numCols; i++) {
+      x += this.columnWidths[i];
+      if (offsetX < x) {
+        col = i;
+        break;
+      }
+    }
+    const row = Math.floor(offsetY / this.cellHeight);
+    if (offsetX > x - 5 && offsetX < x + 5) {
+      this.isResizing = true;
+      this.resizeColIndex = col;
+      this.startX = offsetX;
+      this.columnCanvas.style.cursor = "col-resize";
     }
   }
 
   /**
-   * Network call to bulk update
+   *
+   * Handle Pointer Move event
+   * @param {PointerEvent} event
    * @returns {void}
    */
-  async updateCellsCall() {
-    // console.log(Object.fromEntries(this.customDict.getAll()));
-    
-    try {
-      const res = await fetch(
-        "https://localhost:7210/api/TodoItems/updateCells",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(Object.fromEntries(this.customDict.getAll())),
-        }
+  handleColumnMouseMove(event) {
+    const { offsetX, offsetY } = event;
+    const { movementX, movementY } = event;
+
+    if (this.isResizing) {
+      const delta = movementX;
+      this.columnWidths[this.resizeColIndex] = Math.max(
+        20,
+        this.columnWidths[this.resizeColIndex] + delta
       );
-      const data = await res.json();
-      console.log(data);
-    } catch (error) {
-      console.log(error);
+      this.drawHeaders();
+    } else {
+      let x = 0;
+      for (let i = 0; i < this.numCols; i++) {
+        x += this.columnWidths[i];
+        if (offsetX > x - 5 && offsetX < x + 5) {
+          this.columnCanvas.style.cursor = "col-resize";
+          return;
+        }
+      }
+      this.columnCanvas.style.cursor = "default";
     }
   }
 
   /**
-   * Save input value to particular cell
+   *
+   * Handle Pointer up event
+   * @param {PointerEvent} event
    * @returns {void}
    */
-  saveInputValue() {
-    const { row, col } = this.currentCell;
-    const value = this.cellInput.value;
-    // Ensure gridData array has the appropriate size
-    if (!this.gridData[row - 1]) {
-      this.gridData[row - 1] = [];
-    }
-    this.gridData[row - 1][col] = value;
-    this.addToDict(row, col);
-    this.cellInput.style.display = "none";
-    this.drawGrid();
-  }
+  handleColumnMouseUp(event) {
+    const { offsetX, offsetY } = event;
+    let col = 0;
+    let x = 0;
 
-  /**
-   * Add value to CustomDictionary data structure
-   * @param {number} row
-   * @param {number} col
-   * @returns {void}
-   */
-  addToDict(row, col) {
-    let existingEntry = this.customDict.get(this.gridData[row - 1][0]);
-    if (!existingEntry) {
-      existingEntry = [];
+    for (let i = 0; i < this.numCols; i++) {
+      x += this.columnWidths[i];
+      if (offsetX < x) {
+        col = i;
+        break;
+      }
     }
-    existingEntry.push({
-      [this.gridCols[col]]: this.gridData[row - 1][col],
-    });
-    this.customDict.add(this.gridData[row - 1][0], existingEntry);
+
+    const row = Math.floor(offsetY / this.cellHeight);
+    if (this.isResizing) {
+      this.drawGrid();
+      this.isResizing = false;
+      this.columnCanvas.style.cursor = "default";
+    }
   }
 
   /**
@@ -712,38 +499,6 @@ export class GridTest {
   }
 
   /**
-   * Get the column index based on the x-coordinate
-   * @param {number} x
-   * @returns {number}
-   */
-  getColumnFromX(x) {
-    let totalWidth = 0;
-    for (let i = 0; i < this.numCols; i++) {
-      totalWidth += this.columnWidths[i] || this.defaultCellWidth;
-      if (x < totalWidth) {
-        return i;
-      }
-    }
-    return -1; // If x is beyond the last column
-  }
-
-  /**
-   * Get the row index based on the y-coordinate
-   * @param {number} y
-   * @returns {number}
-   */
-  getRowFromY(y) {
-    let totalHeight = 0;
-    for (let i = 0; i < this.numRows; i++) {
-      totalHeight += this.rowHeights[i] || this.cellHeight;
-      if (y < totalHeight) {
-        return i;
-      }
-    }
-    return -1; // If y is beyond the last row
-  }
-
-  /**
    *
    * Handle Pointer Move event
    * @param {PointerEvent} event
@@ -752,9 +507,9 @@ export class GridTest {
   handleMouseMove(event) {
     const { offsetX, offsetY } = event;
     if (this.isResizing) {
-      const delta = offsetX - this.startX;
-      this.columnWidths[this.resizeColIndex] += delta;
-      this.startX = offsetX;
+      // const delta = offsetX - this.startX;
+      // this.columnWidths[this.resizeColIndex] += delta;
+      // this.startX = offsetX;
       //   this.drawGrid();
     } else if (this.isDragging) {
       let col = 0;
@@ -772,15 +527,15 @@ export class GridTest {
       this.updateSelectedCells(this.startCell, this.currentCell);
       this.drawGrid();
     } else {
-      let x = 0;
-      for (let i = 0; i < this.numCols; i++) {
-        x += this.columnWidths[i];
-        if (offsetX > x - 5 && offsetX < x + 5) {
-          this.canvas.style.cursor = "col-resize";
-          return;
-        }
-      }
-      this.canvas.style.cursor = "default";
+      // let x = 0;
+      // for (let i = 0; i < this.numCols; i++) {
+      //   x += this.columnWidths[i];
+      //   if (offsetX > x - 5 && offsetX < x + 5) {
+      //     this.canvas.style.cursor = "col-resize";
+      //     return;
+      //   }
+      // }
+      // this.canvas.style.cursor = "default";
     }
   }
 
@@ -816,8 +571,8 @@ export class GridTest {
       this.currentCell = null;
     }
     if (this.isResizing) {
-      this.isResizing = false;
-      this.canvas.style.cursor = "default";
+      // this.isResizing = false;
+      // this.canvas.style.cursor = "default";
     }
     if (this.selectedCells.length > 0) {
       for (let i = 0; i < this.selectedCells.length; i++) {
@@ -872,10 +627,473 @@ export class GridTest {
       this.updateCellsCall();
     } else if (ev.ctrlKey && (ev.key === "v" || ev.key === "V")) {
       this.handlePasteToGrid();
-    } else if (ev.key === "Delete") {
+    } else if (ev.ctrlKey && (ev.key === "x" || ev.key === "X")) {
       this.handleDeleteFromGrid();
+    } else if (ev.key === "Delete") {
+      // console.log("Delete row");
+      this.handleDeleteRow();
     } else {
     }
+  }
+
+  /**
+   *
+   * Handle Double click event
+   * @param {PointerEvent} event  -
+   * @returns {void}
+   */
+  handleDoubleClick(event) {
+    const { offsetX, offsetY } = event;
+
+    const col = this.getColumnFromX(offsetX);
+    const row = this.getRowFromY(offsetY);
+
+    if (col !== -1 && row !== -1) {
+      // Calculate cell position and dimensions
+      const cellX = this.columnWidths
+        .slice(0, col)
+        .reduce((acc, val) => acc + val, 0);
+      const cellY = this.rowHeights
+        .slice(0, row)
+        .reduce((acc, val) => acc + val, 0);
+      const cellWidth = this.columnWidths[col];
+      const cellHeight = this.rowHeights[row];
+
+      // Position the input box
+      this.cellInput.style.left = `${cellX + 30}px`;
+      this.cellInput.style.top = `${cellY + 30}px`;
+      this.cellInput.style.width = `${cellWidth}px`;
+      this.cellInput.style.height = `${cellHeight}px`;
+      this.cellInput.style.display = "block";
+      this.cellInput.value =
+        this.gridData[row - 1] && this.gridData[row - 1][col]
+          ? this.gridData[row - 1][col]
+          : "";
+      this.cellInput.focus();
+
+      // Store the current cell coordinates
+      this.currentCell = { row, col };
+    }
+  }
+
+  /**
+   * Helper function for drawing cells
+   * @param {number} x
+   * @param {number} y
+   * @param {number} width
+   * @param {number} height
+   * @param {string} text
+   * @returns {void}
+   */
+  drawCell(x, y, width, height, text) {
+    // if (text === "email") {
+    this.ctx.fillStyle = "white";
+    this.ctx.fillRect(x + 0.5, y + 0.5, width, height);
+    this.ctx.strokeStyle = "#dfdfde";
+    this.ctx.strokeRect(x + 0.5, y + 0.5, width, height);
+    this.ctx.fillStyle = "#000000";
+    this.ctx.font = "11px Arial";
+    this.ctx.fillText(text, x + 5, y + 20);
+    // }
+  }
+
+  /**
+   * Drawing the First Row
+   * @returns {void}
+   */
+  drawFirstRow() {
+    let x = 0;
+
+    this.ctx.lineWidth = 1;
+    for (let col = 0; col < this.numCols; col++) {
+      const width = this.columnWidths[col];
+      const text = this.gridCols[col] || "";
+      //   console.log(text);
+
+      this.drawCell(x, 0, width, this.cellHeight, text);
+      x += width;
+    }
+  }
+
+  drawIds() {
+    this.rowCountCtx.clearRect(
+      0,
+      0,
+      this.rowCountCanvas.width,
+      this.rowCountCanvas.height
+    );
+    this.rowCountCtx.textAlign = "center";
+    this.rowCountCtx.textBaseline = "middle";
+    this.rowCountCtx.font = "10px Calibri";
+    this.rowCountCtx.fillStyle = "black";
+
+    this.rowCountCtx.lineWidth = 0.2;
+    let start = 0.5;
+    for (let i = 0; i < this.numRows; i++) {
+      this.rowCountCtx.save();
+      this.rowCountCtx.beginPath();
+      this.rowCountCtx.moveTo(0, start);
+      this.rowCountCtx.lineTo(this.cellHeight, start);
+      start += this.rowHeights[i];
+      this.rowCountCtx.fillText(
+        i,
+        this.cellHeight / 2,
+        start - this.rowHeights[i] / 2
+      );
+      this.rowCountCtx.stroke();
+      this.rowCountCtx.restore();
+    }
+    this.rowCountCtx.beginPath();
+    this.rowCountCtx.moveTo(30 + 0.5, 0);
+    this.rowCountCtx.lineTo(30 + 0.5, this.rowCountCanvas.height + 0.5);
+    this.rowCountCtx.stroke();
+  }
+
+  /**
+   * Drawing the First Row
+   * @returns {void}
+   */
+  drawHeaders() {
+    this.columnCtx.clearRect(
+      0,
+      0,
+      this.columnCanvas.width,
+      this.columnCanvas.height
+    );
+    this.columnCtx.textAlign = "center";
+    this.columnCtx.textBaseline = "middle";
+    this.columnCtx.font = "12px Calibri";
+    this.columnCtx.fillStyle = "black";
+    this.columnCtx.lineWidth = 0.2;
+    let start = 0.5;
+    for (let i = 0; i < this.numCols; i++) {
+      let char = String.fromCharCode(65 + i);
+      this.columnCtx.save();
+      this.columnCtx.beginPath();
+      this.columnCtx.moveTo(start, 0);
+      this.columnCtx.lineTo(start, this.cellHeight);
+      this.columnCtx.fillText(
+        char,
+        start + this.columnWidths[i] / 2,
+        this.cellHeight / 2
+      );
+      start += this.columnWidths[i];
+      this.columnCtx.stroke();
+      this.columnCtx.restore();
+    }
+    this.columnCtx.beginPath();
+    this.columnCtx.moveTo(0, this.cellHeight + 0.5);
+    this.columnCtx.lineTo(this.cellHeight + 0.5, this.columnCanvas.width);
+    this.columnCtx.stroke();
+  }
+
+  /**
+   * Drawing the Main Grid as a line-based grid
+   * @returns {void}
+   */
+  drawGrid() {
+    // console.log(
+    //   this.excel.rHeightPrefixSum[this.excel.rHeightPrefixSum.length - 1]
+    // );
+    // console.log("Draw Grid called");
+
+    // Clear the existing grid
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.lineWidth = 1;
+    // Draw vertical lines
+    let x = 0; // Start after the first column header
+    for (let col = 0; col <= this.numCols; col++) {
+      this.ctx.beginPath();
+      this.ctx.moveTo(x + 0.5, 0);
+      this.ctx.lineTo(x + 0.5, this.canvas.height);
+      this.ctx.strokeStyle = "#dfdfde"; // Grid line color
+      this.ctx.stroke();
+      x += this.columnWidths[col] || this.defaultCellWidth;
+      this.excel.cWidthPrefixSum.push(x);
+    }
+
+    // // Draw horizontal lines
+    // let y = this.excel.rHeightPrefixSum[this.excel.rHeightPrefixSum.length - 1]; // Start after the first row header
+    // for (let row = this.excel.topIndex; row <= this.excel.bottomIndex; row++) {
+    //   //   this.ctx.beginPath();
+    //   //   this.ctx.moveTo(0, y + 0.5);
+    //   //   this.ctx.lineTo(this.canvas.width, y + 0.5);
+    //   //   this.ctx.strokeStyle = "#dfdfde"; // Grid line color
+    //   //   this.ctx.stroke();
+    //   this.drawLines(0, y + 0.5);
+    //   y += this.rowHeights[row] || this.cellHeight;
+    //   this.excel.rHeightPrefixSum.push(y);
+    // }
+    let y = 0; // Start after the first row header
+    for (let row = 0; row <= this.numRows; row++) {
+      this.ctx.beginPath();
+      this.ctx.moveTo(0, y + 0.5);
+      this.ctx.lineTo(this.canvas.width, y + 0.5);
+      this.ctx.strokeStyle = "#dfdfde"; // Grid line color
+      this.ctx.stroke();
+      //   this.drawLines(0, y + 0.5);
+      y += this.rowHeights[row] || this.cellHeight;
+      this.excel.rHeightPrefixSum.push(y);
+    }
+
+    // Highlight selected cells
+    this.highlightSelectedCells();
+
+    // Draw cell data
+    this.ctx.font = "12px Arial";
+    this.ctx.fillStyle = "black";
+    this.ctx.textAlign = "left";
+    this.ctx.textBaseline = "middle";
+    // this.ctx.font = "14px Calibri";
+    this.ctx.fontWeight = "600";
+    this.gridData.forEach((rowData, rowIndex) => {
+      rowData.forEach((cellData, colIndex) => {
+        if (cellData) {
+          const cellX = this.columnWidths
+            .slice(0, colIndex)
+            .reduce((acc, val) => acc + val, 0);
+          const cellY = (rowIndex + 1) * this.cellHeight + 20; // Adjust to center text vertically
+
+          this.ctx.save();
+          this.ctx.beginPath();
+          this.ctx.rect(
+            cellX,
+            cellY - this.rowHeights[rowIndex] / 2,
+            this.columnWidths[colIndex] - 10,
+            this.rowHeights[rowIndex]
+          );
+          this.ctx.clip();
+
+          this.ctx.fillText(cellData, cellX + 5, cellY); // 5px padding
+          this.ctx.restore();
+        }
+      });
+    });
+    this.drawFirstRow();
+  }
+
+  drawLines(x, y) {
+    this.ctx.beginPath();
+    this.ctx.moveTo(x, y);
+    this.ctx.lineTo(this.canvas.width, y);
+    this.ctx.strokeStyle = "#dfdfde"; // Grid line color
+    this.ctx.stroke();
+  }
+
+  /**
+   * Highlight the selected cells in the line-based grid
+   * @returns {void}
+   */
+  highlightSelectedCells() {
+    if (this.selectedCells.length == 1) {
+      this.ctx.fillStyle = "transparent";
+      this.selectedCells.forEach((cell) => {
+        const x = this.getColumnLeftPosition(cell[1]);
+        const y = cell[0] * this.cellHeight;
+        this.ctx.fillRect(x, y, this.columnWidths[cell[1]], this.cellHeight);
+
+        this.drawIds();
+        this.rowCountCtx.fillStyle = "rgb(0, 128, 0, 0.5)";
+        this.rowCountCtx.fillRect(0, y, 30, this.cellHeight);
+
+        this.drawHeaders();
+        this.columnCtx.fillStyle = "rgb(0, 128, 0, 0.5)";
+        this.columnCtx.fillRect(
+          x,
+          0,
+          this.columnWidths[cell[1]],
+          this.cellHeight
+        );
+      });
+    }
+
+    this.ctx.fillStyle = "rgb(0, 128, 0, 0.1)";
+    this.selectedCells.slice(1).forEach((cell) => {
+      const x = this.getColumnLeftPosition(cell[1]);
+      const y = cell[0] * this.cellHeight;
+      this.ctx.fillRect(x, y, this.columnWidths[cell[1]], this.cellHeight);
+    });
+
+    if (this.selectedCells.length > 0) {
+      const minRow = Math.min(...this.selectedCells.map((cell) => cell[0]));
+      const maxRow = Math.max(...this.selectedCells.map((cell) => cell[0]));
+      const minCol = Math.min(...this.selectedCells.map((cell) => cell[1]));
+      const maxCol = Math.max(...this.selectedCells.map((cell) => cell[1]));
+
+      this.xStart = this.getColumnLeftPosition(minCol);
+      this.yStart = minRow * this.cellHeight;
+      this.xEnd =
+        this.getColumnLeftPosition(maxCol) + this.columnWidths[maxCol];
+      this.yEnd = (maxRow + 1) * this.cellHeight;
+
+      this.drawIds();
+      this.rowCountCtx.fillStyle = "rgb(0, 128, 0, 0.3)";
+      this.rowCountCtx.strokeStyle = "rgba(0, 128, 0)";
+      this.rowCountCtx.lineWidth = 5;
+      this.rowCountCtx.fillRect(0, this.yStart, 30, this.yEnd - this.yStart);
+      this.rowCountCtx.beginPath();
+      this.rowCountCtx.moveTo(30 + 0.5, this.yStart);
+      this.rowCountCtx.lineTo(30 + 0.5, this.yEnd + 0.5);
+      this.rowCountCtx.stroke();
+
+      this.drawHeaders();
+      this.columnCtx.fillStyle = "rgb(0, 128, 0, 0.3)";
+      this.columnCtx.strokeStyle = "rgba(0, 128, 0)";
+      this.columnCtx.lineWidth = 5;
+      this.columnCtx.fillRect(
+        this.xStart,
+        0,
+        this.xEnd - this.xStart,
+        this.cellHeight
+      );
+      this.columnCtx.beginPath();
+      this.columnCtx.moveTo(this.xStart, 30 + 0.5);
+      this.columnCtx.lineTo(this.xEnd + 0.5, 30 + 0.5);
+      this.columnCtx.stroke();
+
+      if (this.isAnimated && this.selectedCells.length > 1) {
+        this.drawDottedRect();
+      } else {
+        this.ctx.strokeStyle = "rgba(0, 128, 0, 0.8)";
+        this.ctx.lineWidth = 2;
+        this.ctx.strokeRect(
+          this.xStart,
+          this.yStart,
+          this.xEnd - this.xStart,
+          this.yEnd - this.yStart
+        );
+      }
+    }
+  }
+
+  /**
+   * Get x position based on column value
+   * @param {number} col
+   * @returns {number}
+   */
+  getColumnLeftPosition(col) {
+    let x = 0;
+    for (let i = 0; i < col; i++) {
+      x += this.columnWidths[i];
+    }
+    return x;
+  }
+
+  /**
+   * Network call to bulk update
+   * @returns {void}
+   */
+  async updateCellsCall() {
+    // console.log(Object.fromEntries(this.customDict.getAll()));
+
+    try {
+      const res = await fetch(
+        "https://localhost:7210/api/TodoItems/updateCells",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(Object.fromEntries(this.customDict.getAll())),
+        }
+      );
+      const data = await res.json();
+      alert("Cells updated successfully");
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async handleDeleteRow() {
+    if (this.emailSelected === null) {
+      alert("No row selected");
+      return;
+    } 
+
+    try {
+      const res = await fetch(
+        `https://localhost:7210/row/${this.emailSelected}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (res.ok) {
+        alert("Row selected successfully");
+        this.emailSelected = null
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  /**
+   * Save input value to particular cell
+   * @returns {void}
+   */
+  saveInputValue() {
+    const { row, col } = this.currentCell;
+    const value = this.cellInput.value;
+    // Ensure gridData array has the appropriate size
+    if (!this.gridData[row - 1]) {
+      this.gridData[row - 1] = [];
+    }
+    this.gridData[row - 1][col] = value;
+    this.addToDict(row, col);
+    this.cellInput.style.display = "none";
+    this.drawGrid();
+  }
+
+  /**
+   * Add value to CustomDictionary data structure
+   * @param {number} row
+   * @param {number} col
+   * @returns {void}
+   */
+  addToDict(row, col) {
+    let existingEntry = this.customDict.get(this.gridData[row - 1][0]);
+    if (!existingEntry) {
+      existingEntry = [];
+    }
+    existingEntry.push({
+      [this.gridCols[col]]: this.gridData[row - 1][col],
+    });
+    this.customDict.add(this.gridData[row - 1][0], existingEntry);
+  }
+
+  /**
+   * Get the column index based on the x-coordinate
+   * @param {number} x
+   * @returns {number}
+   */
+  getColumnFromX(x) {
+    let totalWidth = 0;
+    for (let i = 0; i < this.numCols; i++) {
+      totalWidth += this.columnWidths[i] || this.defaultCellWidth;
+      if (x < totalWidth) {
+        return i;
+      }
+    }
+    return -1; // If x is beyond the last column
+  }
+
+  /**
+   * Get the row index based on the y-coordinate
+   * @param {number} y
+   * @returns {number}
+   */
+  getRowFromY(y) {
+    let totalHeight = 0;
+    for (let i = 0; i < this.numRows; i++) {
+      totalHeight += this.rowHeights[i] || this.cellHeight;
+      if (y < totalHeight) {
+        return i;
+      }
+    }
+    return -1; // If y is beyond the last row
   }
 
   handleCopyFromGrid() {

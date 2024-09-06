@@ -1,11 +1,11 @@
-import { Excel } from "./excel.js";
+import { Excel } from "../excel/excel.js";
 
 export class GraphUtils {
   constructor(excel) {
     /**
      * @type {Excel}
      */
-    this.grid = excel.grid
+    this.grid = excel.sheet.grid
 
     /**
      * @type {HTMLElement}

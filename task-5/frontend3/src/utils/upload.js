@@ -1,12 +1,5 @@
-import { GridTest2 } from "./grid-test-2.js";
-import { NotificationToast } from "./notification.js";
-
 export class UploadFunctionality {
-  constructor(excel) {
-    /**
-     * @type {GridTest2}
-     */
-    this.grid = excel.grid;
+  constructor() {
     /**
      * @type {HTMLFormElement}
      */
@@ -54,14 +47,12 @@ export class UploadFunctionality {
    * @returns {void}
    */
   setupEventListeners() {
-    this.uploadForm.addEventListener("submit", (ev) =>
-      this.handleFormSubmit(ev)
-    );
+    this.uploadForm.addEventListener("submit", (ev) => this.handleFormSubmit(ev));
   }
 
   /**
    * Handle form submission
-   * @param {MouseEvent} ev
+   * @param {MouseEvent} ev 
    * @returns {void}
    */
   handleFormSubmit(ev) {
@@ -76,20 +67,17 @@ export class UploadFunctionality {
 
   /**
    * Upload the selected file
-   * @param {Blob} file
+   * @param {Blob} file 
    */
   async uploadFile(file) {
     const formData = new FormData();
     formData.append("file", file);
     this.progressContainer.style.display = "flex";
     try {
-      const response = await fetch(
-        "https://localhost:7210/api/TodoItems/sendToMQInChunks",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+      const response = await fetch("https://localhost:7210/api/TodoItems/sendToMQInChunks", {
+        method: "POST",
+        body: formData,
+      });
       const data = await response.json();
       console.log("File upload response:", data);
     } catch (error) {
@@ -97,19 +85,17 @@ export class UploadFunctionality {
     }
   }
 
-  /**
-   * Setup SignalR event handlers
-   * @returns {void}
-   */
-  setupSignalRHandlers() {
-    this.connection.on("ProgressUpdates", (message) =>
-      this.handleProgressUpdate(message)
-    );
+   /**
+    * Setup SignalR event handlers
+    * @returns {void}
+    */
+   setupSignalRHandlers() {
+    this.connection.on("ProgressUpdates", (message) => this.handleProgressUpdate(message));
   }
 
   /**
    * Handle progress updates from SignalR
-   * @param {string} message
+   * @param {string} message 
    * @returns {void}
    */
   handleProgressUpdate(message) {
@@ -122,9 +108,7 @@ export class UploadFunctionality {
     this.progressElement.value += progress;
     this.progressPercentage.innerText = `${this.progressElement.value / 2}%`;
     if (this.progressElement.value / 2 === 100) {
-      new NotificationToast("Upload Done", 900, 10, "linear-gradient(to right, #00b09b, #96c93d)", "info")
       this.progressContainer.style.display = "none";
-      this.grid.fetchData(0, 100);
     }
   }
 
@@ -136,11 +120,10 @@ export class UploadFunctionality {
     try {
       console.log("Starting SignalR client");
       await this.connection.start();
-    //   console.log("SignalR connected");
-      new NotificationToast("SignalR connected",  900, 10, "linear-gradient(to right, #00b09b, #96c93d)", "info")
+      console.log("SignalR connected");
     } catch (err) {
       console.error("SignalR connection error:", err);
-      new NotificationToast("SignalR connected", 900, 10, "red", "error",)
+      alert("Failed to connect to progress updates. Please try again.");
     }
   }
 }

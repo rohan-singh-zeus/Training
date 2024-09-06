@@ -366,6 +366,17 @@ namespace server.Controllers
             return Ok();
         }
 
+        [HttpDelete("/row/{email}")]
+        public async Task<IActionResult> DeleteTodoEmail(string email)
+        {
+            await connection.OpenAsync();
+            using var command = connection.CreateCommand();
+            command.CommandText = "DELETE FROM employee where email = @email";
+            command.Parameters.AddWithValue("@email", email);
+            await command.ExecuteNonQueryAsync();
+            return Ok();
+        }
+
         private bool TodoItemExists(long id)
         {
             return _context.TodoItems.Any(e => e.Id == id);
