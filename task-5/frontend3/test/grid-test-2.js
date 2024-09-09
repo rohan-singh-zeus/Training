@@ -7,7 +7,8 @@ import { GridFunctionalities } from "./gridFunctionalities.js";
 import { NotificationToast } from "./notification.js";
 
 export class GridTest2 {
-  constructor(canvasId) {
+  constructor(sheetIdx) {
+    this.sheetIdx = sheetIdx;
     /**
      * @type {Excel}
      */
@@ -16,7 +17,7 @@ export class GridTest2 {
      * Canvas of the main Grid
      * @type {HTMLCanvasElement}
      */
-    this.canvas = document.getElementById(canvasId);
+    this.canvas = document.getElementById(`gridMain-${sheetIdx}`);
     this.ctx = this.canvas.getContext("2d");
     /**
      * Default width of individual cell
@@ -221,13 +222,13 @@ export class GridTest2 {
     /**
      * @type {HTMLCanvasElement}
      */
-    this.rowCountCanvas = document.getElementById("gridCanvas3");
+    this.rowCountCanvas = document.getElementById(`gridIds-${sheetIdx}`);
     this.rowCountCtx = this.rowCountCanvas.getContext("2d");
 
     /**
      * @type {HTMLCanvasElement}
      */
-    this.columnCanvas = document.getElementById("gridCanvas2");
+    this.columnCanvas = document.getElementById(`gridHeader-${sheetIdx}`);
     this.columnCtx = this.columnCanvas.getContext("2d");
 
     /**
@@ -286,7 +287,11 @@ export class GridTest2 {
       this.emailSelected = this.gridData[row - 1][0];
     });
 
-    document.addEventListener("DOMContentLoaded", this.handleEvent.bind(this));
+    this.handleEvent.bind(this);
+
+    this.fetchActualData(0, 100);
+    this.drawIds();
+    this.drawHeaders();
   }
 
   /**
@@ -376,10 +381,11 @@ export class GridTest2 {
       case "keydown":
         this.handleKeyPress(event);
         break;
-      case "DOMContentLoaded":
-        this.fetchActualData(0, 100);
-        this.drawIds();
-        this.drawHeaders();
+        //   case "DOMContentLoaded":
+        //     this.fetchActualData(0, 100);
+        //     this.drawIds();
+        //     this.drawHeaders();
+        //     // this.drawGrid()
         break;
       default:
         break;
@@ -840,7 +846,7 @@ export class GridTest2 {
     this.highlightSelectedCells();
 
     // Draw cell data
-    this.ctx.font = `${14}px Arial`;
+    this.ctx.font = `${12}px Arial`;
     this.ctx.fillStyle = "black";
     this.ctx.textAlign = "left";
     this.ctx.textBaseline = "middle";
@@ -1008,7 +1014,7 @@ export class GridTest2 {
       console.log(data);
     } catch (error) {
       console.log(error);
-      new NotificationToast("Something went wrong", 900, 10, "red", "error",);
+      new NotificationToast("Something went wrong", 900, 10, "red", "error");
     }
   }
 
@@ -1018,7 +1024,7 @@ export class GridTest2 {
       return;
     }
 
-    this.handleDeleteFromGrid()
+    this.handleDeleteFromGrid();
 
     try {
       const res = await fetch(
@@ -1042,7 +1048,7 @@ export class GridTest2 {
       }
     } catch (error) {
       console.log(error);
-        new NotificationToast("Something went wrong", 900, 10, "red", "error");
+      new NotificationToast("Something went wrong", 900, 10, "red", "error");
     }
   }
 
@@ -1113,7 +1119,7 @@ export class GridTest2 {
   }
 
   handleCopyFromGrid() {
-    this.copyCutData = []
+    this.copyCutData = [];
     const selectedString = this.gridFunctionalities.handleCopyToClipBoard(
       this.initialCell,
       this.finalCell,

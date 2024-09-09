@@ -1,4 +1,5 @@
 import { GridConstants } from "../constant/index.js";
+import { Excel } from "./excel.js";
 import { GraphUtils } from "./graphUtils.js";
 import { GridTest2 } from "./grid-test-2.js";
 import { UploadFunctionality } from "./upload.js";
@@ -8,7 +9,8 @@ import { UploadFunctionality } from "./upload.js";
 // Global Variables
 
 export class Sheet {
-  constructor() {
+  constructor(sheetIdx) {
+    this.sheetIdx = sheetIdx;
     /**
      * Array of widths of each column
      * @type {number[]}
@@ -73,6 +75,8 @@ export class Sheet {
 
     this.init();
 
+    // this.sheetIdx = 1;
+
     Sheet.instance = this;
   }
 
@@ -81,24 +85,69 @@ export class Sheet {
    * @returns {void}
    */
   init() {
-    this.grid = new GridTest2("gridCanvas");
+    this.createSheetHTML();
 
-    new GraphUtils(this);
+    setTimeout(() => {
+      this.grid = new GridTest2(this.sheetIdx);
 
-    new UploadFunctionality(this);
+      new GraphUtils(this);
+    }, 100);
 
     // new RowGrid("gridCanvas2", grid)
-    this.resizeObserver = new ResizeObserver(this.handleResize.bind(this));
+    // this.resizeObserver = new ResizeObserver(this.handleResize.bind(this));
 
-    this.resizeObserver.observe(this.grid.canvas);
+    // this.resizeObserver.observe(this.grid.canvas);
   }
+
+  createSheetHTML() {
+    // const grid = document.querySelector(".grid");
+    this.excel = document.createElement("div");
+    this.excel.className = `excel-${this.sheetIdx}`;
+    this.excel.classList.add("excel");
+
+    const gridIds = document.createElement("canvas");
+    gridIds.setAttribute("id", `gridIds-${this.sheetIdx}`);
+    gridIds.classList.add("gridIds");
+    gridIds.height = 1000;
+    gridIds.width = 30;
+
+    const gridHeader = document.createElement("canvas");
+    gridHeader.setAttribute("id", `gridHeader-${this.sheetIdx}`);
+    gridHeader.classList.add("gridHeader");
+    gridHeader.height = 32;
+    gridHeader.width = 2096;
+
+    const gridMain = document.createElement("canvas");
+    gridMain.setAttribute("id", `gridMain-${this.sheetIdx}`);
+    gridMain.classList.add("gridMain");
+    gridMain.height = 1000;
+    gridMain.width = 2096;
+
+    const cellInput = document.createElement("input");
+    cellInput.type = "text";
+    cellInput.setAttribute("id", "cellInput");
+    cellInput.style.display = "none";
+    cellInput.style.position = "absolute";
+
+    this.excel.appendChild(gridHeader);
+    this.excel.appendChild(gridIds);
+    this.excel.appendChild(gridMain);
+    this.excel.appendChild(cellInput);
+
+    // grid.appendChild(excel);
+    // console.log(this);
+
+    // this.init();
+  }
+
+  appenD() {}
 
   handleResize() {
     this.scallingCanvas();
   }
 
   scallingCanvas() {
-    console.log("resizing")
+    console.log("resizing");
     // tells the browser how many of the screen's actual pixels should be used to draw a single CSS pixel
     const dpr = window.devicePixelRatio; // Change to 1 on retina screens to see blurry canvas.
 

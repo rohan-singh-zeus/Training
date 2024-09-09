@@ -1,6 +1,7 @@
 import { GridConstants } from "../constant/index.js";
 import { GraphUtils } from "./graphUtils.js";
 import { MultipleSheets } from "./multipleSheets.js";
+import { NotificationToast } from "./notification.js";
 import { Scroll } from "./scroll.js";
 import { Sheet } from "./sheet.js";
 import { UploadFunctionality } from "./upload.js";
@@ -88,13 +89,16 @@ export class Excel {
     this.shiftBottomY = 0;
     this.topIndex = 0;
     this.bottomIndex = 0;
+    this.activeCurrentIdx = 1;
+    // this.sheetIdx = 1;
 
     this.sheets = [
       {
         name: "Sheet1",
-        instance: new Sheet(),
+        instance: new Sheet(1),
       },
     ];
+    this.updateContentArea();
 
     this.init();
   }
@@ -104,25 +108,17 @@ export class Excel {
    * @returns {void}
    */
   init() {
-    // this.sheet = new Sheet();
-
-    // new Scroll()
-
     new MultipleSheets();
+    new UploadFunctionality();
+
   }
 
-  addSheet() {
-    const addSheetBtn = document.getElementById("addSheetBtn");
-    addSheetBtn.addEventListener("click", (ev) => {
-      this.sheets.push({
-        name: `Sheet${this.sheets.length + 1}`,
-        instance: new Sheet(),
-      });
-    });
-  }
-
-  replaceSheet(){
-
+  updateContentArea() {
+    const grid = document.querySelector(".grid");
+    grid.innerHTML = "";
+    console.log(this.sheets[this.activeCurrentIdx - 1]);
+    const activeSheet = this.sheets[this.activeCurrentIdx - 1].instance;
+    grid.appendChild(activeSheet.excel);
   }
 
   /**

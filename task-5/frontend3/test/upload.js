@@ -1,12 +1,14 @@
+import { Excel } from "./excel.js";
 import { GridTest2 } from "./grid-test-2.js";
 import { NotificationToast } from "./notification.js";
+import { Sheet } from "./sheet.js";
 
 export class UploadFunctionality {
-  constructor(excel) {
+  constructor() {
     /**
      * @type {GridTest2}
      */
-    this.grid = excel.grid;
+    this.grid = Sheet.getInstance().grid;
     /**
      * @type {HTMLFormElement}
      */

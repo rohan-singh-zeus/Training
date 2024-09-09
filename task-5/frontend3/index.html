@@ -5,8 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="styles/index.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
+    />
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/npm/toastify-js"
+    ></script>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
@@ -118,44 +125,16 @@
       </div>
     </div>
     <div class="grid">
-      <div class="excel">
-        <div class="rowExcel">
-          <canvas id="gridCanvas2" height="32" width="2096"></canvas>
-        </div>
-        <div class="fixedColumn">
-          <canvas id="gridCanvas3" height="1000" width="30"></canvas>
-          <!-- Fixed column for row count -->
-        </div>
-        <div class="scrollableGrid">
-          <canvas id="gridCanvas" height="1000" width="2096"></canvas>
-          <!-- Main grid -->
-        </div>
-        <input
-          type="text"
-          id="cellInput"
-          style="position: absolute; display: none"
-        />
-        <!-- <div id='track-y'>
-            <div id='slider-y'>
-            </div>
-          </div>       
-          <div id='track-x'>
-            <div id='slider-x'>
-            </div>
-          </div>   -->
-
-      </div>
     </div>
     <div class="graph">
       <canvas id="myChart"></canvas>
     </div>
     <div class="multipleSheets">
-        <div class="addSheet">
-            <button id="addSheetBtn">+</button>
-        </div>
-        <div class="buttons">
-            <button>Sheet 1</button>
-        </div>
+      <div class="addSheet">
+        <button id="addSheetBtn" data-index="1">+</button>
+      </div>
+      <div class="buttons">
+      </div>
     </div>
     <!-- </div> -->
     <!-- <script type="module" src="test/rowCanvas.js"></script> -->
