@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="styles/index.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
+    />
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/npm/toastify-js"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+      integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="uploadContainer">
+      <div>
+        <div id="fileUploadContainer">
+          <p>Select a .csv file to upload</p>
+          <input type="file" id="fileInput" />
+          <button id="btnUpload">Upload</button>
+        </div>
+        <div id="progressContainer">
+          <progress
+            id="uploadProgress"
+            value="0"
+            max="200"
+            draggable="true"
+          ></progress>
+          <span id="progressPercentage">0%</span>
+        </div>
+        <button id="getData" disabled>Get Data</button>
+        <button id="cancelContainer">X</button>
+      </div>
+    </div>
+
+    <div class="ribbon">
+      <div class="rTitle">
+        <p class="file">File</p>
+        <p class="operations">Operations</p>
+        <p class="oGraph">Graph</p>
+      </div>
+      <div class="rOptions">
+        <div class="rLeft">
+          <div class="r-31">
+            <div class="upload">
+              <form id="uploadForm">
+                <div>
+                  <label for="file-upload" class="custom-file">
+                    <i class="fa-solid fa-circle-chevron-up fa-2xl"></i>
+                    <p>Upload</p>
+                  </label>
+                </div>
+              </form>
+            </div>
+          </div>
+          <div class="r-32">
+            <div>
+              <button class="find">
+                <i class="fa-solid fa-folder-tree fa-2xl"></i>
+              </button>
+              <p>Find</p>
+            </div>
+            <div>
+              <button class="findReplace">
+                <i class="fa-solid fa-wind fa-2xl"></i>
+              </button>
+              <p>Find and Replace</p>
+            </div>
+            <!-- <div>
+              <button class="sort">
+                <i class="fa-solid fa-arrow-down-short-wide fa-2xl"></i>
+              </button>
+              <p>Sort</p>
+            </div> -->
+            <!-- <div>
+              <p>
+                Sum : 
+              </p>
+            </div> -->
+          </div>
+          <div class="r-33">
+            <div>
+              <button class="bar">
+                <i class="fa-solid fa-chart-simple fa-2xl"></i>
+              </button>
+              <p>Bar</p>
+            </div>
+            <div>
+              <button class="line">
+                <i class="fa-solid fa-chart-line fa-2xl"></i>
+              </button>
+              <p>Line</p>
+            </div>
+            <div>
+              <button class="pie">
+                <i class="fa-solid fa-chart-pie fa-2xl"></i>
+              </button>
+              <p>Pie</p>
+            </div>
+            <!-- <div>
+              <p>
+                Sum : 
+              </p>
+            </div> -->
+          </div>
+        </div>
+        <div class="rRight">
+          <p class="sum">Sum: <span>0</span></p>
+          <p class="min">Min: <span>0</span></p>
+          <p class="max">Max <span>0</span></p>
+          <p class="avg">Average <span>0</span></p>
+        </div>
+        <div></div>
+      </div>
+    </div>
+    <div class="grid"></div>
+    <div class="graph">
+      <canvas id="myChart"></canvas>
+    </div>
+    <div class="multipleSheets">
+      <div class="addSheet">
+        <button id="addSheetBtn" data-index="1">+</button>
+      </div>
+      <div class="buttons"></div>
+    </div>
+    <!-- </div> -->
+    <!-- <script type="module" src="test/rowCanvas.js"></script> -->
+    <script type="module" src="test/index.js"></script>
+  </body>
+</html>
