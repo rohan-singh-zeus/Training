@@ -82,13 +82,13 @@ export class Scroll {
     // Initialize scroll
 
     setTimeout(() => {
-        this.init();
+      this.init();
     }, 1000);
   }
 
   init() {
     // Calculate the total height and width of the scrollable container
-        console.log(this.excel.rHeightPrefixSum.length, this.excel.rHeightPrefixSum[this.excel.rHeightPrefixSum.length - 1])
+    // console.log(this.excel.rHeightPrefixSum.length, this.excel.rHeightPrefixSum[this.excel.rHeightPrefixSum.length - 1])
 
     this.containerHeight =
       this.excel.rHeightPrefixSum[this.excel.rHeightPrefixSum.length - 1];
@@ -114,7 +114,7 @@ export class Scroll {
   }
 
   eventListeners() {
-    console.log(this.excel.rHeightPrefixSum);
+    // console.log(this.excel.rHeightPrefixSum);
 
     // Bind mouse events for vertical scrolling
     this.sliderY.addEventListener(
@@ -165,7 +165,6 @@ export class Scroll {
    * @returns {void}
    */
   handleMouseMove(e) {
-    
     if (this.isScrollY) {
       this.handleVerticalScroll(e);
     } else if (this.isScrollX) {
@@ -189,10 +188,12 @@ export class Scroll {
       // Handle scrolling above the top of the scrollbar
       this.yTravelled = 0;
       this.sliderY.style.top = "0px";
-      //   this.updateVerticalScroll(0);
+      const newSliderYHeight = this.getAttInt(this.trackY, "height") * 0.6;
+      this.sliderY.style.height = newSliderYHeight + "px";
+      this.updateVerticalScroll(0);
     } else if (this.yTravelled > 0.8 * this.maxYTravel) {
       // Handle scrolling beyond 80% of the scrollbar
-        this.handleScrollBeyondBottom();
+      this.handleScrollBeyondBottom();
     } else {
       // Update slider position and container shift
       this.sliderY.style.top = this.yTravelled + "px";
@@ -209,10 +210,8 @@ export class Scroll {
    */
   updateVerticalScroll(percentage) {
     // console.log(percentage)
-    this.excel.shiftTopY = 
-    (
-      (percentage * (this.containerHeight - this.mainGrid.canvas.height)) / 100
-    );
+    this.excel.shiftTopY =
+      (percentage * (this.containerHeight - this.mainGrid.canvas.height)) / 100;
 
     // console.log(this.excel.shiftTopY, this.containerHeight, this.mainGrid.canvas.height)
 
@@ -221,21 +220,10 @@ export class Scroll {
 
     this.excel.topIndex = this.excel.cellYIndex(this.excel.shiftTopY);
     this.excel.bottomIndex = this.excel.cellYIndex(this.excel.shiftBottomY);
-
-    // console.log(
-    //   this.containerHeight,
-    //   this.mainGrid.canvas.height,
-    //   this.excel.shiftTopY,
-    //   this.excel.shiftBottomY,
-    //   this.excel.topIndex,
-    //   this.excel.bottomIndex
-    // ); 
-
-    // this.mainGrid.drawGrid();
-    // console.log(this.yTravelled, this.xTravelled);
-    this.sheet.startX = Math.floor(this.excel.shiftTopY/GridConstants.cellHeight)
-    // console.log(this.sheet.startX);
-    
+    this.sheet.startX = Math.floor(
+      this.excel.shiftTopY / GridConstants.cellHeight
+    );
+    console.log(this.sheet.startX);
     this.mainGrid.drawIds();
     this.mainGrid.drawGrid();
   }
@@ -244,24 +232,36 @@ export class Scroll {
    * Handles the scenario when scrolling goes beyond 80% of the scrollbar.
    * @returns {void}
    */
-   handleScrollBeyondBottom() {
-    
+  handleScrollBeyondBottom() {
     this.sheet.maxRows += 100;
     // console.log(this.sheet.maxRows);
-    this.mainGrid.drawGrid()
-    this.mainGrid.drawIds()
+    this.mainGrid.addMoreContent();
+    // this.mainGrid.drawGrid()
+    this.mainGrid.fetchData(
+      Math.floor(this.sheet.startX),
+      Math.floor(this.sheet.startX) + 100
+    );
+    this.mainGrid.drawIds();
     //  this.fileOperations.getFile(this.dimension.rHeightPrefixSum.length - 21, this.dimension.rHeightPrefixSum.length - 1);
-     this.containerHeight = this.excel.rHeightPrefixSum[this.excel.rHeightPrefixSum.length - 1];
+    this.containerHeight =
+      this.excel.rHeightPrefixSum[this.excel.rHeightPrefixSum.length - 1];
     //  console.log(this.containerHeight)
 
-     if (this.getAttInt(this.sliderY, "height") > 40) {
-        const newSliderYHeight = (this.mainGrid.canvas.height * this.mainGrid.canvas.height) / this.containerHeight
-       this.sliderY.style.height = newSliderYHeight + "px";
-       this.maxYTravel =this.getAttInt(this.trackY, "height") - newSliderYHeight;
-     }
+    if (this.getAttInt(this.sliderY, "height") > 40) {
+      const newSliderYHeight = this.getAttInt(this.sliderY, "height") * 0.8;
+        // (this.mainGrid.canvas.height * this.mainGrid.canvas.height) /
+        // this.containerHeight;
+      this.sliderY.style.height = newSliderYHeight + "px";
+      this.maxYTravel =
+        this.getAttInt(this.trackY, "height") - newSliderYHeight;
+    }
 
-      this.sliderY.style.top = (this.excel.shiftTopY/(this.containerHeight-this.mainGrid.canvas.height)) * this.maxYTravel +"px";
-      this.isScrollY = false;
+    this.sliderY.style.top =
+      (this.excel.shiftTopY /
+        (this.containerHeight - this.mainGrid.canvas.height)) *
+        this.maxYTravel +
+      "px";
+    this.isScrollY = false;
   }
 
   /**
