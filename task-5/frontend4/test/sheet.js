@@ -1,4 +1,5 @@
 import { GridConstants } from "../constant/index.js";
+import { Excel } from "./excel.js";
 import { GraphUtils } from "./graphUtils.js";
 import { GridTest2 } from "./grid-test-2.js";
 import { Scroll } from "./scroll.js";
@@ -6,6 +7,7 @@ import { Scroll } from "./scroll.js";
 export class Sheet {
   constructor(sheetIdx) {
     this.sheetIdx = sheetIdx;
+
     /**
      * Array of widths of each column
      * @type {number[]}
@@ -55,6 +57,8 @@ export class Sheet {
      * @type {number}
      */
     this.startX = 0;
+
+    this.endX = 640
 
     /**
      * Start row, col values for the cells to be selected in the format (row, col)

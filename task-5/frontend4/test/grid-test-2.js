@@ -302,7 +302,7 @@ export class GridTest2 {
 
     this.handleEvent.bind(this);
 
-    this.addMoreContent()
+    this.addMoreContent();
     this.fetchActualData(0, 100);
     // this.fetchDataAndPopulateGrid();
     this.drawIds();
@@ -419,7 +419,7 @@ export class GridTest2 {
     let col = 0;
     let x = 0;
     let y = 0;
-    console.log(this.columnWidths);
+    // console.log(this.columnWidths);
 
     for (let i = 0; i < this.numCols; i++) {
       x += this.columnWidths[i];
@@ -434,6 +434,8 @@ export class GridTest2 {
       this.resizeColIndex = col;
       this.startX = offsetX;
       this.columnCanvas.style.cursor = "col-resize";
+    }else if(col !== -1 && row !== -1){
+        this.isDragging = true
     }
   }
 
@@ -492,6 +494,10 @@ export class GridTest2 {
       this.isResizing = false;
       this.columnCanvas.style.cursor = "default";
     }
+    this.updateSelectedCol(col)
+    this.drawHeaders();
+    this.drawIds()
+    this.drawGrid()
   }
 
   /**
@@ -574,7 +580,7 @@ export class GridTest2 {
     if (this.selectedCells.length > 0) {
       for (let i = 0; i < this.selectedCells.length; i++) {
         if (parseInt(this.selectedCells[i][2]) !== NaN) {
-        //   console.log(parseInt(this.selectedCells[i][2]));
+          //   console.log(parseInt(this.selectedCells[i][2]));
           this.sum += parseInt(this.selectedCells[i][2]);
           this.count += 1;
           this.min = Math.min(this.min, parseInt(this.selectedCells[i][2]));
@@ -599,14 +605,14 @@ export class GridTest2 {
         this.cellsCol.push(i);
       }
     }
-    if (row === 0) {
-      this.updateSelectedCol(col);
-      this.drawGrid();
-    }
-    if (col === 0) {
-      this.updateSelectedRow(row);
-      this.drawGrid();
-    }
+    // if (row === 0) {
+    //   this.updateSelectedCol(col);
+    //   this.drawGrid();
+    // }
+    // if (col === 0) {
+    //   this.updateSelectedRow(row);
+    //   this.drawGrid();
+    // }
   }
 
   /**
@@ -658,7 +664,7 @@ export class GridTest2 {
       const cellHeight = this.rowHeights[row];
 
       //   console.log(cellX, cellY);
-        console.log(row, cellY);
+      console.log(row, col);
 
       // Position the input box
       this.cellInput.style.left = `${cellX + 50}px`;
@@ -666,6 +672,8 @@ export class GridTest2 {
       this.cellInput.style.width = `${cellWidth}px`;
       this.cellInput.style.height = `${cellHeight}px`;
       this.cellInput.style.display = "block";
+      this.cellInput.style.border = "none"
+      this.cellInput.style.backgroundColor = "transparent"
       this.cellInput.value =
         this.gridData[row - 1] && this.gridData[row - 1][col]
           ? this.gridData[row - 1][col]
@@ -711,16 +719,10 @@ export class GridTest2 {
       for (let col = 0; col < 14; col++) {
         const width = this.columnWidths[col];
         const text = this.gridCols[col] || "";
-        this.drawCell(
-          x,
-          this.cellY,
-          width,
-          this.cellHeight,
-          text
-        );
+        this.drawCell(x, this.cellY, width, this.cellHeight, text);
         x += width;
       }
-      this.cellY +=GridConstants.cellHeight;
+      this.cellY += GridConstants.cellHeight;
     }
   }
 
@@ -802,7 +804,7 @@ export class GridTest2 {
   }
 
   addMoreContent() {
-    let y =this.excel.rHeightPrefixSum[this.excel.rHeightPrefixSum.length - 1];
+    let y = this.excel.rHeightPrefixSum[this.excel.rHeightPrefixSum.length - 1];
     for (let row = this.sheet.startX; row <= this.sheet.maxRows; row++) {
       y += this.rowHeights[row] || this.cellHeight;
       this.excel.rHeightPrefixSum.push(y);
@@ -834,7 +836,8 @@ export class GridTest2 {
     }
     let y =
       this.excel.rHeightPrefixSum[this.sheet.startX] - this.excel.shiftTopY; // Start after the first row header
-    for (let row = this.sheet.startX; row <= this.sheet.maxRows; row++) {
+    // console.log(this.sheet.startX, this.sheet.endX);
+    for (let row = this.sheet.startX; row <= this.sheet.endX; row++) {
       this.ctx.beginPath();
       this.ctx.moveTo(0, y + 0.5);
       this.ctx.lineTo(this.canvas.width, y + 0.5);
@@ -848,17 +851,16 @@ export class GridTest2 {
     // Highlight selected cells
     this.highlightSelectedCells();
 
-
     const rowsToRender =
       this.filteredRows.length > 0 ? this.filteredRows : this.gridData;
     this.cellY =
       this.excel.rHeightPrefixSum[this.sheet.startX] - this.excel.shiftTopY;
     // console.log(this.cellY)
     this.drawFirstRow();
-     this.ctx.font = "normal 12px Arial";
-     this.ctx.fillStyle = "black";
-     this.ctx.textAlign = "left";
-     this.ctx.textBaseline = "right";
+    this.ctx.font = "normal 12px Arial";
+    this.ctx.fillStyle = "black";
+    this.ctx.textAlign = "left";
+    this.ctx.textBaseline = "right";
 
     rowsToRender.forEach((rowData, rowIndex) => {
       if (rowIndex >= this.sheet.startX) {
@@ -872,18 +874,22 @@ export class GridTest2 {
             this.ctx.beginPath();
             this.ctx.rect(
               cellX,
-              this.cellY ,
+              this.cellY,
               this.columnWidths[colIndex] - 10,
               this.rowHeights[rowIndex]
             );
             this.ctx.clip();
-            this.ctx.fillText(cellData, cellX + 5, this.cellY  + this.rowHeights[rowIndex] -5  ); // 5px padding
+            this.ctx.fillText(
+              cellData,
+              cellX + 5,
+              this.cellY + this.rowHeights[rowIndex] - 5
+            ); // 5px padding
             // console.log(cellData, cellX+5, cellY);
 
             this.ctx.restore();
           }
         });
-        this.cellY += this.rowHeights[rowIndex] ;
+        this.cellY += this.rowHeights[rowIndex];
       }
     });
   }
@@ -905,8 +911,8 @@ export class GridTest2 {
       this.ctx.fillStyle = "transparent";
       this.selectedCells.forEach((cell) => {
         const x = this.getColumnLeftPosition(cell[1]);
-        const y = (cell[0] * this.cellHeight) - this.excel.shiftTopY;
-        this.ctx.fillRect(x, y, this.columnWidths[cell[1]], this.cellHeight);
+        const y = cell[0] * this.cellHeight;
+        this.ctx.fillRect(x, y - this.excel.shiftTopY, this.columnWidths[cell[1]], this.cellHeight);
 
         this.drawIds();
         this.rowCountCtx.fillStyle = "rgb(0, 128, 0, 0.5)";
@@ -927,7 +933,12 @@ export class GridTest2 {
     this.selectedCells.slice(1).forEach((cell) => {
       const x = this.getColumnLeftPosition(cell[1]);
       const y = cell[0] * this.cellHeight;
-      this.ctx.fillRect(x, y - this.excel.shiftTopY, this.columnWidths[cell[1]], this.cellHeight);
+      this.ctx.fillRect(
+        x,
+        y - this.excel.shiftTopY,
+        this.columnWidths[cell[1]],
+        this.cellHeight
+      );
     });
 
     if (this.selectedCells.length > 0) {
@@ -946,12 +957,7 @@ export class GridTest2 {
       this.rowCountCtx.fillStyle = "rgb(0, 128, 0, 0.3)";
       this.rowCountCtx.strokeStyle = "rgba(0, 128, 0)";
       this.rowCountCtx.lineWidth = 5;
-      this.rowCountCtx.fillRect(
-        0,
-        this.yStart,
-        50,
-        this.yEnd - this.yStart
-      );
+      this.rowCountCtx.fillRect(0, this.yStart, 50, this.yEnd - this.yStart);
       this.rowCountCtx.beginPath();
       this.rowCountCtx.moveTo(50 + 0.5, this.yStart);
       this.rowCountCtx.lineTo(50 + 0.5, this.yEnd + 0.5);
@@ -1139,10 +1145,10 @@ export class GridTest2 {
   getRowFromY(y) {
     let totalHeight = 0;
     // console.log(y)
-    console.log(this.sheet.startX)
-    for (let i = this.sheet.startX; i < this.sheet.maxRows; i++) {
+    // console.log(this.sheet.startX);
+    for (let i = this.sheet.startX; i < this.sheet.endX; i++) {
       totalHeight += this.rowHeights[i] || this.cellHeight;
-      if (Math.ceil(y)  <= totalHeight) {
+      if (y <= totalHeight) {
         // console.log(i);
         return i;
       }
@@ -1285,6 +1291,8 @@ export class GridTest2 {
   updateSelectedCells(startCell, endCell) {
     const [startRow, startCol] = startCell;
     const [endRow, endCol] = endCell;
+    // console.log(startCell, endCell);
+    
     this.selectedCells = [];
 
     for (

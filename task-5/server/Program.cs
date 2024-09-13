@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
-using MySqlConnector;
 using RabbitMQ.Client;
 using server.BackgroundServices;
+using StackExchange.Redis;
 using server.Models;
 using server.Services;
 
@@ -32,6 +32,19 @@ builder.Services.AddSingleton<IConnectionFactory>(sp =>
 builder.Services.AddSingleton<LogService>();
 builder.Services.AddHostedService<RabbitMQConsumerService>();
 builder.Services.AddSignalR();
+var logger = builder.Services.BuildServiceProvider().GetService<ILogger<Program>>();
+var redis = ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("Redis"));
+builder.Services.AddSingleton<IConnectionMultiplexer>(redis);
+
+if(redis.IsConnected){
+    logger.LogInformation("Redis connected successfully");
+}else{
+    logger.LogError("Failed to connect");
+}
+// builder.Services.AddStackExchangeRedisCache(options=> {
+//     options.Configuration = builder.Configuration["RedisCacheOptions:Configuration"];
+//     options.InstanceName = builder.Configuration["RedisCacheOptions:InstanceName"];
+// });
 
 builder.Services.AddControllers();
 

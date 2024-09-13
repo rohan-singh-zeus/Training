@@ -223,7 +223,10 @@ export class Scroll {
     this.sheet.startX = Math.floor(
       this.excel.shiftTopY / GridConstants.cellHeight
     );
-    console.log(this.sheet.startX);
+    this.sheet.endX = Math.floor(
+        this.excel.shiftBottomY / GridConstants.cellHeight
+      )
+    // console.log(this.excel.shiftTopY, this.excel.shiftBottomY);
     this.mainGrid.drawIds();
     this.mainGrid.drawGrid();
   }

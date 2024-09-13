@@ -4,18 +4,20 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
+using Microsoft.Extensions.Caching.Distributed;
 using MySql.Data.MySqlClient;
 using Mysqlx.Crud;
-using Newtonsoft.Json;
 using NuGet.Protocol.Plugins;
 using RabbitMQ.Client;
 using server.Models;
 using server.Services;
+using StackExchange.Redis;
 
 namespace server.Controllers
 {
@@ -26,14 +28,49 @@ namespace server.Controllers
         private readonly TodoContext _context;
         private readonly IConfiguration _configuration;
         private readonly MySqlConnection connection;
-
         private readonly RabbitMQService _rabbitmqService;
-        public TodoItemsController(TodoContext context, IConfiguration configuration, RabbitMQService rabbitmqService)
+        private readonly IConnectionMultiplexer _redis;
+        // private readonly IDistributedCache _cache;
+        public TodoItemsController(TodoContext context, IConfiguration configuration, RabbitMQService rabbitmqService, IConnectionMultiplexer redis)
         {
             _context = context;
             _configuration = configuration;
             connection = new MySqlConnection(_configuration.GetConnectionString("DefaultConnection"));
             _rabbitmqService = rabbitmqService;
+            // _cache = cache;
+            _redis = redis;
+        }
+
+        [HttpGet("ping")]
+        public IActionResult PingRedis()
+        {
+            var db = _redis.GetDatabase();
+            var ping = db.Ping();
+            return Ok($"Redis responded in {ping.Milliseconds} ms.");
+        }
+
+        [HttpPost("kTest")]
+        public async Task<IActionResult> GetKeyRedis(List<Employee> employee)
+        {
+            var db = _redis.GetDatabase();
+            var cacheKey = "TEST_KEY_2";
+            var cacheStr = JsonSerializer.Serialize(employee);
+            var cacheData = Encoding.UTF8.GetBytes(cacheStr);
+            await db.StringSetAsync(cacheKey, cacheData);
+            return Ok("Saved to cache");
+        }
+
+        [HttpGet("gTest")]
+        public async Task<IActionResult> SetKeyRedis(){
+            var db = _redis.GetDatabase();
+            var cacheKey = "TEST_KEY_2";
+            string? cacheData = await db.StringGetAsync(cacheKey);
+            if(cacheData is null){
+                Console.WriteLine("Data not available");
+                return BadRequest("Something went wrong");
+            }
+            var finalData = JsonSerializer.Deserialize<List<Employee>>(cacheData);
+            return Ok(finalData);
         }
 
         private async Task EnsureConnectionOpenAsync()
@@ -79,6 +116,7 @@ namespace server.Controllers
             // return await _context.TodoItems.ToListAsync();
         }
 
+
         [HttpGet]
         [Route("/lazy/{from}/{to}")]
         public async Task<IActionResult> GetCsvRecordInChunks(long from, long to)
@@ -86,7 +124,7 @@ namespace server.Controllers
             var csvRecord = new List<EmployeeStr>();
 
             await EnsureConnectionOpenAsync();
-
+           
             using var command = new MySqlCommand("select * from employee limit @from, @to;", connection);
             command.Parameters.AddWithValue("@from", from);
             command.Parameters.AddWithValue("@to", to);
@@ -112,6 +150,55 @@ namespace server.Controllers
                 };
                 csvRecord.Add(item);
             }
+            return Ok(csvRecord);
+        }
+
+        [HttpGet]
+        [Route("/lazy_2/{from}/{to}")]
+        public async Task<IActionResult> GetCsvRecordInChunks_2(long from, long to)
+        {
+            var csvRecord = new List<EmployeeStr>();
+
+            await EnsureConnectionOpenAsync();
+            var db = _redis.GetDatabase();
+            var cacheKey = "LazyRecords";
+
+            string? cacheData = await db.StringGetAsync(cacheKey);
+
+            if(cacheData is not null){
+                List<EmployeeStr> cacheDSTR = JsonSerializer.Deserialize<List<EmployeeStr>>(cacheData);
+                Console.WriteLine("Cache Hit");
+                return Ok(cacheDSTR);
+            }
+            using var command = new MySqlCommand("select * from employee limit @from, @to;", connection);
+            command.Parameters.AddWithValue("@from", from);
+            command.Parameters.AddWithValue("@to", to);
+            using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                EmployeeStr item = new()
+                {
+                    Email = reader.GetString(0),
+                    Name = reader.GetString(1),
+                    Country = reader.GetString(2),
+                    State = reader.GetString(3),
+                    City = reader.GetString(4),
+                    Telephone = reader.GetString(5),
+                    Address_Line_1 = reader.GetString(6),
+                    Address_Line_2 = reader.GetString(7),
+                    DOB = reader.GetString(8),
+                    FY2019_20 = reader.GetString(9),
+                    FY2020_21 = reader.GetString(10),
+                    FY2021_22 = reader.GetString(11),
+                    FY2022_23 = reader.GetString(12),
+                    FY2023_24 = reader.GetString(13),
+                };
+                csvRecord.Add(item);
+            }
+            var toCache = JsonSerializer.Serialize(csvRecord);
+            var finalCacheData = Encoding.UTF8.GetBytes(toCache);
+            await db.StringSetAsync(cacheKey, finalCacheData);
+            Console.WriteLine("Cache Miss");
             return Ok(csvRecord);
         }
 
