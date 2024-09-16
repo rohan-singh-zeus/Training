@@ -117,7 +117,7 @@ export class Excel {
   updateContentArea() {
     const grid = document.querySelector(".grid");
     grid.innerHTML = "";
-    console.log(this.sheets[this.activeCurrentIdx - 1]);
+    // console.log(this.sheets[this.activeCurrentIdx - 1]);
     const activeSheet = this.sheets[this.activeCurrentIdx - 1].instance;
     grid.appendChild(activeSheet.excel);
   }

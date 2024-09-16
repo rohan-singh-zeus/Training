@@ -98,8 +98,8 @@ export class Scroll {
     // Get references to slider and track elements
     this.sliderY = document.getElementById("slider-y");
     this.trackY = document.getElementById("track-y");
-    this.sliderX = document.getElementById("slider-x");
-    this.trackX = document.getElementById("track-x");
+    // this.sliderX = document.getElementById("slider-x");
+    // this.trackX = document.getElementById("track-x");
 
     // Initialize scroll properties
     this.sliderPercentageY = null;
@@ -122,13 +122,17 @@ export class Scroll {
       this.handleMouseDownY.bind(this)
     );
     // Bind mouse events for horizontal scrolling
-    this.sliderX.addEventListener(
-      "mousedown",
-      this.handleMouseDownX.bind(this)
-    );
+    // this.sliderX.addEventListener(
+    //   "mousedown",
+    //   this.handleMouseDownX.bind(this)
+    // );
     // Bind global mouse events
     document.addEventListener("mouseup", this.handleMouseUp.bind(this));
     document.addEventListener("mousemove", this.handleMouseMove.bind(this));
+    this.mainGrid.canvas.addEventListener(
+      "wheel",
+      this.wheelMovement.bind(this)
+    );
   }
 
   /**
@@ -203,6 +207,30 @@ export class Scroll {
     }
   }
 
+  wheelMovement(ev) {
+    const { deltaX, deltaY } = ev;
+    this.yTravelled += deltaY * 0.2;
+    this.maxYTravel =
+      this.getAttInt(this.trackY, "height") -
+      this.getAttInt(this.sliderY, "height");
+    // this.maxYTravel = this.trackY.style.height - this.sliderY.style.height
+    console.log(this.yTravelled, this.maxYTravel);
+
+    if (this.yTravelled < 0) {
+      this.yTravelled = 0;
+      this.sliderY.style.top = "0px";
+      const newSliderYHeight = this.getAttInt(this.trackY, "height") * 0.6;
+      this.sliderY.style.height = newSliderYHeight + "px";
+      this.updateVerticalScroll(0);
+    } else if (this.yTravelled > 0.8 * this.maxYTravel) {
+      this.handleScrollBeyondBottom();
+    } else {
+      this.sliderY.style.top = `${this.yTravelled}px`;
+      this.sliderPercentageY = (this.yTravelled / this.maxYTravel) * 100;
+      this.updateVerticalScroll(this.sliderPercentageY);
+    }
+  }
+
   /**
    * Updates the vertical scroll position based on the given percentage.
    * @param {number} percentage - The percentage of the scrollbar's movement, used to calculate the new vertical scroll position.
@@ -224,8 +252,8 @@ export class Scroll {
       this.excel.shiftTopY / GridConstants.cellHeight
     );
     this.sheet.endX = Math.floor(
-        this.excel.shiftBottomY / GridConstants.cellHeight
-      )
+      this.excel.shiftBottomY / GridConstants.cellHeight
+    );
     // console.log(this.excel.shiftTopY, this.excel.shiftBottomY);
     this.mainGrid.drawIds();
     this.mainGrid.drawGrid();
@@ -244,6 +272,11 @@ export class Scroll {
       Math.floor(this.sheet.startX),
       Math.floor(this.sheet.startX) + 100
     );
+    // console.log(
+    //   Math.floor(this.sheet.startX),
+    //   Math.floor(this.sheet.startX) + 100, this.mainGrid.gridData
+    // );
+
     this.mainGrid.drawIds();
     //  this.fileOperations.getFile(this.dimension.rHeightPrefixSum.length - 21, this.dimension.rHeightPrefixSum.length - 1);
     this.containerHeight =
@@ -252,8 +285,8 @@ export class Scroll {
 
     if (this.getAttInt(this.sliderY, "height") > 40) {
       const newSliderYHeight = this.getAttInt(this.sliderY, "height") * 0.8;
-        // (this.mainGrid.canvas.height * this.mainGrid.canvas.height) /
-        // this.containerHeight;
+      // (this.mainGrid.canvas.height * this.mainGrid.canvas.height) /
+      // this.containerHeight;
       this.sliderY.style.height = newSliderYHeight + "px";
       this.maxYTravel =
         this.getAttInt(this.trackY, "height") - newSliderYHeight;

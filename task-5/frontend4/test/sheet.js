@@ -147,7 +147,7 @@ export class Sheet {
     this.excel.appendChild(gridMain);
     this.excel.appendChild(cellInput);
     this.excel.appendChild(trackY);
-    this.excel.appendChild(trackX);
+    // this.excel.appendChild(trackX);
 
     // grid.appendChild(excel);
     // console.log(this);

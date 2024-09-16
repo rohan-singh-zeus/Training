@@ -273,7 +273,7 @@ body .grid .excel > #track-y {
   position: absolute;
   z-index: 10001;
   right: 20px;
-  top: 0;
+  top: 30px;
   border-radius: 10px;
   width: 10px;
   background-color: #e7e7e7;

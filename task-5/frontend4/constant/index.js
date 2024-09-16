@@ -12,7 +12,7 @@ export const GridConstants = {
   /**
    * @type {number} --> Total number of Rows
    */
-  numRows: 70,
+  numRows: 100,
 
   /**
    * @type {number} --> Total number of Columns

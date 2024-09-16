@@ -231,6 +231,10 @@ export class GridTest2 {
     this.rowCountCanvas = document.getElementById(`gridIds-${sheetIdx}`);
     this.rowCountCtx = this.rowCountCanvas.getContext("2d");
 
+    this.colIdsData = [];
+
+    this.rowIdsData = [];
+
     /**
      * @type {HTMLCanvasElement}
      */
@@ -256,7 +260,7 @@ export class GridTest2 {
    */
   init() {
     ["pointerdown", "pointermove", "pointerup", "dblclick"].forEach((type) => {
-      this.canvas.addEventListener(type, this.handleEvent.bind(this));
+      document.addEventListener(type, this.handleEvent.bind(this));
     });
     document.addEventListener("keydown", this.handleEvent.bind(this));
     this.cellInput.addEventListener("blur", () => {
@@ -303,11 +307,11 @@ export class GridTest2 {
     this.handleEvent.bind(this);
 
     this.addMoreContent();
-    this.fetchActualData(0, 100);
+    this.fetchActualData(this.sheet.startX, this.sheet.startX + 100);
+    // this.drawGrid();
     // this.fetchDataAndPopulateGrid();
     this.drawIds();
     this.drawHeaders();
-    // this.drawGrid();
   }
 
   /**
@@ -359,9 +363,15 @@ export class GridTest2 {
     try {
       const res = await fetch(`https://localhost:7210/lazy/${from}/${to}`);
       const data = await res.json();
-      Object.keys(data[0]).forEach((d, i) => {
-        this.gridCols.push(d);
-      });
+      console.log(this.gridData.length);
+
+      //   this.gridData = []
+      //   console.log(this.gridData);
+      if (data[0]) {
+        Object.keys(data[0]).forEach((d, i) => {
+          this.gridCols.push(d);
+        });
+      }
       data.forEach((row, rowIndex) => {
         this.gridData[rowIndex] = Object.values(row);
         this.gridRows.push(rowIndex);
@@ -434,8 +444,8 @@ export class GridTest2 {
       this.resizeColIndex = col;
       this.startX = offsetX;
       this.columnCanvas.style.cursor = "col-resize";
-    }else if(col !== -1 && row !== -1){
-        this.isDragging = true
+    } else if (col !== -1 && row !== -1) {
+      this.isDragging = true;
     }
   }
 
@@ -494,10 +504,10 @@ export class GridTest2 {
       this.isResizing = false;
       this.columnCanvas.style.cursor = "default";
     }
-    this.updateSelectedCol(col)
+    this.updateSelectedCol(col);
     this.drawHeaders();
-    this.drawIds()
-    this.drawGrid()
+    this.drawIds();
+    this.drawGrid();
   }
 
   /**
@@ -664,7 +674,7 @@ export class GridTest2 {
       const cellHeight = this.rowHeights[row];
 
       //   console.log(cellX, cellY);
-      console.log(row, col);
+      //   console.log(row, col);
 
       // Position the input box
       this.cellInput.style.left = `${cellX + 50}px`;
@@ -672,8 +682,8 @@ export class GridTest2 {
       this.cellInput.style.width = `${cellWidth}px`;
       this.cellInput.style.height = `${cellHeight}px`;
       this.cellInput.style.display = "block";
-      this.cellInput.style.border = "none"
-      this.cellInput.style.backgroundColor = "transparent"
+      //   this.cellInput.style.border = "none"
+      //   this.cellInput.style.backgroundColor = "transparent"
       this.cellInput.value =
         this.gridData[row - 1] && this.gridData[row - 1][col]
           ? this.gridData[row - 1][col]
@@ -741,7 +751,7 @@ export class GridTest2 {
     // let start = this.rowHeights[this.sheet.startX];
     let start =
       this.excel.rHeightPrefixSum[this.sheet.startX] - this.excel.shiftTopY;
-    for (let i = this.sheet.startX; i < this.sheet.maxRows; i++) {
+    for (let i = this.sheet.startX; i < this.sheet.endX; i++) {
       this.rowCountCtx.save();
       this.rowCountCtx.beginPath();
       this.rowCountCtx.moveTo(0, start);
@@ -752,6 +762,7 @@ export class GridTest2 {
         this.cellHeight / 2,
         start - this.rowHeights[i] / 2
       );
+      this.colIdsData.push(i);
       this.rowCountCtx.stroke();
       this.rowCountCtx.restore();
     }
@@ -791,6 +802,7 @@ export class GridTest2 {
         start + this.columnWidths[i] / 2,
         this.cellHeight / 2
       );
+      this.rowIdsData.push(char);
       start += this.columnWidths[i];
       this.columnCtx.stroke();
       this.columnCtx.restore();
@@ -912,7 +924,12 @@ export class GridTest2 {
       this.selectedCells.forEach((cell) => {
         const x = this.getColumnLeftPosition(cell[1]);
         const y = cell[0] * this.cellHeight;
-        this.ctx.fillRect(x, y - this.excel.shiftTopY, this.columnWidths[cell[1]], this.cellHeight);
+        this.ctx.fillRect(
+          x,
+          y - this.excel.shiftTopY,
+          this.columnWidths[cell[1]],
+          this.cellHeight
+        );
 
         this.drawIds();
         this.rowCountCtx.fillStyle = "rgb(0, 128, 0, 0.5)";
@@ -1092,16 +1109,106 @@ export class GridTest2 {
 
   saveInputValueAndUpdate() {
     const { row, col } = this.currentCell;
+    console.log(row, col);
+
     const value = this.cellInput.value;
+    if (value.startsWith("=")) {
+      if (value.includes("SUM")) {
+        this.handleSumQuery(row, col, value);
+      } else if (value.includes("AVG")) {
+        this.handleAverageQuery(row, col, value);
+      } else {
+        alert("Invalid query");
+      }
+    }
+    if (value.includes("+") || value.includes("-") || value.includes("*") || value.includes("/")) {
+    
+      this.gridData[row][col] = eval(value);
+      this.cellInput.style.display = "none";
+      this.drawGrid();
+      return;
+    }
     if (!this.gridData[row - 1]) {
       this.gridData[row - 1] = [];
     }
     this.gridData[row - 1][col] = value;
+
     this.addToDict(row, col);
     this.updateCellsCall();
     this.customDict.clear();
     this.cellInput.style.display = "none";
     this.drawGrid();
+  }
+
+//   handleQuery(){
+//     let val = 0
+//     if (this.cellInput.value.includes("SUM")) {
+//         val = this.handleSumQuery(this.cellInput.value);
+//       } else if (this.cellInput.value.includes("AVG")) {
+//         val = this.handleAverageQuery(this.cellInput.value);
+//       } else {
+//         alert("Invalid query");
+//         val = ""
+//       }
+//       return val.toString()
+//   }
+
+  handleSumQuery(row, col,value) {
+    console.log(value.split(""));
+    
+    
+    // let rowColVal = value.match(/([A-Z]+[0-9]+)/g);
+    // let startRow,
+    //   startCol,
+    //   endRow,
+    //   endCol = 0;
+    // startCol = rowColVal[0].split("")[0].charCodeAt(0) - 65;
+    // startRow = parseInt(rowColVal[0].split("")[1]);
+    // endCol = rowColVal[1].split("")[0].charCodeAt(0) - 65;
+    // endRow = parseInt(rowColVal[1].split("")[1]);
+    // console.log(startRow, startCol, endRow, endCol);
+
+    // let s = 0;
+    // for (let r = startRow; r <= endRow; r++) {
+    //   for (let c = startCol; c <= endCol; c++) {
+    //     if (!Number.isNaN(parseInt(this.gridData[r - 1][c]))) {
+    //       s += parseInt(this.gridData[r - 1][c]);
+    //     }
+    //   }
+    // }
+    // this.gridData[row][col] = s;
+    // this.cellInput.style.display = "none";
+    // this.drawGrid();
+    return;
+  }
+
+  handleAverageQuery(row, col, value) {
+    let rowColVal = value.match(/([A-Z]+[0-9]+)/g);
+    let startRow,
+      startCol,
+      endRow,
+      endCol = 0;
+    startCol = rowColVal[0].split("")[0].charCodeAt(0) - 65;
+    startRow = parseInt(rowColVal[0].split("")[1]);
+    endCol = rowColVal[1].split("")[0].charCodeAt(0) - 65;
+    endRow = parseInt(rowColVal[1].split("")[1]);
+    console.log(startRow, startCol, endRow, endCol);
+
+    let a = 0;
+    let i = 0;
+    for (let r = startRow; r <= endRow; r++) {
+      for (let c = startCol; c <= endCol; c++) {
+        if (!Number.isNaN(parseInt(this.gridData[r - 1][c]))) {
+          i++;
+          a += parseInt(this.gridData[r - 1][c]);
+        }
+      }
+    }
+    // return a / i;
+    this.gridData[row][col] = a / i;
+    this.cellInput.style.display = "none";
+    this.drawGrid();
+    return;
   }
 
   /**
@@ -1292,7 +1399,7 @@ export class GridTest2 {
     const [startRow, startCol] = startCell;
     const [endRow, endCol] = endCell;
     // console.log(startCell, endCell);
-    
+
     this.selectedCells = [];
 
     for (
